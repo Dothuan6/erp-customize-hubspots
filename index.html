@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HarnexAI CRM — Mockup giao diện theo HubSpot</title>
+<meta name="description" content="Mockup giao diện CRM HarnexAI theo phong cách HubSpot: danh sách giao dịch và trang chi tiết giao dịch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<style>
+:root{
+  --surface:#FFFFFF; --surface-variant:#F7F7F7; --surface-2:#F0F0F0;
+  --on-surface:#333333; --on-surface-variant:#666666;
+  --primary:#00494B; --on-primary:#FFFFFF; --primary-container:#E0F0EF; --on-primary-container:#00494B; --link:#006162;
+  --outline:#CCCCCC; --outline-variant:#E3E3E3;
+  --shell:#333333; --shell-fg:#F5F5F5; --shell-muted:#B3B3B3;
+  --radius-md:8px; --radius-lg:12px; --radius-xl:16px; --radius-pill:999px;
+  --font-sans:'Inter','Be Vietnam Pro',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){ :root{
+  --surface:#202124; --surface-variant:#292A2D; --surface-2:#35363A;
+  --on-surface:#E8EAED; --on-surface-variant:#9AA0A6;
+  --primary:#5CC2C0; --on-primary:#0B2A2A; --primary-container:#123C3C; --on-primary-container:#BFE8E6; --link:#7AD3D1;
+  --outline:#5F6368; --outline-variant:#3C4043; --shell:#171717;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--shell);color:var(--on-surface);line-height:1.55;min-height:100vh;
+  -webkit-font-smoothing:antialiased;padding:8px}
+a{color:inherit;text-decoration:none}
+.ms{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;font-size:20px;line-height:1;display:inline-block;
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;flex:none}
+header{display:flex;align-items:center;gap:10px;padding:10px 12px 14px;color:var(--shell-fg)}
+.mark{width:30px;height:30px;border-radius:var(--radius-md);background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:700}
+header .sub{margin-left:auto;font-size:12px;color:var(--shell-muted)}
+main{background:var(--surface);border-radius:var(--radius-xl);padding:24px 16px 32px;min-height:calc(100vh - 80px)}
+.wrap{max-width:1080px;margin:0 auto}
+h1{font-size:24px;font-weight:700;line-height:1.3}
+.lead{color:var(--on-surface-variant);margin-top:6px;max-width:720px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:24px}
+@media(min-width:760px){ main{padding:32px} .grid{grid-template-columns:1fr 1fr} h1{font-size:28px} }
+.card{display:flex;flex-direction:column;border:1px solid var(--outline-variant);border-radius:var(--radius-lg);overflow:hidden;
+  background:var(--surface);transition:border-color .1s,transform .2s}
+.card:hover{border-color:var(--primary);transform:translateY(-2px)}
+.card:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.prev{height:180px;background:var(--surface-2);padding:14px;display:flex;gap:8px;border-bottom:1px solid var(--outline-variant)}
+.pv-side{width:44px;border-radius:6px;background:var(--shell)}
+.pv-main{flex:1;border-radius:8px;background:var(--surface);padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.bar{height:8px;border-radius:4px;background:var(--outline-variant)}
+.bar.t{width:40%;height:10px;background:var(--on-surface-variant);opacity:.5}
+.cols{flex:1;display:flex;gap:6px}
+.cols div{flex:1;border-radius:6px;background:var(--surface-variant);border:1px solid var(--outline-variant);display:flex;flex-direction:column;gap:5px;padding:5px}
+.cols i{display:block;height:18px;border-radius:4px;background:var(--surface);border:1px solid var(--outline-variant)}
+.cols i.h{height:6px;border:none;background:var(--primary-container)}
+.three{flex:1;display:grid;grid-template-columns:1fr 2fr 1fr;gap:6px}
+.three div{border-radius:6px;background:var(--surface-variant);border:1px solid var(--outline-variant)}
+.three .mid{background:linear-gradient(var(--primary) 0 6px,var(--surface-variant) 6px)}
+.body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.body h2{font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
+.body p{font-size:14px;color:var(--on-surface-variant)}
+.body ul{font-size:13px;color:var(--on-surface-variant);padding-left:18px}
+.go{margin-top:auto;display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--link);padding-top:6px}
+.note{margin-top:28px;display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:760px){ .note{grid-template-columns:repeat(3,1fr)} }
+.note div{border:1px solid var(--outline-variant);border-radius:var(--radius-lg);padding:14px;font-size:13px;color:var(--on-surface-variant)}
+.note b{display:flex;align-items:center;gap:6px;color:var(--on-surface);font-size:14px;margin-bottom:4px}
+footer{margin-top:28px;font-size:12px;color:var(--on-surface-variant)}
+</style>
+</head>
+<body>
+<header>
+  <span class="mark">H</span><strong>HarnexAI CRM</strong>
+  <span class="sub">Mockup giao diện · cập nhật 23/09/2026</span>
+</header>
+<main>
+  <div class="wrap">
+    <h1>Mockup giao diện CRM theo phong cách HubSpot</h1>
+    <p class="lead">Hai màn Sales dựng trên design system của HarnexAI, bố cục và luồng thao tác theo HubSpot để người dùng quen HubSpot chuyển sang không phải học lại. Dữ liệu trong mockup là dữ liệu mẫu.</p>
+
+    <div class="grid">
+      <a class="card" href="crm-giao-dich-hubspot.html">
+        <div class="prev" aria-hidden="true"><div class="pv-side"></div><div class="pv-main"><div class="bar t"></div><div class="bar" style="width:70%"></div>
+          <div class="cols"><div><i class="h"></i><i></i><i></i></div><div><i class="h"></i><i></i><i></i><i></i></div><div><i class="h"></i><i></i></div><div><i class="h"></i><i></i></div></div></div></div>
+        <div class="body">
+          <h2><span class="ms">view_kanban</span>Danh sách giao dịch</h2>
+          <p>Board theo giai đoạn pipeline và bảng dữ liệu, cùng view đã lưu và bộ lọc nhanh như HubSpot.</p>
+          <ul><li>Kéo thả thẻ đổi giai đoạn, tổng giá trị và giá trị có trọng số theo cột</li><li>Chuyển board ↔ bảng, chọn nhiều dòng để thao tác hàng loạt</li><li>Panel xem nhanh bên phải</li></ul>
+          <span class="go">Mở màn danh sách <span class="ms">arrow_forward</span></span>
+        </div>
+      </a>
+      <a class="card" href="crm-deal-chi-tiet-hubspot.html?id=8">
+        <div class="prev" aria-hidden="true"><div class="pv-side"></div><div class="pv-main"><div class="bar t"></div>
+          <div class="three"><div></div><div class="mid"></div><div></div></div></div></div>
+        <div class="body">
+          <h2><span class="ms">handshake</span>Chi tiết giao dịch</h2>
+          <p>Trang bản ghi 3 cột: thuộc tính bên trái, dòng thời gian hoạt động ở giữa, liên kết bên phải.</p>
+          <ul><li>Sửa thuộc tính tại chỗ, đổi giai đoạn bằng thanh tiến độ</li><li>Ghi nhận ghi chú, cuộc gọi, email, việc, lịch hẹn</li><li>Liên hệ, công ty, báo giá, thanh toán, workflow đang chạy</li></ul>
+          <span class="go">Mở màn chi tiết <span class="ms">arrow_forward</span></span>
+        </div>
+      </a>
+    </div>
+
+    <div class="note">
+      <div><b><span class="ms">palette</span>Đổi giao diện</b>Trong mỗi màn, bấm nút “⚙ Giao diện” góc trái dưới để so sánh tông HubSpot với giao diện HarnexAI gốc, hoặc bật chế độ tối.</div>
+      <div><b><span class="ms">link</span>Hai màn liên kết với nhau</b>Bấm tên giao dịch trên board hoặc bảng để sang trang chi tiết; “‹ Giao dịch” ở trang chi tiết để quay lại.</div>
+      <div><b><span class="ms">devices</span>Responsive</b>Dùng được trên desktop, tablet và điện thoại. Dưới 905px, thanh điều hướng thu vào nút menu.</div>
+    </div>
+    <footer>Mockup phục vụ trao đổi thiết kế, chưa kết nối dữ liệu thật. Mọi thay đổi trong mockup mất khi tải lại trang.</footer>
+  </div>
+</main>
+</body>
+</html>

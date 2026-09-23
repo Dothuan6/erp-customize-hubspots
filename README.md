@@ -1,13 +1,13 @@
 # erp-customize-hubspots
 
-Mockup giao diện CRM HarnexAI theo phong cách HubSpot (Sales).
+Mockup collection **Deals_Pipeline** của HarnexAI ERP: chức năng giữ đúng như ERP, giao diện/UX theo HubSpot.
 
-| Trang | File |
+| File | Nội dung |
 | --- | --- |
-| Trang chủ | `index.html` |
-| Danh sách giao dịch (board + bảng) | `crm-giao-dich-hubspot.html` |
-| Chi tiết giao dịch (3 cột) | `crm-deal-chi-tiet-hubspot.html` |
+| `index.html` | Trang chủ, link tới 2 màn |
+| `crm-giao-dich-hubspot.html` | Danh sách bản ghi (Bảng / Kanban / view / bộ lọc / import-export) |
+| `crm-deal-chi-tiet-hubspot.html` | Trang chi tiết bản ghi (`?id=r013`) |
+| `crm-shared.css`, `crm-shared.js` | Token theme, schema 17 trường, dữ liệu mẫu, panel, hộp thoại dùng chung |
+| `DOI-CHIEU-CHUC-NANG.md` | Bảng đối chiếu chức năng ERP ↔ mockup |
 
-Site tĩnh, không cần build. Deploy Netlify: publish directory = `.` (gốc repo), build command để trống.
-
-Dữ liệu trong mockup là dữ liệu mẫu.
+Site tĩnh, không cần build. Netlify: publish directory = `.`, build command để trống.

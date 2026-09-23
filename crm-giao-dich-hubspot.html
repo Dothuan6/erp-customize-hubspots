@@ -3,565 +3,396 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Giao dịch — CRM theme (mockup HubSpot-style)</title>
+<title>Deals_Pipeline — HarnexAI CRM (mockup)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link rel="stylesheet" href="crm-shared.css">
 <style>
-/* ═══════════════════════════════════════════════════════════
-   Mockup màn "Giao dịch" (Deals index) — theme CRM kiểu HubSpot
-   Dựng trên token của DESIGN-SYSTEM.md v3.3. Theme mới chỉ là một bộ
-   giá trị token khác: [data-brand="crm"]. Bỏ attribute = giao diện
-   HarnexAI gốc. Không có class trang trí riêng cho HubSpot.
-   Đối chiếu: plan §3–§5, số đo HubSpot ngày 23/09/2026.
-   ═══════════════════════════════════════════════════════════ */
-:root{
-  --surface:#FFFFFF; --surface-variant:#F8F9FA; --surface-2:#F1F3F4;
-  --on-surface:#202124; --on-surface-variant:#5F6368;
-  --primary:#1A73E8; --on-primary:#FFFFFF; --primary-container:#E8F0FE; --on-primary-container:#1F4E9E;
-  --outline:#DADCE0; --outline-variant:#E8EAED;
-  --success:#1E8E3E; --success-container:#E6F4EA;
-  --warning:#B06000; --warning-container:#FEF7E0;
-  --error:#D93025;   --error-container:#FCE8E6;
-  --radius-sm:4px; --radius-md:8px; --radius-lg:12px; --radius-pill:999px;
-  --shadow-2:0 2px 6px rgba(0,0,0,.08); --shadow-3:0 8px 24px rgba(0,0,0,.12);
-  --dur:200ms; --ease-enter:cubic-bezier(.2,0,0,1);
-  --font-sans:'Inter','Be Vietnam Pro',system-ui,sans-serif;
-  /* Tầng shell — mặc định HarnexAI: shell sáng, nội dung phẳng */
-  --shell-bg:var(--surface); --shell-fg:var(--on-surface); --shell-fg-muted:var(--on-surface-variant);
-  --shell-hover:var(--surface-2); --shell-active-bg:var(--primary-container); --shell-active-fg:var(--on-primary-container);
-  --shell-line:var(--outline-variant); --shell-search:var(--surface-variant);
-  --canvas:var(--surface); --frame-gap:0px; --frame-radius:0px;
-  --btn-radius:var(--radius-md); --row-h:40px;
-}
-/* ── Theme CRM (HubSpot-style) — token mới đề xuất, xem plan §5 bảng lệch DS ── */
-html[data-brand="crm"]{
-  --primary:#00494B; --on-primary:#FFFFFF; --primary-container:#E0F0EF; --on-primary-container:#00494B;
-  --link:#006162;
-  --on-surface:#333333; --on-surface-variant:#666666; --outline:#CCCCCC; --outline-variant:#E3E3E3;
-  --shell-bg:#333333; --shell-fg:#F5F5F5; --shell-fg-muted:#B3B3B3;
-  --shell-hover:#444444; --shell-active-bg:#4D4D4D; --shell-active-fg:#FFFFFF;
-  --shell-line:#474747; --shell-search:#262626;
-  --canvas:#333333; --frame-gap:8px; --frame-radius:16px;
-  --btn-radius:var(--radius-pill);
-}
-@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
-  --surface:#202124; --surface-variant:#292A2D; --surface-2:#35363A;
-  --on-surface:#E8EAED; --on-surface-variant:#9AA0A6;
-  --primary:#8AB4F8; --on-primary:#202124; --primary-container:#1F3D6B; --on-primary-container:#D2E3FC;
-  --outline:#5F6368; --outline-variant:#3C4043;
-  --success:#81C995; --success-container:#1E3A28; --warning:#FDD663; --warning-container:#3E3016;
-  --error:#F28B82; --error-container:#4A1F1B;
-}}
-:root[data-theme="dark"]{
-  --surface:#202124; --surface-variant:#292A2D; --surface-2:#35363A;
-  --on-surface:#E8EAED; --on-surface-variant:#9AA0A6;
-  --primary:#8AB4F8; --on-primary:#202124; --primary-container:#1F3D6B; --on-primary-container:#D2E3FC;
-  --outline:#5F6368; --outline-variant:#3C4043;
-  --success:#81C995; --success-container:#1E3A28; --warning:#FDD663; --warning-container:#3E3016;
-  --error:#F28B82; --error-container:#4A1F1B;
-}
-@media (prefers-color-scheme:dark){ html[data-brand="crm"]:not([data-theme="light"]){
-  --primary:#5CC2C0; --on-primary:#0B2A2A; --primary-container:#123C3C; --on-primary-container:#BFE8E6; --link:#7AD3D1;
-  --shell-bg:#171717; --shell-hover:#2A2A2A; --shell-active-bg:#303030; --shell-line:#2E2E2E; --shell-search:#0F0F0F; --canvas:#171717;
-}}
-html[data-brand="crm"][data-theme="dark"]{
-  --primary:#5CC2C0; --on-primary:#0B2A2A; --primary-container:#123C3C; --on-primary-container:#BFE8E6; --link:#7AD3D1;
-  --shell-bg:#171717; --shell-hover:#2A2A2A; --shell-active-bg:#303030; --shell-line:#2E2E2E; --shell-search:#0F0F0F; --canvas:#171717;
-}
-
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
-body{font-family:var(--font-sans);background:var(--canvas);color:var(--on-surface);
-  font-size:14px;line-height:1.5;overflow:hidden;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
-.ms{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;font-size:20px;line-height:1;
-  display:inline-block;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;user-select:none;flex:none}
-.ms.sm{font-size:18px}
-button,input,select{font:inherit;color:inherit}
-button{background:none;border:none;cursor:pointer}
-a{color:inherit;text-decoration:none}
-:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-
-/* ── Khung: mobile-first. <905 sidebar là drawer; 905–1239 rail 72px; ≥1240 236px ── */
-.app{display:grid;grid-template-columns:1fr;grid-template-rows:56px 1fr;height:100vh;overflow:hidden}
-.topbar{grid-column:1/-1;min-width:0;overflow:hidden;display:flex;align-items:center;gap:8px;padding:0 12px;
-  background:var(--shell-bg);color:var(--shell-fg);border-bottom:1px solid var(--shell-line)}
-.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;min-width:0}
-.brand-mark{width:28px;height:28px;border-radius:var(--radius-md);background:var(--primary);color:var(--on-primary);
-  display:grid;place-items:center;font-size:13px;font-weight:700}
-.tb-search{display:none;align-items:center;gap:8px;flex:1;max-width:440px;height:34px;padding:0 12px;margin-left:16px;
-  background:var(--shell-search);border:1px solid var(--shell-line);border-radius:var(--btn-radius);color:var(--shell-fg-muted)}
-.tb-search input{flex:1;background:none;border:none;outline:none;color:var(--shell-fg);min-width:0}
-.tb-search input::placeholder{color:var(--shell-fg-muted)}
-.kbd{font-size:11px;padding:1px 6px;border:1px solid var(--shell-line);border-radius:var(--radius-sm)}
-.tb-ai{display:none;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:var(--btn-radius);color:var(--shell-fg)}
-.tb-ai:hover,.icon-btn:hover{background:var(--shell-hover)}
-.tb-right{display:flex;align-items:center;gap:4px;margin-left:auto}
-.icon-btn{width:34px;height:34px;display:grid;place-items:center;border-radius:var(--btn-radius);color:var(--shell-fg);position:relative;overflow:hidden}
-.dot-badge{position:absolute;top:5px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--error);border:2px solid var(--shell-bg)}
-.avatar{width:30px;height:30px;border-radius:var(--radius-pill);background:var(--primary-container);color:var(--on-primary-container);
-  display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
-.avatar.xs{width:22px;height:22px;font-size:10px}
-
-.sidebar{position:fixed;inset:56px auto 0 0;width:min(276px,84vw);z-index:950;display:flex;flex-direction:column;
-  gap:2px;padding:12px 8px;overflow-y:auto;background:var(--shell-bg);color:var(--shell-fg);
-  transform:translateX(-100%);transition:transform var(--dur) var(--ease-enter)}
-body.nav-open .sidebar{transform:none}
-.scrim{position:fixed;inset:0;z-index:940;background:rgba(0,0,0,.45);display:none}
-body.nav-open .scrim,body.drawer-open .scrim{display:block}
-.nav-group{display:flex;align-items:center;gap:6px;height:28px;padding:0 10px;margin-top:10px;
-  font-size:12px;color:var(--shell-fg-muted);width:100%}
-.nav-group .ms{font-size:16px}
-.nav-i{display:flex;align-items:center;gap:10px;height:34px;padding:0 10px;border-radius:var(--radius-md);
-  color:var(--shell-fg);font-size:14px;white-space:nowrap}
-.nav-i:hover{background:var(--shell-hover)}
-.nav-i[aria-current="page"]{background:var(--shell-active-bg);color:var(--shell-active-fg);font-weight:600}
-.nav-i .tag{margin-left:auto;font-size:11px;padding:0 6px;border-radius:var(--radius-pill);border:1px solid var(--shell-line);color:var(--shell-fg-muted)}
-.nav-sep{height:1px;background:var(--shell-line);margin:6px 10px}
-
-.main{min-width:0;min-height:0;padding:var(--frame-gap);padding-top:var(--frame-gap)}
-.frame{height:100%;min-width:0;display:flex;flex-direction:column;min-height:0;background:var(--surface);
-  border-radius:var(--frame-radius);overflow:hidden}
-
-@media(min-width:600px){ .tb-search{display:flex} .tb-ai{display:inline-flex} }
-@media(min-width:905px){
-  .app{grid-template-columns:72px 1fr}
-  .navbtn{display:none}
-  .sidebar{position:static;transform:none;width:auto;grid-row:2;padding:12px 8px;z-index:auto}
-  .sidebar .lbl,.sidebar .tag,.nav-group span:not(.ms){display:none}
-  .nav-i{justify-content:center;padding:0}
-  .nav-group{justify-content:center;padding:0}
-  body.nav-open .scrim{display:none}
-}
-@media(min-width:1240px){
-  .app{grid-template-columns:236px 1fr}
-  .sidebar .lbl,.sidebar .tag,.nav-group span:not(.ms){display:inline}
-  .nav-i{justify-content:flex-start;padding:0 10px}
-  .nav-group{justify-content:flex-start;padding:0 10px}
-}
-
-/* ── Nút (component Button §8.2 — chỉ đổi radius qua token) ── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 14px;
-  border-radius:var(--btn-radius);font-size:13px;font-weight:600;white-space:nowrap;
-  transition:background var(--dur),opacity var(--dur)}
-.btn--primary{background:var(--primary);color:var(--on-primary)}
-.btn--primary:hover{opacity:.9}
-.btn--secondary{background:var(--surface);border:1px solid var(--outline);color:var(--on-surface)}
-.btn--secondary:hover,.btn--text:hover{background:var(--surface-2)}
-.btn--text{height:30px;padding:0 8px;font-weight:600;color:var(--on-surface)}
-.btn--icon{width:32px;padding:0;overflow:hidden}
-.btn[aria-pressed="true"]{background:var(--surface-2);border-color:var(--on-surface-variant)}
-
-/* ── Header trang ── */
+/* ═══ Màn danh sách bản ghi collection Deals_Pipeline ═══
+   Chức năng: đúng màn /data/:id/records của ERP. Bố cục: index page HubSpot. */
+.frame{position:relative}
 .ph{display:flex;align-items:center;gap:8px;padding:16px 16px 0;flex-wrap:wrap}
-.ph h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:2px}
-.ph .count{font-size:13px;color:var(--on-surface-variant);margin-left:4px}
-.ph-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
-.menu{position:relative}
-.menu-pop{position:absolute;right:0;top:36px;min-width:210px;background:var(--surface);border:1px solid var(--outline-variant);
-  border-radius:var(--radius-md);box-shadow:var(--shadow-2);padding:6px;z-index:30;display:none}
-.menu.open .menu-pop{display:block}
-.menu-pop button{display:flex;align-items:center;gap:10px;width:100%;height:34px;padding:0 10px;border-radius:var(--radius-sm);text-align:left}
-.menu-pop button:hover{background:var(--surface-2)}
+.ph h1{font-size:22px;font-weight:700}
+.ph .count{font-size:13px;color:var(--on-surface-variant)}
+.ph-act{margin-left:auto;display:flex;gap:8px;align-items:center;position:relative}
+.ph-act .hide-sm{display:none}
+@media(min-width:600px){.ph-act .hide-sm{display:inline-flex}}
 
-/* ── View tabs (component mới ViewTabs) ── */
-.vtabs{display:flex;align-items:flex-end;gap:4px;padding:10px 16px 0;border-bottom:1px solid var(--outline-variant);overflow-x:auto}
-.vtab{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;font-weight:600;color:var(--on-surface-variant);
-  border-bottom:2px solid transparent;white-space:nowrap;border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+.vtabs{display:flex;align-items:flex-end;gap:2px;padding:8px 16px 0;border-bottom:1px solid var(--outline-variant);overflow-x:auto;position:relative}
+.vtab{display:flex;align-items:center;gap:6px;height:36px;padding:0 10px;font-weight:600;color:var(--on-surface-variant);white-space:nowrap;
+  border-bottom:2px solid transparent;border-radius:var(--radius-sm) var(--radius-sm) 0 0}
 .vtab:hover{background:var(--surface-variant)}
 .vtab[aria-selected="true"]{color:var(--on-surface);border-bottom-color:var(--primary);background:var(--surface-variant)}
+.vtab .va{display:none;gap:0}
+.vtab:hover .va,.vtab[aria-selected="true"] .va{display:inline-flex}
+.vtab .va span{width:22px;height:22px;display:grid;place-items:center;border-radius:var(--radius-sm);color:var(--on-surface-variant)}
+.vtab .va span:hover{background:var(--surface-2);color:var(--on-surface)}
+.vform{display:flex;flex-direction:column;gap:10px;padding:8px}
+.vform label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600}
+.vform input,.vform select{height:32px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 8px;background:var(--surface);font-weight:400}
+.vform .row{display:flex;justify-content:flex-end;gap:6px}
 
-/* ── Toolbar + filter chip ── */
-.tools{display:flex;align-items:center;gap:8px;padding:12px 16px 0;flex-wrap:wrap}
-.search{display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;width:200px;border:1px solid var(--outline);
-  border-radius:var(--btn-radius);color:var(--on-surface-variant)}
+.tools{display:flex;align-items:center;gap:8px;padding:10px 16px 0;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;width:240px;max-width:100%;border:1px solid var(--outline);border-radius:var(--btn-radius);color:var(--on-surface-variant)}
 .search input{border:none;outline:none;background:none;flex:1;min-width:0;color:var(--on-surface)}
-.tools-right{margin-left:auto;display:flex;gap:6px;align-items:center}
-.select{height:32px;padding:0 10px;border:1px solid var(--outline);border-radius:var(--btn-radius);background:var(--surface);font-size:13px;font-weight:600}
 .seg{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden}
-.seg button{overflow:hidden;width:34px;height:30px;display:grid;place-items:center;color:var(--on-surface-variant)}
+.seg button{height:30px;padding:0 10px;display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--on-surface-variant)}
 .seg button[aria-pressed="true"]{background:var(--primary-container);color:var(--on-primary-container)}
-.qf{display:flex;align-items:center;gap:2px;padding:6px 16px 8px;overflow-x:auto;border-bottom:1px solid var(--outline-variant)}
-.qf .btn--text{font-size:12px;white-space:nowrap}
-.qf .vsep{width:1px;height:20px;background:var(--outline-variant);margin:0 6px;flex:none}
-.chip-on{background:var(--primary-container)!important;color:var(--on-primary-container)!important}
+.tools-r{margin-left:auto;display:flex;gap:6px;align-items:center}
+.grpsel{height:32px;border:1px solid var(--outline);border-radius:var(--btn-radius);padding:0 10px;background:var(--surface);font-size:13px;font-weight:600}
 
-/* ── Vùng nội dung ── */
-.body{flex:1;min-height:0;position:relative;overflow:hidden}
-.view{position:absolute;inset:0;display:none}
-.view.on{display:flex}
+.fbar{display:flex;align-items:center;gap:6px;padding:8px 16px;border-bottom:1px solid var(--outline-variant);flex-wrap:wrap;position:relative}
+.fbar .lb{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--on-surface-variant)}
+.fchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 4px 0 10px;border-radius:var(--radius-pill);background:var(--primary-container);color:var(--on-primary-container);font-size:12px}
+.fchip b{font-weight:700}
+.fchip button{width:20px;height:20px;border-radius:50%;display:grid;place-items:center}
+.fchip button:hover{background:rgba(0,0,0,.08)}
+.fadd{height:28px;padding:0 10px;border:1px dashed var(--outline);border-radius:var(--radius-pill);font-size:12px;font-weight:600;color:var(--on-surface-variant)}
+.fclear{margin-left:auto;font-size:12px;font-weight:600;color:var(--link)}
+.fbuilder{display:flex;flex-direction:column;gap:8px;padding:10px;min-width:280px}
+.fbuilder select,.fbuilder input{height:32px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 8px;background:var(--surface)}
+.fbuilder .row{display:flex;justify-content:flex-end;gap:6px}
 
-/* Board (KanbanBoard §8.30 mở rộng: tổng tiền theo cột + kéo thả) */
-.board{gap:12px;padding:12px 16px;overflow-x:auto;overflow-y:hidden;align-items:stretch}
-.col{flex:none;width:82vw;max-width:290px;display:flex;flex-direction:column;min-height:0;
-  background:var(--surface-variant);border-radius:var(--radius-lg);border:1px solid var(--outline-variant)}
-@media(min-width:600px){.col{width:272px}}
-.col-h{padding:10px 12px 8px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--outline-variant)}
-.col-h .row{display:flex;align-items:center;gap:6px}
-.stage{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:var(--radius-pill);
-  font-size:12px;font-weight:600;background:var(--primary-container);color:var(--on-primary-container);max-width:200px}
-.stage .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.stage.won{background:var(--success-container);color:var(--success)}
-.stage.lost{background:var(--error-container);color:var(--error)}
-.col-h .n{font-size:12px;color:var(--on-surface-variant);font-weight:600}
-.col-h .sum{font-size:12px;color:var(--on-surface-variant)}
-.col-h .sum b{color:var(--on-surface);font-weight:600}
-.cards{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px;min-height:60px}
-.cards.drop{background:var(--primary-container)}
-.card{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:10px 12px;
-  display:flex;flex-direction:column;gap:6px;cursor:grab}
-.card:hover{border-color:var(--outline)}
-.card.dragging{opacity:.5}
-.card .name{font-weight:600;color:var(--link,var(--primary));text-align:left;line-height:1.35}
-.card .name:hover{text-decoration:underline}
-.meta{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--on-surface-variant)}
-.meta b{color:var(--on-surface);font-weight:600}
-.card-f{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--on-surface-variant)}
-.card-f .avatar{margin-left:auto}
-.mi{display:flex;align-items:center;gap:6px;min-width:0}.mi .ms{font-size:16px;color:var(--on-surface-variant)}
-.ctn{color:var(--link,var(--primary));font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.qi{width:26px;height:26px;display:grid;place-items:center;border-radius:var(--radius-sm);color:var(--on-surface-variant);overflow:hidden}
-.qi:hover{background:var(--surface-2);color:var(--on-surface)}
-.nx{margin-left:auto;font-size:11px;padding:1px 8px;border-radius:var(--radius-pill);border:1px solid var(--outline);white-space:nowrap}
-.nx.warn{border-color:var(--warning);color:var(--warning);background:var(--warning-container)}
-.col-f{border-top:1px solid var(--outline-variant);padding:8px 12px;display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--on-surface-variant)}
-.col-f b{color:var(--on-surface)}
-a.name{display:block}
-.pkg{font-size:11px;padding:0 6px;border-radius:var(--radius-sm);border:1px solid var(--outline);color:var(--on-surface-variant)}
-.warn{color:var(--warning);display:inline-flex;align-items:center;gap:2px}
-.empty-col{border:1px dashed var(--outline);border-radius:var(--radius-md);padding:14px;text-align:center;font-size:12px;color:var(--on-surface-variant)}
-
-/* Table (DataTable §8.7 với density="comfortable", header chữ thường) */
-.tablewrap{flex-direction:column;overflow:auto}
-table{border-collapse:separate;border-spacing:0;min-width:980px;width:100%;table-layout:fixed}
-th,td{height:var(--row-h);padding:0 12px;border-bottom:1px solid var(--outline-variant);text-align:left;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-th{position:sticky;top:0;background:var(--surface);font-weight:500;color:var(--on-surface-variant);font-size:13px;z-index:1}
-tbody tr:hover td{background:var(--surface-variant)}
-tbody tr.sel td{background:var(--primary-container)}
-td.num,th.num{text-align:right}
-td .lnk{font-weight:600;color:var(--link,var(--primary))}
-td .lnk:hover{text-decoration:underline}
-.bulk{position:sticky;top:0;z-index:2;display:none;align-items:center;gap:8px;padding:6px 16px;
-  background:var(--primary-container);color:var(--on-primary-container);font-size:13px;font-weight:600}
+.bulk{display:none;align-items:center;gap:10px;padding:6px 16px;background:var(--primary-container);color:var(--on-primary-container);font-size:13px;font-weight:600}
 .bulk.on{display:flex}
 
-.foot{display:flex;align-items:center;gap:8px;padding:8px 16px;border-top:1px solid var(--outline-variant);flex:none}
-.pill{font-size:12px;font-weight:600;padding:2px 10px;border-radius:var(--radius-pill);background:var(--surface-2)}
-.foot .r{margin-left:auto;display:flex;gap:6px}
+.body{flex:1;min-height:0;position:relative;overflow:hidden;display:flex}
+/* Bảng (DataTable) */
+.tw{flex:1;overflow:auto}
+table{border-collapse:separate;border-spacing:0;table-layout:fixed}
+th,td{border-bottom:1px solid var(--outline-variant);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 12px;height:40px}
+body.compact th,body.compact td{height:33px}
+th{position:sticky;top:0;z-index:2;background:var(--surface);font-weight:500;font-size:13px;color:var(--on-surface-variant);user-select:none;cursor:pointer}
+th:hover{color:var(--on-surface)}
+th .srt{margin-left:4px;font-size:11px}
+th .rz{position:absolute;right:0;top:8px;bottom:8px;width:6px;cursor:col-resize;border-right:2px solid transparent}
+th:hover .rz{border-right-color:var(--outline)}
+td{cursor:text;background:var(--surface)}
+td.num{text-align:right}
+tbody tr:hover td{background:var(--surface-variant)}
+tbody tr.sel td{background:var(--primary-container)}
+td.cb,th.cb{width:44px;cursor:default;text-align:center}
+td.cb input{opacity:0} tr:hover td.cb input,td.cb input:checked{opacity:1}
+td.editing{overflow:visible;padding:4px 8px}
+.pri{display:flex;align-items:center;gap:8px;min-width:0}
+.ini{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;background:var(--primary-container);color:var(--on-primary-container);flex:none}
+.pri .t{overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--link)}
+.pv{display:none;margin-left:auto;height:24px;padding:0 8px;border:1px solid var(--outline);border-radius:var(--btn-radius);font-size:11px;font-weight:600;background:var(--surface);color:var(--on-surface);cursor:pointer;flex:none}
+tr:hover .pv{display:inline-flex;align-items:center}
+.empty{padding:48px 16px;text-align:center;color:var(--on-surface-variant)}
+.colpop{max-height:360px;overflow-y:auto}
+.colpop label{display:flex;align-items:center;gap:8px;min-height:30px;padding:0 8px;font-size:13px;border-radius:var(--radius-sm);cursor:pointer}
+.colpop label:hover{background:var(--surface-2)}
 
-/* ── Drawer xem nhanh (Drawer §8.6, side="right") ── */
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);z-index:960;background:var(--surface);
-  box-shadow:var(--shadow-3);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 300ms var(--ease-enter)}
-body.drawer-open .drawer{transform:none}
-.dw-h{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--outline-variant)}
-.dw-h .t{font-size:13px;color:var(--on-surface-variant)}
-.dw-b{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px}
-.dw-title{font-size:18px;font-weight:700;line-height:1.3}
-.dw-sub{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--on-surface-variant)}
-.acts{display:flex;justify-content:space-between;gap:4px}
-.act{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--on-surface-variant);width:56px}
-.act .circ{width:36px;height:36px;border-radius:50%;border:1px solid var(--outline);display:grid;place-items:center;color:var(--on-surface)}
-.act:hover .circ{background:var(--surface-2)}
-.sect{border:1px solid var(--outline-variant);border-radius:var(--radius-lg)}
-.sect-h{display:flex;align-items:center;gap:6px;padding:10px 12px;font-weight:600}
-.sect-h .r{margin-left:auto}
-.props{display:grid;grid-template-columns:1fr;gap:10px;padding:0 12px 12px}
-.prop label{display:block;font-size:12px;color:var(--on-surface-variant)}
-.prop .v{font-weight:500;padding:2px 0;border-bottom:1px solid transparent}
-.prop .v:hover{border-bottom-color:var(--outline)}
-.assoc{display:flex;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--outline-variant)}
-.assoc .lnk{font-weight:600;color:var(--link,var(--primary))}
-.assoc small{display:block;color:var(--on-surface-variant);font-size:12px}
-.tl{list-style:none;padding:0 12px 12px;display:flex;flex-direction:column;gap:10px}
-.tl li{display:flex;gap:10px;font-size:13px}
-.tl .ic{width:28px;height:28px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;flex:none}
-.tl .ic .ms{font-size:16px}
-.tl small{color:var(--on-surface-variant);font-size:12px}
-.dw-f{padding:12px 16px;border-top:1px solid var(--outline-variant);display:flex;gap:8px}
+/* Kanban */
+.kb{flex:1;display:flex;gap:12px;padding:12px 16px;overflow-x:auto;align-items:stretch}
+.kcol{flex:none;width:82vw;max-width:280px;display:flex;flex-direction:column;min-height:0;background:var(--surface-variant);border:1px solid var(--outline-variant);border-radius:var(--radius-lg)}
+@media(min-width:600px){.kcol{width:272px}}
+.kh{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--outline-variant)}
+.kh .n{font-size:12px;font-weight:700;color:var(--on-surface-variant)}
+.kcards{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px;min-height:80px}
+.kcards.drop{background:var(--primary-container)}
+.kc{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:10px 12px;display:flex;flex-direction:column;gap:4px;cursor:pointer}
+.kc:hover{border-color:var(--outline)}
+.kc.dragging{opacity:.5}
+.kc .tt{font-weight:600;color:var(--link)}
+.kc .ln{font-size:12px;color:var(--on-surface-variant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kc .ln b{color:var(--on-surface);font-weight:500}
+.kempty{border:1px dashed var(--outline);border-radius:var(--radius-md);padding:14px;text-align:center;font-size:12px;color:var(--on-surface-variant)}
+.kpick{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--on-surface-variant)}
 
-#footSum{display:none}
-@media(min-width:600px){#footSum{display:inline}}
-.foot{padding-left:16px}
-/* ── Thanh demo (không thuộc sản phẩm) ── */
-.demo{position:fixed;left:12px;bottom:12px;z-index:990;display:flex;gap:6px;align-items:center;
-  padding:6px 8px;border-radius:var(--radius-pill);background:#111;color:#fff;font-size:12px;box-shadow:var(--shadow-3)}
-.demo button{padding:4px 10px;border-radius:var(--radius-pill);color:#ddd}
-.demo button[aria-pressed="true"]{background:#fff;color:#111;font-weight:600}
-.demo .lb{padding:0 6px;color:#999}
-.demo:not(.open) > :not(.dtog){display:none}
-.demo .dtog{color:#fff;font-weight:600}
-.toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--on-surface);color:var(--surface);
-  padding:8px 14px;border-radius:var(--radius-md);font-size:13px;opacity:0;transition:opacity var(--dur);z-index:995;pointer-events:none}
-.toast.on{opacity:1}
+.foot{display:flex;align-items:center;gap:8px;padding:8px 16px;border-top:1px solid var(--outline-variant);flex:none;flex-wrap:wrap}
+.foot .info{font-size:13px;color:var(--on-surface-variant)}
+.pager{display:flex;align-items:center;gap:6px;margin:0 auto;font-size:13px}
+.foot .r{display:flex;gap:6px;align-items:center}
+.fmt{height:32px;border:1px solid var(--outline);border-radius:var(--btn-radius);padding:0 8px;background:var(--surface);font-size:13px}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="topbar">
-    <button class="icon-btn navbtn" id="navBtn" aria-label="Mở điều hướng"><span class="ms">menu</span></button>
-    <a class="brand" href="index.html"><span class="brand-mark">H</span><span>HarnexAI</span></a>
-    <label class="tb-search"><span class="ms sm">search</span><input placeholder="Tìm trong HarnexAI"><span class="kbd">Ctrl K</span></label>
-    <button class="tb-ai"><span class="ms sm">auto_awesome</span>Cowork AI</button>
-    <div class="tb-right">
-      <button class="icon-btn" aria-label="Tạo nhanh" title="Tạo nhanh"><span class="ms">add</span></button>
-      <button class="icon-btn" aria-label="Gọi điện" title="Gọi điện"><span class="ms">call</span></button>
-      <button class="icon-btn" aria-label="Trợ giúp" title="Trợ giúp"><span class="ms">help</span></button>
-      <button class="icon-btn" aria-label="Cài đặt" title="Cài đặt"><span class="ms">settings</span></button>
-      <button class="icon-btn" aria-label="Thông báo, có mục chưa đọc" title="Thông báo"><span class="ms">notifications</span><span class="dot-badge"></span></button>
-      <span class="avatar" title="Phương Nguyễn">PN</span>
-    </div>
-  </header>
-
-  <nav class="sidebar" aria-label="Điều hướng chính">
-    <a class="nav-i" href="index.html"><span class="ms">home</span><span class="lbl">Trang chủ</span></a>
-    <div class="nav-sep"></div>
-    <a class="nav-i" href="#"><span class="ms">contacts</span><span class="lbl">Liên hệ</span></a>
-    <a class="nav-i" href="#"><span class="ms">domain</span><span class="lbl">Công ty</span></a>
-    <a class="nav-i" href="crm-giao-dich-hubspot.html" aria-current="page"><span class="ms">handshake</span><span class="lbl">Giao dịch</span></a>
-    <a class="nav-i" href="#"><span class="ms">task_alt</span><span class="lbl">Việc của tôi</span></a>
-    <a class="nav-i" href="#"><span class="ms">segment</span><span class="lbl">Phân khúc</span></a>
-    <button class="nav-group"><span class="ms">expand_more</span><span>Marketing</span></button>
-    <a class="nav-i" href="#"><span class="ms">description</span><span class="lbl">Biểu mẫu</span></a>
-    <a class="nav-i" href="#"><span class="ms">mail</span><span class="lbl">Email marketing</span><span class="tag">Sắp có</span></a>
-    <button class="nav-group"><span class="ms">expand_more</span><span>Nền tảng</span></button>
-    <a class="nav-i" href="#"><span class="ms">account_tree</span><span class="lbl">Workflow</span></a>
-    <a class="nav-i" href="#"><span class="ms">bar_chart</span><span class="lbl">Báo cáo</span></a>
-    <a class="nav-i" href="#"><span class="ms">table_chart</span><span class="lbl">Dữ liệu</span></a>
-  </nav>
-
-  <main class="main">
-    <div class="frame">
-      <div class="ph">
-        <h1>Giao dịch <span class="ms">expand_more</span></h1>
-        <span class="count" id="count"></span>
-        <div class="ph-actions">
-          <div class="menu" id="moreMenu">
-            <button class="btn btn--secondary btn--icon" aria-label="Thao tác khác" aria-haspopup="menu"><span class="ms sm">more_vert</span></button>
-            <div class="menu-pop" role="menu">
-              <button role="menuitem"><span class="ms sm">upload</span>Import</button>
-              <button role="menuitem"><span class="ms sm">download</span>Export .xlsx</button>
-              <button role="menuitem"><span class="ms sm">sync</span>Kết nối Google Sheet</button>
-              <button role="menuitem"><span class="ms sm">tune</span>Sửa pipeline &amp; giai đoạn</button>
-            </div>
-          </div>
-          <button class="btn btn--primary" id="newBtn"><span class="ms sm">add</span>Tạo giao dịch</button>
+  <header class="topbar" id="topbar"></header>
+  <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
+  <main class="main"><div class="frame">
+    <div class="ph">
+      <h1 id="colName"></h1><span class="count" id="count"></span>
+      <div class="ph-act">
+        <button class="btn btn--secondary btn--icon" id="moreBtn" aria-label="Thêm" aria-haspopup="menu"><span class="ms sm">more_horiz</span></button>
+        <div class="pop" id="morePop" role="menu" style="top:38px;left:0">
+          <button class="mi" role="menuitem" data-toast="Đã ghim Deals_Pipeline vào sidebar"><span class="ms sm">push_pin</span>Ghim vào sidebar</button>
+          <button class="mi" role="menuitem" data-toast="Chọn nhóm để ghim"><span class="ms sm">folder</span>Ghim vào nhóm…</button>
+          <div class="sep"></div>
+          <button class="mi" role="menuitem" id="gsBtn"><span class="ms sm">sync</span>Kết nối Google Sheet</button>
         </div>
-      </div>
-
-      <div class="vtabs" role="tablist" aria-label="View đã lưu">
-        <button class="vtab" role="tab" aria-selected="true" data-v="all"><span class="ms sm">view_kanban</span>Tất cả giao dịch</button>
-        <button class="vtab" role="tab" aria-selected="false" data-v="mine"><span class="ms sm">person</span>Giao dịch của tôi</button>
-        <button class="vtab" role="tab" aria-selected="false" data-v="month"><span class="ms sm">event</span>Chốt trong tháng</button>
-        <button class="btn btn--text btn--icon" aria-label="Thêm view"><span class="ms sm">add</span></button>
-      </div>
-
-      <div class="tools">
-        <label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm giao dịch ( / )"></label>
-        <button class="btn btn--secondary"><span class="ms sm">filter_list</span>Bộ lọc</button>
-        <button class="btn btn--secondary"><span class="ms sm">swap_vert</span>Sắp xếp</button>
-        <div class="tools-right">
-          <select class="select" aria-label="Pipeline"><option>Pipeline bán hàng</option><option>Pipeline gia hạn</option></select>
-          <div class="seg" role="group" aria-label="Kiểu hiển thị">
-            <button aria-pressed="true" data-mode="board" title="Board"><span class="ms sm">view_kanban</span></button>
-            <button aria-pressed="false" data-mode="table" title="Bảng"><span class="ms sm">table_rows</span></button>
-          </div>
-        </div>
-      </div>
-      <div class="qf">
-        <button class="btn btn--text" id="fOwner">Người phụ trách <span class="ms sm">arrow_drop_down</span></button>
-        <button class="btn btn--text">Ngày tạo <span class="ms sm">arrow_drop_down</span></button>
-        <button class="btn btn--text">Hoạt động gần nhất <span class="ms sm">arrow_drop_down</span></button>
-        <button class="btn btn--text">Ngày chốt dự kiến <span class="ms sm">arrow_drop_down</span></button>
-        <button class="btn btn--text">Gói dịch vụ <span class="ms sm">arrow_drop_down</span></button>
-        <span class="vsep"></span>
-        <button class="btn btn--text btn--icon" aria-label="Thêm bộ lọc nhanh"><span class="ms sm">add</span></button>
-        <button class="btn btn--text"><span class="ms sm">tune</span>Bộ lọc nâng cao</button>
-      </div>
-
-      <div class="body">
-        <section class="view board on" id="board" aria-label="Board theo giai đoạn"></section>
-        <section class="view tablewrap" id="tableView" aria-label="Bảng giao dịch">
-          <div class="bulk" id="bulk"><span id="bulkN"></span>
-            <button class="btn btn--text"><span class="ms sm">person</span>Đổi người phụ trách</button>
-            <button class="btn btn--text"><span class="ms sm">flag</span>Đổi giai đoạn</button>
-            <button class="btn btn--text"><span class="ms sm">delete</span>Xoá</button>
-          </div>
-          <table>
-            <colgroup><col style="width:44px"><col style="width:280px"><col style="width:170px"><col style="width:150px"><col style="width:120px"><col style="width:130px"><col style="width:170px"><col style="width:160px"></colgroup>
-            <thead><tr><th><input type="checkbox" id="all" aria-label="Chọn tất cả"></th><th>Tên giao dịch</th><th>Giai đoạn</th><th class="num">Giá trị</th><th>Gói dịch vụ</th><th>Ngày chốt</th><th>Người phụ trách</th><th>Hoạt động gần nhất</th></tr></thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </section>
-      </div>
-
-      <div class="foot">
-        <span class="pill" id="footCount"></span>
-        <span style="font-size:12px;color:var(--on-surface-variant)" id="footSum"></span>
-        <div class="r">
-          <button class="btn btn--secondary btn--icon" aria-label="Làm mới"><span class="ms sm">refresh</span></button>
-          <button class="btn btn--secondary"><span class="ms sm">download</span>Export</button>
-        </div>
+        <a class="btn btn--secondary hide-sm" href="#" id="colsBtn" title="Quản lý cột (trường dữ liệu)"><span class="ms sm">edit</span>Cột</a>
+        <button class="btn btn--secondary hide-sm" id="impBtn">Import</button>
+        <button class="btn btn--primary" id="newBtn"><span class="ms sm">add</span>Tạo mới</button>
       </div>
     </div>
-  </main>
+
+    <div class="vtabs" role="tablist" aria-label="View" id="vtabs"></div>
+    <div class="pop" id="viewPop" style="top:0;left:0"></div>
+
+    <div class="tools">
+      <label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm kiếm bản ghi..."><button id="qx" class="ms xs" style="display:none" aria-label="Xoá tìm kiếm">close</button></label>
+      <div class="seg" role="group" aria-label="Mật độ hiển thị">
+        <button aria-pressed="true" data-density="normal" title="Thoáng"><span class="ms sm">view_agenda</span>Thoáng</button>
+        <button aria-pressed="false" data-density="compact" title="Gọn"><span class="ms sm">density_small</span>Gọn</button>
+      </div>
+      <div class="tools-r" id="toolsR"></div>
+    </div>
+
+    <div class="fbar" id="fbar"></div>
+    <div class="pop" id="fPop" style="top:0;left:0"></div>
+    <div class="bulk" id="bulk"><span id="bulkN"></span><button class="btn btn--text sm" id="bulkDel"><span class="ms sm">delete</span>Xoá</button><button class="btn btn--text sm" id="bulkCancel">Huỷ</button></div>
+
+    <div class="body" id="body"></div>
+
+    <div class="foot">
+      <span class="info" id="footInfo"></span>
+      <div class="pager"><button class="btn btn--secondary sm" id="prev"><span class="ms xs">chevron_left</span>Trước</button><span id="pg"></span><button class="btn btn--secondary sm" id="next">Sau<span class="ms xs">chevron_right</span></button></div>
+      <div class="r">
+        <button class="btn btn--secondary btn--icon" id="refresh" title="Làm mới" aria-label="Làm mới"><span class="ms sm">refresh</span></button>
+        <select class="fmt" id="fmt" aria-label="Định dạng xuất"><option>.xlsx</option><option>.csv</option></select>
+        <button class="btn btn--secondary" id="exportBtn"><span class="ms sm">download</span>Export</button>
+      </div>
+    </div>
+  </div></main>
 </div>
 <div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel" aria-label="Chi tiết bản ghi"></aside>
+<div class="modal-bg" id="modal"></div>
+<div class="demo" id="demo" role="group" aria-label="Điều khiển mockup"></div>
+<div class="toast" id="toast" role="status"></div>
 
-<aside class="drawer" id="drawer" aria-label="Xem nhanh giao dịch">
-  <div class="dw-h"><span class="t">Xem nhanh giao dịch</span>
-    <button class="btn btn--text btn--icon" style="margin-left:auto" id="dwClose" aria-label="Đóng"><span class="ms">close</span></button></div>
-  <div class="dw-b" id="dwBody"></div>
-  <div class="dw-f"><a class="btn btn--primary" id="dwFull" href="crm-deal-chi-tiet-hubspot.html"><span class="ms sm">open_in_full</span>Mở trang đầy đủ</a><button class="btn btn--secondary">Sửa thuộc tính</button></div>
-</aside>
-
-<div class="demo" role="group" aria-label="Điều khiển mockup">
-  <button class="dtog" aria-expanded="false" onclick="const d=this.parentElement;d.classList.toggle('open');this.setAttribute('aria-expanded',d.classList.contains('open'))">⚙ Giao diện</button>
-  <button aria-pressed="true" data-brand="crm">Tông HubSpot</button>
-  <button aria-pressed="false" data-brand="">HarnexAI gốc</button>
-  <span class="lb">|</span>
-  <button aria-pressed="false" id="darkBtn">Tối</button>
-</div>
-<div class="toast" id="toast"></div>
-
+<script src="crm-shared.js"></script>
 <script>
-const STAGES=[
-  {id:'s1',name:'1. MQL Qualified',p:10},{id:'s2',name:'2. Đã tư vấn',p:30},{id:'s3',name:'3. Đã gửi báo giá',p:50},
-  {id:'s4',name:'4. Đàm phán',p:70},{id:'won',name:'Thắng',p:100,cls:'won'},{id:'lost',name:'Thua',p:0,cls:'lost'}];
-const OWN={PN:'Phương Nguyễn',MT:'Minh Trần',LL:'Lan Lê'};
-let DEALS=[
- {id:1,name:'Nội thất Minh Phát — gói CRM 12 tháng',stage:'s1',amt:48000000,pkg:'Professional',close:'2026-10-15',own:'PN',act:'Gọi điện · 2 giờ trước',co:'Công ty CP Nội thất Minh Phát',ct:'Anh Hoàng Minh'},
- {id:2,name:'Thực phẩm An Khang — triển khai ERP',stage:'s1',amt:120000000,pkg:'Enterprise',close:'2026-11-30',own:'MT',act:'Email · hôm qua',co:'Cty TNHH Thực phẩm An Khang',ct:'Chị Thu Hà'},
- {id:3,name:'Mầm non Hoa Sen — Starter 6T',stage:'s2',amt:18000000,pkg:'Starter 6T',close:'2026-10-05',own:'LL',act:'Lịch hẹn · 3 ngày trước',co:'Trường Mầm non Hoa Sen',ct:'Cô Ngọc Anh'},
- {id:4,name:'Logistics Tân Cảng Xanh — mở rộng 20 user',stage:'s2',amt:65000000,pkg:'Professional',close:'2026-10-28',own:'PN',act:'Ghi chú · 4 ngày trước',co:'Công ty Logistics Tân Cảng Xanh',ct:'Anh Quốc Bảo'},
- {id:5,name:'Nha khoa Nụ Cười Việt — Starter 6T',stage:'s2',amt:18000000,pkg:'Starter 6T',close:'2026-09-30',own:'MT',act:'Chưa có hoạt động · 12 ngày',co:'Phòng khám Nha khoa Nụ Cười Việt',ct:'BS. Đức Trí',stale:true},
- {id:6,name:'Xây dựng Hưng Thịnh — gói Pro + setup',stage:'s3',amt:86000000,pkg:'Professional',close:'2026-10-10',own:'LL',act:'Gửi báo giá · hôm qua',co:'Công ty Xây dựng Hưng Thịnh',ct:'Anh Văn Hưng'},
- {id:7,name:'Thời trang Mộc Lan — Starter 12T',stage:'s3',amt:32000000,pkg:'Starter 12T',close:'2026-10-20',own:'PN',act:'Email · 5 ngày trước',co:'Cty TNHH Thời trang Mộc Lan',ct:'Chị Mộc Lan'},
- {id:8,name:'Dược phẩm Thiên Phúc — Enterprise',stage:'s4',amt:210000000,pkg:'Enterprise',close:'2026-10-31',own:'MT',act:'Cuộc họp · hôm nay',co:'Công ty CP Dược phẩm Thiên Phúc',ct:'Anh Thiên Phúc'},
- {id:9,name:'Du lịch Biển Xanh — gia hạn Pro',stage:'s4',amt:54000000,pkg:'Professional',close:'2026-09-29',own:'LL',act:'Gọi điện · 2 ngày trước',co:'Công ty Du lịch Biển Xanh',ct:'Chị Hải Yến'},
- {id:10,name:'Kế toán Sao Việt — Starter 6T',stage:'won',amt:18000000,pkg:'Starter 6T',close:'2026-09-12',own:'PN',act:'Ký hợp đồng · 11/09/2026',co:'Công ty Kế toán Sao Việt',ct:'Anh Việt Anh'},
- {id:11,name:'Cơ khí Đại Phong — Professional',stage:'won',amt:72000000,pkg:'Professional',close:'2026-09-05',own:'MT',act:'Ký hợp đồng · 05/09/2026',co:'Công ty Cơ khí Đại Phong',ct:'Anh Đại Phong'},
- {id:12,name:'Spa Ngọc Trai — Starter 6T',stage:'lost',amt:18000000,pkg:'Starter 6T',close:'2026-09-08',own:'LL',act:'Lý do: chọn đối thủ',co:'Ngọc Trai Spa',ct:'Chị Ngọc Trai'},
- {id:13,name:'In ấn Phương Đông — Starter 12T',stage:'s3',amt:32000000,pkg:'Starter 12T',close:'2026-10-18',own:'MT',act:'Email · hôm nay',co:'Cty In ấn Phương Đông',ct:'Anh Đông Phương'}];
+const {FIELDS,F,api,esc,empty,fmt,display,chipCls,createdFmt,title,editor,toast,confirmBox,$} = HX;
+HX.shell();
+$('#colName').textContent = HX.COLLECTION.name;
 
-/* Định dạng — trong code thật đi qua src/utils/format.ts (§13.5) */
-const money=v=>new Intl.NumberFormat('vi-VN').format(v)+' ₫';
-const short=v=>v>=1e9?(v/1e9).toLocaleString('vi-VN',{maximumFractionDigits:1})+' tỷ':v>=1e6?Math.round(v/1e6).toLocaleString('vi-VN')+' tr':money(v);
-const date=s=>{const [y,m,d]=s.split('-');return `${d}/${m}/${y}`};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const stageOf=id=>STAGES.find(s=>s.id===id);
-let view='all', q='', mode='board', selected=new Set();
+/* ── Điều kiện lọc theo kiểu trường — đúng danh sách của ERP ── */
+const OPS = {
+  TEXT:[['eq','Bằng'],['neq','Khác'],['contains','Chứa'],['is_empty','Trống'],['is_not_empty','Không trống']],
+  NUMBER:[['eq','Bằng'],['neq','Khác'],['gt','Lớn hơn'],['lt','Nhỏ hơn'],['is_empty','Trống'],['is_not_empty','Không trống']],
+  SELECT:[['eq','Bằng'],['neq','Khác']],
+  DATE:[['eq','Bằng'],['neq','Khác'],['gt','Lớn hơn'],['lt','Nhỏ hơn']],
+  RELATION:[['eq','Bằng'],['neq','Khác']]
+};
+const isDate = f => f.type === 'DATE' || f.type === 'DATETIME' || f.type === '__created';
+const opsOf = f => OPS[f.type === 'LONG_TEXT' ? 'TEXT' : isDate(f) ? 'DATE' : f.type] || OPS.TEXT;
+const CREATED = {key:'__createdAt', name:'Ngày tạo', type:'__created'};
+const fieldOf = k => k === '__createdAt' ? CREATED : F[k];
+const filterFields = [CREATED, ...FIELDS];
+const PAGE = 50;
+const st = { view:'builtin-table', q:'', filters:[], sort:{key:'__createdAt',dir:'desc'}, hidden:[], sel:new Set(), page:1, groupBy:{ 'builtin-kanban':null }, widths:{} };
+try { Object.assign(st.widths, JSON.parse(localStorage.getItem('smartdb-col-widths:' + HX.COLLECTION.id) || '{}')); } catch {}
+const viewType = () => st.view === 'builtin-table' ? 'TABLE' : st.view === 'builtin-kanban' ? 'KANBAN' : (api.views().find(v => v.id === st.view) || {}).type;
 
-function visible(){
-  return DEALS.filter(d=>{
-    if(view==='mine'&&d.own!=='PN')return false;
-    if(view==='month'&&!d.close.startsWith('2026-09')&&!d.close.startsWith('2026-10'))return false;
-    if(q&&!(d.name+d.co).toLowerCase().includes(q))return false; return true;});
+const valOf = (r, key) => key === '__createdAt' ? r.createdAt : r.values[key];
+function pass(r, fl){
+  const f = fieldOf(fl.key), v = valOf(r, fl.key);
+  if (isDate(f)) { if (empty(v)) return fl.op === 'neq';
+    const a = String(v).slice(0,10), b = String(fl.value).slice(0,10);
+    return fl.op === 'eq' ? a === b : fl.op === 'neq' ? a !== b : fl.op === 'gt' ? a > b : a < b; }
+  switch (fl.op) {
+    case 'eq': return String(v ?? '') === String(fl.value);
+    case 'neq': return String(v ?? '') !== String(fl.value);
+    case 'contains': return String(v ?? '').toLowerCase().includes(String(fl.value).toLowerCase());
+    case 'gt': return Number(v) > Number(fl.value);
+    case 'lt': return Number(v) < Number(fl.value);
+    case 'is_empty': return empty(v);
+    case 'is_not_empty': return !empty(v);
+  }
+  return true;
 }
-function render(){
-  const list=visible();
-  document.getElementById('count').textContent=`${list.length} giao dịch`;
-  document.getElementById('footCount').textContent=`${list.length} giao dịch`;
-  const open=list.filter(d=>d.stage!=='won'&&d.stage!=='lost');
-  const weighted=open.reduce((s,d)=>s+d.amt*stageOf(d.stage).p/100,0);
-  document.getElementById('footSum').textContent=`Tổng đang mở: ${money(open.reduce((s,d)=>s+d.amt,0))} · Dự báo có trọng số: ${money(weighted)}`;
-  renderBoard(list); renderTable(list);
+function rows(){
+  let list = api.list().filter(r => st.filters.every(fl => pass(r, fl)));
+  if (st.q) { const q = st.q.toLowerCase(); list = list.filter(r => FIELDS.some(f => String(fmt(r.values[f.key], f)).toLowerCase().includes(q))); }
+  const s = st.sort || {key:'__createdAt', dir:'desc'}, d = s.dir === 'asc' ? 1 : -1;
+  return [...list].sort((a, b) => { const x = valOf(a, s.key), y = valOf(b, s.key);
+    if (empty(x) && empty(y)) return 0; if (empty(x)) return 1; if (empty(y)) return -1;
+    return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'vi')) * d; });
 }
-function renderBoard(list){
-  const b=document.getElementById('board'); b.innerHTML='';
-  STAGES.forEach(s=>{
-    const items=list.filter(d=>d.stage===s.id); const sum=items.reduce((a,d)=>a+d.amt,0);
-    const col=document.createElement('div'); col.className='col';
-    col.innerHTML=`<div class="col-h"><div class="row"><span class="stage ${s.cls||''}"><span class="t">${esc(s.name)}</span></span><span class="n">${items.length}</span></div>
-      </div>`;
-    const cards=document.createElement('div'); cards.className='cards'; cards.dataset.stage=s.id;
-    if(!items.length) cards.innerHTML='<div class="empty-col">Chưa có giao dịch</div>';
-    items.forEach(d=>{
-      const c=document.createElement('article'); c.className='card'; c.draggable=true; c.dataset.id=d.id;
-      const nx=d.stale?'<span class="nx warn">Không có việc sắp tới</span>':`<span class="nx">Việc tới: ${date(d.close)}</span>`;
-      c.innerHTML=`<a class="name" href="crm-deal-chi-tiet-hubspot.html?id=${d.id}">${esc(d.name)}</a>
-        <div class="meta"><span class="mi"><span class="ms sm">event_available</span>Chốt ${date(d.close)}</span><span class="mi"><span class="ms sm">payments</span><b>${money(d.amt)}</b></span>
-        <span class="mi"><span class="ms sm">person</span>${OWN[d.own]}</span><span class="mi"><span class="ms sm">contacts</span><span class="ctn">${esc(d.ct)}</span></span></div>
-        <div class="card-f"><button class="qi" title="Ghi chú" aria-label="Ghi chú"><span class="ms sm">edit_note</span></button><button class="qi" title="Tạo việc" aria-label="Tạo việc"><span class="ms sm">task_alt</span></button>
-        <button class="qi" data-open="${d.id}" title="Xem nhanh" aria-label="Xem nhanh"><span class="ms sm">visibility</span></button>${nx}</div>`;
-      c.addEventListener('dragstart',e=>{c.classList.add('dragging');e.dataTransfer.setData('text/plain',d.id)});
-      c.addEventListener('dragend',()=>c.classList.remove('dragging'));
-      cards.appendChild(c);
-    });
-    cards.addEventListener('dragover',e=>{e.preventDefault();cards.classList.add('drop')});
-    cards.addEventListener('dragleave',()=>cards.classList.remove('drop'));
-    cards.addEventListener('drop',e=>{e.preventDefault();cards.classList.remove('drop');
-      const d=DEALS.find(x=>x.id==e.dataTransfer.getData('text/plain')); if(!d||d.stage===s.id)return;
-      d.stage=s.id; render(); toast(`Đã chuyển “${d.name}” sang ${s.name}`)});
-    col.appendChild(cards);
-    const ft=document.createElement('div'); ft.className='col-f';
-    ft.innerHTML=s.id==='won'||s.id==='lost'?`<span><b>${money(sum)}</b> · Tổng giá trị</span><span>${s.id==='won'?'Thắng (100%)':'Thua (0%)'}</span>`
-      :`<span><b>${money(sum)}</b> · Tổng giá trị</span><span><b>${money(sum*s.p/100)}</b> (${s.p}%) · Có trọng số</span>`;
-    col.appendChild(ft); b.appendChild(col);
-  });
-}
-function renderTable(list){
-  const tb=document.getElementById('tbody');
-  tb.innerHTML=list.map(d=>{const s=stageOf(d.stage);return `<tr class="${selected.has(d.id)?'sel':''}">
-    <td><input type="checkbox" data-sel="${d.id}" ${selected.has(d.id)?'checked':''} aria-label="Chọn ${esc(d.name)}"></td>
-    <td><span style="display:flex;gap:4px;align-items:center;min-width:0"><button class="qi" data-open="${d.id}" title="Xem nhanh" aria-label="Xem nhanh"><span class="ms sm">chevron_right</span></button><a class="lnk" href="crm-deal-chi-tiet-hubspot.html?id=${d.id}" style="overflow:hidden;text-overflow:ellipsis">${esc(d.name)}</a></span></td>
-    <td><span class="stage ${s.cls||''}"><span class="t">${esc(s.name)}</span></span></td>
-    <td class="num">${money(d.amt)}</td><td>${esc(d.pkg)}</td><td>${date(d.close)}</td>
-    <td><span style="display:inline-flex;align-items:center;gap:6px"><span class="avatar xs">${d.own}</span>${OWN[d.own]}</span></td>
-    <td style="color:var(--on-surface-variant)">${esc(d.act)}</td></tr>`}).join('');
-  const bulk=document.getElementById('bulk'); bulk.classList.toggle('on',selected.size>0);
-  document.getElementById('bulkN').textContent=`Đã chọn ${selected.size} giao dịch`;
-}
-function openDrawer(id){
-  const d=DEALS.find(x=>x.id==id), s=stageOf(d.stage);
-  document.getElementById('dwFull').href=`crm-deal-chi-tiet-hubspot.html?id=${d.id}`;
-  document.getElementById('dwBody').innerHTML=`
-    <div><div class="dw-title">${esc(d.name)}</div>
-      <div class="dw-sub"><span class="stage ${s.cls||''}"><span class="t">${esc(s.name)}</span></span><span>${money(d.amt)}</span><span>· Chốt ${date(d.close)}</span></div></div>
-    <div class="acts">${[['edit_note','Ghi chú'],['mail','Email'],['call','Gọi'],['task_alt','Việc'],['event','Lịch hẹn'],['more_horiz','Khác']].map(([i,l])=>`<button class="act"><span class="circ"><span class="ms sm">${i}</span></span>${l}</button>`).join('')}</div>
-    <section class="sect"><div class="sect-h"><span class="ms sm">expand_more</span>Thông tin chính</div>
-      <div class="props">
-        <div class="prop"><label>Người phụ trách</label><div class="v">${OWN[d.own]}</div></div>
-        <div class="prop"><label>Gói dịch vụ mục tiêu</label><div class="v">${esc(d.pkg)}</div></div>
-        <div class="prop"><label>Giai đoạn pipeline</label><div class="v">${esc(s.name)}</div></div>
-        <div class="prop"><label>Tổng cash-in dự kiến</label><div class="v">${money(d.amt)}</div></div>
-      </div></section>
-    <section class="sect"><div class="sect-h"><span class="ms sm">expand_more</span>Liên kết<button class="btn btn--text r"><span class="ms sm">add</span>Thêm</button></div>
-      <div class="assoc"><span class="ms">domain</span><div><button class="lnk">${esc(d.co)}</button><small>Công ty · Chính</small></div></div>
-      <div class="assoc"><span class="ms">person</span><div><button class="lnk">${esc(d.ct)}</button><small>Liên hệ · Người quyết định</small></div></div></section>
-    <section class="sect"><div class="sect-h"><span class="ms sm">expand_more</span>Hoạt động gần đây</div>
-      <ul class="tl">
-        <li><span class="ic"><span class="ms">history</span></span><div>${esc(d.act)}<br><small>Phương Nguyễn</small></div></li>
-        <li><span class="ic"><span class="ms">flag</span></span><div>Chuyển sang <b>${esc(s.name)}</b><br><small>Tự động · workflow “Cập nhật giai đoạn”</small></div></li>
-        <li><span class="ic"><span class="ms">add_circle</span></span><div>Tạo giao dịch từ Lead<br><small>13/08/2026 09:12</small></div></li>
-      </ul></section>`;
-  document.body.classList.add('drawer-open'); document.getElementById('dwClose').focus();
-}
-function closeAll(){document.body.classList.remove('drawer-open','nav-open')}
-let tt; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200)}
+function place(pop, anchor, w){ const r = anchor.getBoundingClientRect(), fr = document.querySelector('.frame').getBoundingClientRect();
+  pop.style.left = Math.max(8, Math.min(r.left - fr.left, fr.width - w)) + 'px'; pop.style.top = (r.bottom - fr.top + 4) + 'px'; }
 
-document.addEventListener('click',e=>{
-  const o=e.target.closest('[data-open]'); if(o){openDrawer(o.dataset.open);return}
-  const v=e.target.closest('.vtab'); if(v){document.querySelectorAll('.vtab').forEach(x=>x.setAttribute('aria-selected',x===v));view=v.dataset.v;render();return}
-  const m=e.target.closest('[data-mode]'); if(m){mode=m.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',x===m));
-    document.getElementById('board').classList.toggle('on',mode==='board');document.getElementById('tableView').classList.toggle('on',mode==='table');return}
-  const br=e.target.closest('.demo [data-brand]'); if(br){document.querySelectorAll('.demo [data-brand]').forEach(x=>x.setAttribute('aria-pressed',x===br));
-    if(br.dataset.brand)document.documentElement.dataset.brand=br.dataset.brand;else delete document.documentElement.dataset.brand;return}
-  const mm=document.getElementById('moreMenu'); if(e.target.closest('#moreMenu > button'))mm.classList.toggle('open');else if(!e.target.closest('.menu-pop'))mm.classList.remove('open');
+/* ── View tabs: Bảng · Kanban (sẵn có) + view đã lưu (sửa / xoá) + Tạo View ── */
+function renderTabs(){
+  const tabs = [{id:'builtin-table',name:'Bảng',type:'TABLE',b:1},{id:'builtin-kanban',name:'Kanban',type:'KANBAN',b:1},...api.views()];
+  $('#vtabs').innerHTML = tabs.map(v => `<button class="vtab" role="tab" aria-selected="${st.view === v.id}" data-view="${v.id}">
+      <span class="ms sm">${v.type === 'KANBAN' ? 'view_kanban' : 'table_rows'}</span>${esc(v.name)}
+      ${v.b ? '' : `<span class="va"><span data-vedit="${v.id}" title="Sửa view"><span class="ms xs">edit</span></span><span data-vdel="${v.id}" title="Xóa view"><span class="ms xs">close</span></span></span>`}</button>`).join('')
+    + `<button class="btn btn--text btn--icon" id="vAdd" title="Tạo View" aria-label="Tạo View"><span class="ms sm">add</span></button>`;
+}
+function viewForm(anchor, v){
+  const pop = $('#viewPop'); place(pop, anchor, 260);
+  pop.innerHTML = `<form class="vform"><b>${v ? 'Sửa View' : 'Tạo View'}</b>
+    <label>Tên View<input name="n" value="${v ? esc(v.name) : ''}" required></label>
+    <label>Loại View<select name="t"><option value="TABLE" ${v && v.type === 'TABLE' ? 'selected' : ''}>Danh sách</option><option value="KANBAN" ${v && v.type === 'KANBAN' ? 'selected' : ''}>Kanban</option></select></label>
+    <div class="row"><button type="button" class="btn btn--secondary sm" data-vcancel>Huỷ</button><button class="btn btn--primary sm">${v ? 'Lưu thay đổi' : 'Tạo View'}</button></div></form>`;
+  pop.classList.add('open'); pop.querySelector('input').focus();
+  pop.querySelector('form').onsubmit = e => { e.preventDefault(); const n = e.target.n.value.trim(), t = e.target.t.value; if (!n) return;
+    let vs = api.views();
+    if (v) vs = vs.map(x => x.id === v.id ? {...x, name:n, type:t} : x); else { const id = 'v' + Date.now(); vs = [...vs, {id, name:n, type:t}]; st.view = id; }
+    api.saveViews(vs); pop.classList.remove('open'); toast(v ? 'Đã lưu thay đổi view' : 'Đã tạo view'); renderAll(); };
+  pop.querySelector('[data-vcancel]').onclick = () => pop.classList.remove('open');
+}
+$('#vtabs').onclick = e => {
+  const ed = e.target.closest('[data-vedit]'), dl = e.target.closest('[data-vdel]');
+  if (ed) { e.stopPropagation(); viewForm(ed, api.views().find(v => v.id === ed.dataset.vedit)); return; }
+  if (dl) { e.stopPropagation(); const v = api.views().find(x => x.id === dl.dataset.vdel);
+    confirmBox('Xóa view', `Xóa view “${esc(v.name)}”? Bản ghi không bị ảnh hưởng.`, 'Xóa view', () => { api.saveViews(api.views().filter(x => x.id !== v.id)); if (st.view === v.id) st.view = 'builtin-table'; renderAll(); toast('Đã xóa view'); }); return; }
+  if (e.target.closest('#vAdd')) { viewForm(e.target.closest('#vAdd')); return; }
+  const t = e.target.closest('[data-view]'); if (t) { st.view = t.dataset.view; st.sel.clear(); st.page = 1; renderAll(); }
+};
+
+/* ── Thanh bộ lọc (RecordFilterBar): chip + Thêm bộ lọc + Xoá tất cả ── */
+function renderFilters(){
+  const txt = fl => { const f = fieldOf(fl.key), op = opsOf(f).find(o => o[0] === fl.op)[1];
+    const vv = ['is_empty','is_not_empty'].includes(fl.op) ? '' : ` “${esc(f.type === 'RELATION' ? fmt(fl.value, f) : isDate(f) ? new Date(fl.value).toLocaleDateString('vi-VN') : fl.value)}”`;
+    return `<b>${esc(f.name)}</b> ${op}${vv}`; };
+  $('#fbar').innerHTML = `<span class="lb"><span class="ms sm">filter_list</span>Bộ lọc</span>`
+    + st.filters.map((fl, i) => `<span class="fchip">${txt(fl)}<button data-frm="${i}" aria-label="Xóa bộ lọc"><span class="ms xs">close</span></button></span>`).join('')
+    + `<button class="fadd" id="fAdd">+ Thêm bộ lọc</button>` + (st.filters.length ? `<button class="fclear" id="fClear">Xoá tất cả</button>` : '');
+}
+function filterBuilder(anchor){
+  const pop = $('#fPop'); place(pop, anchor, 300);
+  pop.innerHTML = `<div class="fbuilder"><select id="fbF" aria-label="Trường">${filterFields.map(f => `<option value="${f.key}">${esc(f.name)}</option>`).join('')}</select>
+    <select id="fbO" aria-label="Điều kiện"></select><span id="fbV"></span>
+    <div class="row"><button class="btn btn--secondary sm" id="fbX">Huỷ</button><button class="btn btn--primary sm" id="fbOk">Áp dụng</button></div></div>`;
+  const fS = $('#fbF', pop), oS = $('#fbO', pop), vB = $('#fbV', pop);
+  const syncV = () => { const f = fieldOf(fS.value), op = oS.value;
+    if (['is_empty','is_not_empty'].includes(op)) { vB.innerHTML = ''; return; }
+    if (f.type === 'SELECT') vB.innerHTML = `<select id="fbVal" style="width:100%">${f.choices.map(c => `<option>${esc(c)}</option>`).join('')}</select>`;
+    else if (f.type === 'RELATION') vB.innerHTML = `<select id="fbVal" style="width:100%"><option value="t1">Bản ghi liên kết #1</option><option value="t2">Bản ghi liên kết #2</option><option value="t3">Bản ghi liên kết #3</option></select>`;
+    else vB.innerHTML = `<input id="fbVal" style="width:100%" placeholder="Giá trị..." type="${f.type === 'NUMBER' ? 'number' : isDate(f) ? 'date' : 'text'}">`; };
+  const syncO = () => { oS.innerHTML = opsOf(fieldOf(fS.value)).map(([v, l]) => `<option value="${v}">${l}</option>`).join(''); syncV(); };
+  fS.onchange = syncO; oS.onchange = syncV; syncO();
+  $('#fbX', pop).onclick = () => pop.classList.remove('open');
+  $('#fbOk', pop).onclick = () => { const vi = $('#fbVal', pop); if (vi && vi.value === '') { vi.focus(); return; }
+    st.filters.push({key:fS.value, op:oS.value, value: vi ? vi.value : null}); st.page = 1; pop.classList.remove('open'); renderAll(); };
+  pop.classList.add('open');
+}
+$('#fbar').onclick = e => {
+  const rm = e.target.closest('[data-frm]'); if (rm) { st.filters.splice(+rm.dataset.frm, 1); renderAll(); return; }
+  if (e.target.closest('#fAdd')) { filterBuilder(e.target.closest('#fAdd')); return; }
+  if (e.target.closest('#fClear')) { st.filters = []; renderAll(); }
+};
+
+/* ── Bảng (RecordTableView): sửa ô tại chỗ, sort ▲▼, đổi rộng cột, ẩn/hiện cột, chọn nhiều ── */
+const DEFW = f => f.primary ? 240 : f.type === 'LONG_TEXT' ? 220 : f.type === 'SELECT' ? 190 : f.type === 'NUMBER' ? 170 : 180;
+const W = f => st.widths[f.key] || DEFW(f);
+const visFields = () => FIELDS.filter(f => !st.hidden.includes(f.key));
+function renderTable(){
+  const all = rows(), pages = Math.max(1, Math.ceil(all.length / PAGE)); st.page = Math.min(Math.max(1, st.page), pages);
+  const list = all.slice((st.page - 1) * PAGE, st.page * PAGE), vis = visFields();
+  const srt = k => st.sort && st.sort.key === k ? (st.sort.dir === 'asc' ? '▲' : '▼') : '';
+  const total = 44 + vis.reduce((s, f) => s + W(f), 0) + 160 + 56;
+  $('#body').innerHTML = `<div class="tw"><table style="width:${total}px;min-width:100%"><colgroup><col style="width:44px">${vis.map(f => `<col style="width:${W(f)}px">`).join('')}<col style="width:160px"><col style="width:56px"></colgroup>
+    <thead><tr><th class="cb"><input type="checkbox" id="all" aria-label="Chọn tất cả" ${list.length && list.every(r => st.sel.has(r.id)) ? 'checked' : ''}></th>
+    ${vis.map(f => `<th data-sort="${f.key}" title="Sắp xếp">${esc(f.name)}<span class="srt">${srt(f.key)}</span><span class="rz" data-rz="${f.key}" title="Kéo để đổi bề rộng · bấm đúp để về mặc định"></span></th>`).join('')}
+    <th data-sort="__createdAt" title="Sắp xếp">Ngày tạo<span class="srt">${srt('__createdAt')}</span></th>
+    <th style="cursor:default"><button class="btn btn--text btn--icon" id="colBtn" title="Ẩn/hiện cột" aria-label="Ẩn/hiện cột"><span class="ms sm">view_column</span></button></th></tr></thead>
+    <tbody>${list.length ? list.map(r => `<tr data-id="${r.id}" class="${st.sel.has(r.id) ? 'sel' : ''}"><td class="cb"><input type="checkbox" data-sel="${r.id}" ${st.sel.has(r.id) ? 'checked' : ''} aria-label="Chọn ${esc(title(r))}"></td>
+      ${vis.map(f => { const v = r.values[f.key];
+        if (f.primary) return `<td data-k="${f.key}"><span class="pri">${empty(v) ? '<span class="nil">—</span>' : `<span class="ini">${esc(String(v).replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase())}</span><span class="t">${esc(v)}</span>`}<button class="pv" data-open="${r.id}">Xem trước</button></span></td>`;
+        return `<td data-k="${f.key}" class="${f.type === 'NUMBER' ? 'num' : ''}" title="${typeof v === 'string' ? esc(v) : ''}">${display(v, f)}</td>`; }).join('')}
+      <td style="color:var(--on-surface-variant);font-size:13px;cursor:default">${createdFmt(r.createdAt)}</td>
+      <td style="cursor:pointer;text-align:center" data-open="${r.id}" title="Mở chi tiết"><span class="ms sm" style="color:var(--on-surface-variant)">chevron_right</span></td></tr>`).join('')
+      : `<tr><td colspan="${vis.length + 3}" class="empty">${st.q ? `Không tìm thấy kết quả cho “${esc(st.q)}”` : 'Chưa có bản ghi nào'}</td></tr>`}</tbody></table></div>
+    <div class="pop colpop" id="colPop" style="right:12px;top:44px"></div>`;
+  $('#pg').textContent = `${st.page} / ${pages}`; $('#prev').disabled = st.page <= 1; $('#next').disabled = st.page >= pages;
+  footer(all.length, pages);
+}
+function footer(n, pages){
+  const tot = api.list().length;
+  $('#footInfo').textContent = (st.filters.length || st.q) ? `Hiển thị ${n} / ${tot} bản ghi` : `${tot} bản ghi · Trang ${st.page}/${pages}`;
+  $('#count').textContent = `${tot} bản ghi`;
+  $('#bulk').classList.toggle('on', st.sel.size > 0); $('#bulkN').textContent = `Đã chọn ${st.sel.size} bản ghi`;
+}
+function openColPop(){ const p = $('#colPop'); p.innerHTML = '<div class="hd">Ẩn/hiện cột</div>' + FIELDS.map(f => `<label><input type="checkbox" data-hide="${f.key}" ${st.hidden.includes(f.key) ? '' : 'checked'}>${esc(f.name)}</label>`).join(''); p.classList.add('open'); }
+$('#body').addEventListener('click', e => {
+  const op = e.target.closest('[data-open]'); if (op) { e.stopPropagation(); HX.openPanel(op.dataset.open); return; }
+  const c = e.target.closest('[data-card]'); if (c) { HX.openPanel(c.dataset.card); return; }
+  if (e.target.closest('#colBtn')) { $('#colPop').classList.contains('open') ? $('#colPop').classList.remove('open') : openColPop(); return; }
+  if (e.target.closest('#colPop')) return;
+  const th = e.target.closest('th[data-sort]'); if (th && !e.target.closest('.rz')) { const k = th.dataset.sort;
+    st.sort = !st.sort || st.sort.key !== k ? {key:k, dir:'asc'} : st.sort.dir === 'asc' ? {key:k, dir:'desc'} : null; renderTable(); return; }
+  const td = e.target.closest('td[data-k]'); if (td && !td.classList.contains('editing')) {
+    const r = api.get(td.parentElement.dataset.id), f = F[td.dataset.k]; td.classList.add('editing');
+    td.replaceChildren(editor(f, r.values[f.key], nv => { if (nv !== r.values[f.key]) { api.update(r.id, f.key, nv); toast('Đã lưu'); } renderTable(); }, renderTable, 'table'));
+  }
 });
-document.getElementById('darkBtn').onclick=e=>{const on=document.documentElement.dataset.theme!=='dark';
-  document.documentElement.dataset.theme=on?'dark':'light';e.target.setAttribute('aria-pressed',on)};
-document.getElementById('tbody').addEventListener('change',e=>{const id=+e.target.dataset.sel;if(!id)return;e.target.checked?selected.add(id):selected.delete(id);renderTable(visible())});
-document.getElementById('all').addEventListener('change',e=>{visible().forEach(d=>e.target.checked?selected.add(d.id):selected.delete(d.id));renderTable(visible())});
-document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render()});
-document.getElementById('navBtn').onclick=()=>document.body.classList.add('nav-open');
-document.getElementById('scrim').onclick=closeAll; document.getElementById('dwClose').onclick=closeAll;
-document.getElementById('newBtn').onclick=()=>toast('Mở drawer “Tạo giao dịch” bên phải (P5)');
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();
-  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();document.getElementById('q').focus()}});
-render();
+$('#body').addEventListener('change', e => {
+  if (e.target.id === 'all') { rows().slice((st.page-1)*PAGE, st.page*PAGE).forEach(r => e.target.checked ? st.sel.add(r.id) : st.sel.delete(r.id)); renderTable(); }
+  else if (e.target.dataset.sel) { e.target.checked ? st.sel.add(e.target.dataset.sel) : st.sel.delete(e.target.dataset.sel); renderTable(); }
+  else if (e.target.dataset.hide) { const k = e.target.dataset.hide; st.hidden = e.target.checked ? st.hidden.filter(x => x !== k) : [...st.hidden, k]; renderTable(); openColPop(); }
+  else if (e.target.id === 'grp') { st.groupBy[st.view] = e.target.value || null; renderKanban(); }
+});
+$('#body').addEventListener('dblclick', e => { const rz = e.target.closest('[data-rz]'); if (rz) { delete st.widths[rz.dataset.rz]; saveW(); renderTable(); } });
+$('#body').addEventListener('mousedown', e => {
+  const rz = e.target.closest('[data-rz]'); if (!rz) return; e.preventDefault(); e.stopPropagation(); const k = rz.dataset.rz, x0 = e.clientX, w0 = W(F[k]);
+  const idx = visFields().findIndex(f => f.key === k), col = document.querySelectorAll('colgroup col')[1 + idx];
+  const mv = ev => { st.widths[k] = Math.max(80, w0 + ev.clientX - x0); if (col) col.style.width = st.widths[k] + 'px'; };
+  const up = () => { document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); saveW(); renderTable(); };
+  document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+});
+const saveW = () => { try { localStorage.setItem('smartdb-col-widths:' + HX.COLLECTION.id, JSON.stringify(st.widths)); } catch {} };
+
+/* ── Kanban: chọn trường lựa chọn làm cột, kéo thả để đổi giá trị ──
+   Như ERP: bản ghi chưa có giá trị ở trường làm cột thì không hiện trên board. */
+const selectFields = FIELDS.filter(f => f.type === 'SELECT');
+function renderKanban(){
+  const gk = st.groupBy[st.view] ?? null;
+  $('#toolsR').innerHTML = gk ? `<label for="grp" style="font-size:13px;color:var(--on-surface-variant)">Cột theo</label><select class="grpsel" id="grp">${selectFields.map(f => `<option value="${f.key}" ${f.key === gk ? 'selected' : ''}>${esc(f.name)}</option>`).join('')}</select>` : '';
+  $('#pg').textContent = '1 / 1'; $('#prev').disabled = $('#next').disabled = true;
+  if (!gk) {
+    $('#body').innerHTML = `<div class="kpick"><span>Chọn field để làm cột Kanban</span><select class="grpsel" id="grp"><option value="">Chọn field...</option>${selectFields.map(f => `<option value="${f.key}">${esc(f.name)}</option>`).join('')}</select></div>`;
+    footer(rows().length, 1); return;
+  }
+  const f = F[gk], list = rows();
+  const extra = r => FIELDS.filter(x => !x.primary && x.key !== gk && !empty(r.values[x.key])).slice(0, 3);
+  $('#body').innerHTML = `<div class="kb">${f.choices.map(c => { const items = list.filter(r => r.values[gk] === c);
+    return `<section class="kcol"><div class="kh"><span class="chip ${gk === 'giai_o_n_pipeline' ? chipCls(c) : ''}">${esc(c)}</span><span class="n">${items.length}</span></div>
+      <div class="kcards" data-drop="${esc(c)}">${items.length ? items.map(r => `<article class="kc" draggable="true" data-card="${r.id}"><span class="tt">${esc(title(r))}</span>
+        ${extra(r).map(x => `<span class="ln">${esc(x.name)}: <b>${esc(fmt(r.values[x.key], x))}</b></span>`).join('')}</article>`).join('') : '<div class="kempty">Chưa có bản ghi</div>'}</div></section>`; }).join('')}</div>`;
+  footer(list.length, 1);
+}
+$('#toolsR').addEventListener('change', e => { if (e.target.id === 'grp') { st.groupBy[st.view] = e.target.value || null; renderKanban(); } });
+$('#body').addEventListener('dragstart', e => { const c = e.target.closest('[data-card]'); if (c) { c.classList.add('dragging'); e.dataTransfer.setData('text/plain', c.dataset.card); } });
+$('#body').addEventListener('dragend', e => e.target.closest('[data-card]')?.classList.remove('dragging'));
+$('#body').addEventListener('dragover', e => { const z = e.target.closest('[data-drop]'); if (z) { e.preventDefault(); z.classList.add('drop'); } });
+$('#body').addEventListener('dragleave', e => e.target.closest('[data-drop]')?.classList.remove('drop'));
+$('#body').addEventListener('drop', e => { const z = e.target.closest('[data-drop]'); if (!z) return; e.preventDefault();
+  const r = api.get(e.dataTransfer.getData('text/plain')), gk = st.groupBy[st.view];
+  if (r && r.values[gk] !== z.dataset.drop) { api.update(r.id, gk, z.dataset.drop); toast(`Đã chuyển sang “${z.dataset.drop}”`); } renderKanban(); });
+
+/* ── Khác ── */
+function renderAll(){
+  renderTabs(); renderFilters();
+  if (viewType() === 'KANBAN') { if (!(st.view in st.groupBy)) st.groupBy[st.view] = null; st.sel.clear(); renderKanban(); }
+  else { $('#toolsR').innerHTML = ''; renderTable(); }
+}
+HX.onChange = () => renderAll();
+$('#q').oninput = e => { st.q = e.target.value.trim(); $('#qx').style.display = st.q ? '' : 'none'; st.page = 1; renderAll(); };
+$('#qx').onclick = () => { $('#q').value = ''; st.q = ''; $('#qx').style.display = 'none'; renderAll(); };
+document.querySelector('.seg').onclick = e => { const b = e.target.closest('[data-density]'); if (!b) return;
+  document.querySelectorAll('[data-density]').forEach(x => x.setAttribute('aria-pressed', x === b)); document.body.classList.toggle('compact', b.dataset.density === 'compact'); };
+$('#moreBtn').onclick = e => { e.stopPropagation(); $('#morePop').classList.toggle('open'); };
+$('#morePop').onclick = e => { const t = e.target.closest('[data-toast]'); if (t) toast(t.dataset.toast); $('#morePop').classList.remove('open'); };
+$('#gsBtn').onclick = () => HX.sheetDialog();
+$('#impBtn').onclick = () => HX.importDialog();
+$('#colsBtn').onclick = e => { e.preventDefault(); toast('Mở trang quản lý cột (Fields) của collection'); };
+$('#newBtn').onclick = () => HX.openCreate(() => renderAll());
+$('#refresh').onclick = () => { renderAll(); toast('Đã làm mới'); };
+$('#exportBtn').onclick = () => toast(`Mockup: xuất ${rows().length} bản ghi ra tệp ${$('#fmt').value}`);
+$('#prev').onclick = () => { st.page--; renderAll(); }; $('#next').onclick = () => { st.page++; renderAll(); };
+$('#bulkCancel').onclick = () => { st.sel.clear(); renderAll(); };
+$('#bulkDel').onclick = () => confirmBox('Xoá bản ghi', `Xoá ${st.sel.size} bản ghi đã chọn? Không thể hoàn tác.`, 'Xoá', () => { const n = st.sel.size; api.remove([...st.sel]); st.sel.clear(); renderAll(); toast(`Đã xoá ${n} bản ghi`); });
+document.addEventListener('click', e => { if (!e.target.closest('.pop') && !e.target.closest('#moreBtn,#colBtn,#fAdd,#vAdd,[data-vedit]')) document.querySelectorAll('.pop.open').forEach(p => p.classList.remove('open')); });
+renderAll();
 </script>
 </body>
 </html>

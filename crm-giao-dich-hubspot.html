@@ -3,108 +3,129 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Deals_Pipeline — HarnexAI CRM (mockup)</title>
+<title>Deals — HarnexAI CRM (mockup)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 <link rel="stylesheet" href="crm-shared.css">
 <style>
-/* ═══ Màn danh sách bản ghi collection Deals_Pipeline ═══
-   Chức năng: đúng màn /data/:id/records của ERP. Bố cục: index page HubSpot. */
+/* ═══ Màn danh sách collection Deals_Pipeline (ghim trên sidebar với tên "Deals") ═══
+   Chức năng: theo màn /data/:id/records của ERP.
+   UX: theo trang Deals của HubSpot (views/…/list và board) — khảo sát 24/09/2026:
+   · mặc định Board theo Giai Đoạn Pipeline · bấm tên bản ghi → trang chi tiết
+   · nút Xem trước cạnh tên → panel dock bên phải · bấm ô → sửa tại chỗ
+   · tiêu đề "Deals ⌄" chuyển đối tượng · Board/Table toggle · View settings ⚙ · thu gọn thanh lọc ⌃
+   · menu ngữ cảnh ở tiêu đề cột · cột Board có Tổng giá trị + Giá trị có trọng số */
 .frame{position:relative}
 .ph{display:flex;align-items:center;gap:8px;padding:16px 16px 0;flex-wrap:wrap}
-.ph h1{font-size:22px;font-weight:700}
+.ttl{display:flex;align-items:center;gap:2px;font-size:24px;font-weight:600;border-radius:var(--radius-md);padding:0 4px;margin-left:-4px}
+.ttl:hover{background:var(--surface-2)}
 .ph .count{font-size:13px;color:var(--on-surface-variant)}
 .ph-act{margin-left:auto;display:flex;gap:8px;align-items:center;position:relative}
-.ph-act .hide-sm{display:none}
-@media(min-width:600px){.ph-act .hide-sm{display:inline-flex}}
+.hide-sm{display:none!important}
+@media(min-width:600px){.hide-sm{display:inline-flex!important}}
 
-.vtabs{display:flex;align-items:flex-end;gap:2px;padding:8px 16px 0;border-bottom:1px solid var(--outline-variant);overflow-x:auto;position:relative}
-.vtab{display:flex;align-items:center;gap:6px;height:36px;padding:0 10px;font-weight:600;color:var(--on-surface-variant);white-space:nowrap;
-  border-bottom:2px solid transparent;border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+.vtabs{display:flex;align-items:flex-end;gap:2px;padding:8px 16px 0;border-bottom:1px solid var(--outline-variant);overflow-x:auto}
+.vtab{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;font-weight:600;font-size:13px;color:var(--on-surface-variant);white-space:nowrap;
+  border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
 .vtab:hover{background:var(--surface-variant)}
-.vtab[aria-selected="true"]{color:var(--on-surface);border-bottom-color:var(--primary);background:var(--surface-variant)}
-.vtab .va{display:none;gap:0}
-.vtab:hover .va,.vtab[aria-selected="true"] .va{display:inline-flex}
-.vtab .va span{width:22px;height:22px;display:grid;place-items:center;border-radius:var(--radius-sm);color:var(--on-surface-variant)}
-.vtab .va span:hover{background:var(--surface-2);color:var(--on-surface)}
-.vform{display:flex;flex-direction:column;gap:10px;padding:8px}
-.vform label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600}
-.vform input,.vform select{height:32px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 8px;background:var(--surface);font-weight:400}
-.vform .row{display:flex;justify-content:flex-end;gap:6px}
+.vtab[aria-selected="true"]{color:var(--on-surface);border-bottom-color:var(--on-surface);background:var(--surface-2)}
 
-.tools{display:flex;align-items:center;gap:8px;padding:10px 16px 0;flex-wrap:wrap}
-.search{display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;width:240px;max-width:100%;border:1px solid var(--outline);border-radius:var(--btn-radius);color:var(--on-surface-variant)}
-.search input{border:none;outline:none;background:none;flex:1;min-width:0;color:var(--on-surface)}
+.tools{display:flex;align-items:center;gap:8px;padding:12px 16px 0;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;width:200px;max-width:100%;border:1px solid var(--outline);border-radius:var(--btn-radius);color:var(--on-surface-variant)}
+.search input{border:none;outline:none;background:none;flex:1;min-width:0;color:var(--on-surface);font-size:13px}
+.tools-r{margin-left:auto;display:flex;gap:6px;align-items:center;position:relative}
 .seg{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden}
-.seg button{height:30px;padding:0 10px;display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--on-surface-variant)}
-.seg button[aria-pressed="true"]{background:var(--primary-container);color:var(--on-primary-container)}
-.tools-r{margin-left:auto;display:flex;gap:6px;align-items:center}
-.grpsel{height:32px;border:1px solid var(--outline);border-radius:var(--btn-radius);padding:0 10px;background:var(--surface);font-size:13px;font-weight:600}
+.seg button{height:30px;width:34px;display:grid;place-items:center;color:var(--on-surface-variant)}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--on-surface)}
+.grpsel{height:32px;border:1px solid var(--outline);border-radius:var(--btn-radius);padding:0 10px;background:var(--surface);font-size:12px;font-weight:600;max-width:200px}
+.pop-form{display:flex;flex-direction:column;gap:10px;padding:8px}
+.pop-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600}
+.pop-form input,.pop-form select{height:32px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 8px;background:var(--surface);font-weight:400}
+.pop-form .row{display:flex;justify-content:flex-end;gap:6px}
+.segtxt{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden}
+.segtxt button{height:28px;padding:0 10px;font-size:12px;font-weight:600;color:var(--on-surface-variant)}
+.segtxt button[aria-pressed="true"]{background:var(--primary-container);color:var(--on-primary-container)}
 
-.fbar{display:flex;align-items:center;gap:6px;padding:8px 16px;border-bottom:1px solid var(--outline-variant);flex-wrap:wrap;position:relative}
-.fbar .lb{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--on-surface-variant)}
+.fbar{display:flex;align-items:center;gap:6px;padding:8px 16px 10px;flex-wrap:wrap}
+body.fcollapsed .fbar{display:none}
+.fbar .lb{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--on-surface-variant)}
 .fchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 4px 0 10px;border-radius:var(--radius-pill);background:var(--primary-container);color:var(--on-primary-container);font-size:12px}
-.fchip b{font-weight:700}
 .fchip button{width:20px;height:20px;border-radius:50%;display:grid;place-items:center}
 .fchip button:hover{background:rgba(0,0,0,.08)}
-.fadd{height:28px;padding:0 10px;border:1px dashed var(--outline);border-radius:var(--radius-pill);font-size:12px;font-weight:600;color:var(--on-surface-variant)}
-.fclear{margin-left:auto;font-size:12px;font-weight:600;color:var(--link)}
+.fadd{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;font-size:12px;font-weight:600;color:var(--on-surface)}
+.fadd:hover{background:var(--surface-2);border-radius:var(--btn-radius)}
+.fclear{font-size:12px;font-weight:600;color:var(--link);margin-left:4px}
 .fbuilder{display:flex;flex-direction:column;gap:8px;padding:10px;min-width:280px}
 .fbuilder select,.fbuilder input{height:32px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 8px;background:var(--surface)}
 .fbuilder .row{display:flex;justify-content:flex-end;gap:6px}
 
 .bulk{display:none;align-items:center;gap:10px;padding:6px 16px;background:var(--primary-container);color:var(--on-primary-container);font-size:13px;font-weight:600}
 .bulk.on{display:flex}
+.body{flex:1;min-height:0;position:relative;overflow:hidden;display:flex;border-top:1px solid var(--outline-variant)}
 
-.body{flex:1;min-height:0;position:relative;overflow:hidden;display:flex}
-/* Bảng (DataTable) */
+/* ── Bảng ── */
 .tw{flex:1;overflow:auto}
 table{border-collapse:separate;border-spacing:0;table-layout:fixed}
 th,td{border-bottom:1px solid var(--outline-variant);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 12px;height:40px}
 body.compact th,body.compact td{height:33px}
 th{position:sticky;top:0;z-index:2;background:var(--surface);font-weight:500;font-size:13px;color:var(--on-surface-variant);user-select:none;cursor:pointer}
-th:hover{color:var(--on-surface)}
+th:hover{color:var(--on-surface);background:var(--surface-variant)}
 th .srt{margin-left:4px;font-size:11px}
+th .hm{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:var(--radius-sm);display:none;place-items:center;background:var(--surface)}
+th:hover .hm{display:grid}
 th .rz{position:absolute;right:0;top:8px;bottom:8px;width:6px;cursor:col-resize;border-right:2px solid transparent}
 th:hover .rz{border-right-color:var(--outline)}
-td{cursor:text;background:var(--surface)}
+td{background:var(--surface);cursor:default}
+td[data-k]:hover{box-shadow:inset 0 0 0 1px var(--on-surface-variant);cursor:text}
 td.num{text-align:right}
-tbody tr:hover td{background:var(--surface-variant)}
+tbody tr:hover td{background:var(--surface-2)}
 tbody tr.sel td{background:var(--primary-container)}
-td.cb,th.cb{width:44px;cursor:default;text-align:center}
-td.cb input{opacity:0} tr:hover td.cb input,td.cb input:checked{opacity:1}
-td.editing{overflow:visible;padding:4px 8px}
+td.cb,th.cb{width:44px;text-align:center;cursor:default}
+td.editing{overflow:visible;padding:4px 8px;box-shadow:none!important}
+td.pk{cursor:default}
 .pri{display:flex;align-items:center;gap:8px;min-width:0}
-.ini{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;background:var(--primary-container);color:var(--on-primary-container);flex:none}
-.pri .t{overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--link)}
-.pv{display:none;margin-left:auto;height:24px;padding:0 8px;border:1px solid var(--outline);border-radius:var(--btn-radius);font-size:11px;font-weight:600;background:var(--surface);color:var(--on-surface);cursor:pointer;flex:none}
-tr:hover .pv{display:inline-flex;align-items:center}
+.pri a{overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--link)}
+.pri a:hover{text-decoration:underline}
+.pvb{display:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--outline);background:var(--surface);place-items:center;flex:none;margin-left:auto;color:var(--on-surface)}
+tr:hover .pvb{display:grid}
+.pvb:hover{background:var(--primary-container)}
 .empty{padding:48px 16px;text-align:center;color:var(--on-surface-variant)}
 .colpop{max-height:360px;overflow-y:auto}
 .colpop label{display:flex;align-items:center;gap:8px;min-height:30px;padding:0 8px;font-size:13px;border-radius:var(--radius-sm);cursor:pointer}
 .colpop label:hover{background:var(--surface-2)}
 
-/* Kanban */
-.kb{flex:1;display:flex;gap:12px;padding:12px 16px;overflow-x:auto;align-items:stretch}
-.kcol{flex:none;width:82vw;max-width:280px;display:flex;flex-direction:column;min-height:0;background:var(--surface-variant);border:1px solid var(--outline-variant);border-radius:var(--radius-lg)}
-@media(min-width:600px){.kcol{width:272px}}
-.kh{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--outline-variant)}
+/* ── Board ── */
+.kb{flex:1;display:flex;gap:10px;padding:12px 16px;overflow-x:auto;align-items:stretch}
+.kcol{flex:none;width:82vw;max-width:300px;display:flex;flex-direction:column;min-height:0;background:#F0F0F0;border-radius:var(--radius-lg)}
+html[data-theme="dark"] .kcol{background:var(--surface-variant)}
+@media(min-width:600px){.kcol{width:300px}}
+.kh{display:flex;align-items:center;gap:6px;padding:10px 10px 6px}
 .kh .n{font-size:12px;font-weight:700;color:var(--on-surface-variant)}
-.kcards{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px;min-height:80px}
-.kcards.drop{background:var(--primary-container)}
-.kc{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:10px 12px;display:flex;flex-direction:column;gap:4px;cursor:pointer}
-.kc:hover{border-color:var(--outline)}
+.kcards{flex:1;overflow-y:auto;padding:4px 8px 8px;display:flex;flex-direction:column;gap:8px;min-height:80px}
+.kcards.drop{outline:2px dashed var(--primary);outline-offset:-4px;border-radius:var(--radius-md)}
+.kc{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-lg);padding:12px;display:flex;flex-direction:column;gap:5px;cursor:grab;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.kc:hover{border-color:var(--outline);box-shadow:var(--shadow-2)}
 .kc.dragging{opacity:.5}
-.kc .tt{font-weight:600;color:var(--link)}
-.kc .ln{font-size:12px;color:var(--on-surface-variant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.kc .ln b{color:var(--on-surface);font-weight:500}
-.kempty{border:1px dashed var(--outline);border-radius:var(--radius-md);padding:14px;text-align:center;font-size:12px;color:var(--on-surface-variant)}
-.kpick{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--on-surface-variant)}
+.kc a.tt{font-weight:600;color:var(--link);align-self:flex-start}
+.kc a.tt:hover{text-decoration:underline}
+.kc .ln{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--on-surface);min-width:0}
+.kc .ln .ms{font-size:15px;color:var(--on-surface-variant)}
+.kc .ln span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kc .kf{display:flex;align-items:center;gap:6px;border-top:1px solid var(--outline-variant);padding-top:8px;margin-top:4px}
+.kc .kf .qi{width:26px;height:26px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant)}
+.kc .kf .qi:hover{background:var(--surface-2);color:var(--on-surface)}
+.kc .kf .rate{margin-left:auto;font-size:11px;font-weight:600;padding:1px 8px;border-radius:var(--radius-pill);border:1px solid var(--outline);color:var(--on-surface-variant)}
+.kempty{padding:14px;text-align:center;font-size:12px;color:var(--on-surface-variant)}
+.ksum{border-top:1px solid var(--outline);padding:8px 12px 10px;font-size:12px;color:var(--on-surface-variant);display:flex;flex-direction:column;gap:2px}
+.ksum b{color:var(--on-surface)}
+.ksum .ms{font-size:14px;vertical-align:-2px}
+.knote{font-size:12px;color:var(--on-surface-variant);padding:0 16px 4px}
 
 .foot{display:flex;align-items:center;gap:8px;padding:8px 16px;border-top:1px solid var(--outline-variant);flex:none;flex-wrap:wrap}
-.foot .info{font-size:13px;color:var(--on-surface-variant)}
+.foot .pillc{font-size:12px;font-weight:600;padding:3px 10px;border-radius:var(--radius-pill);background:var(--surface-2)}
+.foot .info{font-size:12px;color:var(--on-surface-variant)}
 .pager{display:flex;align-items:center;gap:6px;margin:0 auto;font-size:13px}
 .foot .r{display:flex;gap:6px;align-items:center}
 .fmt{height:32px;border:1px solid var(--outline);border-radius:var(--btn-radius);padding:0 8px;background:var(--surface);font-size:13px}
@@ -116,96 +137,108 @@ tr:hover .pv{display:inline-flex;align-items:center}
   <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
   <main class="main"><div class="frame">
     <div class="ph">
-      <h1 id="colName"></h1><span class="count" id="count"></span>
+      <div style="position:relative">
+        <button class="ttl" id="objBtn" aria-haspopup="menu"><span id="objName"></span><span class="ms">expand_more</span></button>
+        <div class="pop" id="objPop" role="menu" style="top:42px;left:0"></div>
+      </div>
+      <span class="count" id="count"></span>
       <div class="ph-act">
-        <button class="btn btn--secondary btn--icon" id="moreBtn" aria-label="Thêm" aria-haspopup="menu"><span class="ms sm">more_horiz</span></button>
-        <div class="pop" id="morePop" role="menu" style="top:38px;left:0">
-          <button class="mi" role="menuitem" data-toast="Đã ghim Deals_Pipeline vào sidebar"><span class="ms sm">push_pin</span>Ghim vào sidebar</button>
+        <button class="btn btn--secondary btn--icon" id="moreBtn" aria-label="Thêm thao tác" aria-haspopup="menu"><span class="ms sm">more_vert</span></button>
+        <div class="pop" id="morePop" role="menu" style="top:38px;right:0">
+          <button class="mi" role="menuitem" data-toast="Deals_Pipeline đã được ghim vào sidebar với tên “Deals”"><span class="ms sm">push_pin</span>Ghim vào sidebar</button>
           <button class="mi" role="menuitem" data-toast="Chọn nhóm để ghim"><span class="ms sm">folder</span>Ghim vào nhóm…</button>
           <div class="sep"></div>
+          <button class="mi" role="menuitem" data-cols><span class="ms sm">edit</span>Quản lý cột (trường dữ liệu)</button>
           <button class="mi" role="menuitem" id="gsBtn"><span class="ms sm">sync</span>Kết nối Google Sheet</button>
         </div>
-        <a class="btn btn--secondary hide-sm" href="#" id="colsBtn" title="Quản lý cột (trường dữ liệu)"><span class="ms sm">edit</span>Cột</a>
         <button class="btn btn--secondary hide-sm" id="impBtn">Import</button>
-        <button class="btn btn--primary" id="newBtn"><span class="ms sm">add</span>Tạo mới</button>
+        <button class="btn btn--primary" id="newBtn">Tạo mới</button>
       </div>
     </div>
 
     <div class="vtabs" role="tablist" aria-label="View" id="vtabs"></div>
-    <div class="pop" id="viewPop" style="top:0;left:0"></div>
 
     <div class="tools">
-      <label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm kiếm bản ghi..."><button id="qx" class="ms xs" style="display:none" aria-label="Xoá tìm kiếm">close</button></label>
-      <div class="seg" role="group" aria-label="Mật độ hiển thị">
-        <button aria-pressed="true" data-density="normal" title="Thoáng"><span class="ms sm">view_agenda</span>Thoáng</button>
-        <button aria-pressed="false" data-density="compact" title="Gọn"><span class="ms sm">density_small</span>Gọn</button>
+      <label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm kiếm ( / )"></label>
+      <div style="position:relative">
+        <button class="btn btn--secondary" id="sortBtn"><span class="ms sm">swap_vert</span>Sắp xếp</button>
+        <div class="pop" id="sortPop" style="top:38px;left:0"></div>
       </div>
-      <div class="tools-r" id="toolsR"></div>
+      <div class="tools-r">
+        <span id="grpBox"></span>
+        <div class="seg" role="group" aria-label="Kiểu hiển thị">
+          <button data-mode="KANBAN" title="Board" aria-label="Board"><span class="ms sm">view_kanban</span></button>
+          <button data-mode="TABLE" title="Bảng" aria-label="Bảng"><span class="ms sm">table_rows</span></button>
+        </div>
+        <button class="btn btn--secondary btn--icon" id="setBtn" title="Cài đặt view" aria-label="Cài đặt view"><span class="ms sm">settings</span></button>
+        <button class="btn btn--secondary btn--icon" id="colBtn2" title="Thu gọn thanh lọc" aria-label="Thu gọn thanh lọc"><span class="ms sm" id="colIc">expand_less</span></button>
+        <div class="pop" id="setPop" style="top:38px;right:0;width:280px"></div>
+      </div>
     </div>
 
     <div class="fbar" id="fbar"></div>
-    <div class="pop" id="fPop" style="top:0;left:0"></div>
+    <div class="pop" id="fPop"></div>
     <div class="bulk" id="bulk"><span id="bulkN"></span><button class="btn btn--text sm" id="bulkDel"><span class="ms sm">delete</span>Xoá</button><button class="btn btn--text sm" id="bulkCancel">Huỷ</button></div>
 
     <div class="body" id="body"></div>
 
     <div class="foot">
-      <span class="info" id="footInfo"></span>
-      <div class="pager"><button class="btn btn--secondary sm" id="prev"><span class="ms xs">chevron_left</span>Trước</button><span id="pg"></span><button class="btn btn--secondary sm" id="next">Sau<span class="ms xs">chevron_right</span></button></div>
+      <span class="pillc" id="footCount"></span><span class="info" id="footInfo"></span>
+      <div class="pager" id="pager"><button class="btn btn--secondary sm" id="prev"><span class="ms xs">chevron_left</span>Trước</button><span id="pg"></span><button class="btn btn--secondary sm" id="next">Sau<span class="ms xs">chevron_right</span></button></div>
       <div class="r">
         <button class="btn btn--secondary btn--icon" id="refresh" title="Làm mới" aria-label="Làm mới"><span class="ms sm">refresh</span></button>
         <select class="fmt" id="fmt" aria-label="Định dạng xuất"><option>.xlsx</option><option>.csv</option></select>
-        <button class="btn btn--secondary" id="exportBtn"><span class="ms sm">download</span>Export</button>
+        <button class="btn btn--secondary" id="exportBtn"><span class="ms sm">ios_share</span>Export</button>
       </div>
     </div>
   </div></main>
 </div>
 <div class="scrim" id="scrim"></div>
-<aside class="panel" id="panel" aria-label="Chi tiết bản ghi"></aside>
+<aside class="panel" id="panel" aria-label="Xem trước bản ghi"></aside>
 <div class="modal-bg" id="modal"></div>
 <div class="demo" id="demo" role="group" aria-label="Điều khiển mockup"></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="crm-shared.js"></script>
 <script>
-const {FIELDS,F,api,esc,empty,fmt,display,chipCls,createdFmt,title,editor,toast,confirmBox,$} = HX;
+const {FIELDS,F,api,esc,empty,fmt,display,pill,pillCls,createdFmt,title,editor,toast,confirmBox,$} = HX;
 HX.shell();
-$('#colName').textContent = HX.COLLECTION.name;
+$('#objName').textContent = HX.COLLECTION.label;
+const DETAIL = id => `crm-deal-chi-tiet-hubspot.html?id=${id}`;
 
 /* ── Điều kiện lọc theo kiểu trường — đúng danh sách của ERP ── */
 const OPS = {
   TEXT:[['eq','Bằng'],['neq','Khác'],['contains','Chứa'],['is_empty','Trống'],['is_not_empty','Không trống']],
   NUMBER:[['eq','Bằng'],['neq','Khác'],['gt','Lớn hơn'],['lt','Nhỏ hơn'],['is_empty','Trống'],['is_not_empty','Không trống']],
-  SELECT:[['eq','Bằng'],['neq','Khác']],
-  DATE:[['eq','Bằng'],['neq','Khác'],['gt','Lớn hơn'],['lt','Nhỏ hơn']],
-  RELATION:[['eq','Bằng'],['neq','Khác']]
+  SELECT:[['eq','Bằng'],['neq','Khác']], DATE:[['eq','Bằng'],['neq','Khác'],['gt','Lớn hơn'],['lt','Nhỏ hơn']], RELATION:[['eq','Bằng'],['neq','Khác']]
 };
 const isDate = f => f.type === 'DATE' || f.type === 'DATETIME' || f.type === '__created';
 const opsOf = f => OPS[f.type === 'LONG_TEXT' ? 'TEXT' : isDate(f) ? 'DATE' : f.type] || OPS.TEXT;
 const CREATED = {key:'__createdAt', name:'Ngày tạo', type:'__created'};
 const fieldOf = k => k === '__createdAt' ? CREATED : F[k];
-const filterFields = [CREATED, ...FIELDS];
-const PAGE = 50;
-const st = { view:'builtin-table', q:'', filters:[], sort:{key:'__createdAt',dir:'desc'}, hidden:[], sel:new Set(), page:1, groupBy:{ 'builtin-kanban':null }, widths:{} };
+const PAGE = 50, STAGE = 'giai_o_n_pipeline', CASH = 't_ng_cash_in_d_ki_n', RATE = 't_l_th_nh_c_ng';
+
+/* View: "Tất cả Deals" (tương ứng Bảng/Kanban sẵn có của ERP) + view đã lưu.
+   Mỗi view nhớ kiểu hiển thị riêng; mặc định mở ở Board theo Giai Đoạn Pipeline. */
+const st = { view:'all', q:'', filters:[], sort:{key:'__createdAt',dir:'desc'}, hidden:[], sel:new Set(), page:1,
+  mode:{ all:'KANBAN' }, groupBy:{}, widths:{} };
 try { Object.assign(st.widths, JSON.parse(localStorage.getItem('smartdb-col-widths:' + HX.COLLECTION.id) || '{}')); } catch {}
-const viewType = () => st.view === 'builtin-table' ? 'TABLE' : st.view === 'builtin-kanban' ? 'KANBAN' : (api.views().find(v => v.id === st.view) || {}).type;
+const views = () => [{id:'all', name:'Tất cả Deals', type:'KANBAN', b:1}, ...api.views()];
+const curView = () => views().find(v => v.id === st.view) || views()[0];
+const mode = () => st.mode[st.view] || curView().type;
+const groupKey = () => st.groupBy[st.view] || STAGE;
 
 const valOf = (r, key) => key === '__createdAt' ? r.createdAt : r.values[key];
 function pass(r, fl){
   const f = fieldOf(fl.key), v = valOf(r, fl.key);
-  if (isDate(f)) { if (empty(v)) return fl.op === 'neq';
-    const a = String(v).slice(0,10), b = String(fl.value).slice(0,10);
+  if (isDate(f)) { if (empty(v)) return fl.op === 'neq'; const a = String(v).slice(0,10), b = String(fl.value).slice(0,10);
     return fl.op === 'eq' ? a === b : fl.op === 'neq' ? a !== b : fl.op === 'gt' ? a > b : a < b; }
   switch (fl.op) {
-    case 'eq': return String(v ?? '') === String(fl.value);
-    case 'neq': return String(v ?? '') !== String(fl.value);
+    case 'eq': return String(v ?? '') === String(fl.value); case 'neq': return String(v ?? '') !== String(fl.value);
     case 'contains': return String(v ?? '').toLowerCase().includes(String(fl.value).toLowerCase());
-    case 'gt': return Number(v) > Number(fl.value);
-    case 'lt': return Number(v) < Number(fl.value);
-    case 'is_empty': return empty(v);
-    case 'is_not_empty': return !empty(v);
-  }
-  return true;
+    case 'gt': return Number(v) > Number(fl.value); case 'lt': return Number(v) < Number(fl.value);
+    case 'is_empty': return empty(v); case 'is_not_empty': return !empty(v);
+  } return true;
 }
 function rows(){
   let list = api.list().filter(r => st.filters.every(fl => pass(r, fl)));
@@ -216,50 +249,89 @@ function rows(){
     return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'vi')) * d; });
 }
 function place(pop, anchor, w){ const r = anchor.getBoundingClientRect(), fr = document.querySelector('.frame').getBoundingClientRect();
-  pop.style.left = Math.max(8, Math.min(r.left - fr.left, fr.width - w)) + 'px'; pop.style.top = (r.bottom - fr.top + 4) + 'px'; }
+  pop.style.left = Math.max(8, Math.min(r.left - fr.left, fr.width - w)) + 'px'; pop.style.top = (r.bottom - fr.top + 4) + 'px'; pop.style.right = 'auto'; }
+const closePops = except => document.querySelectorAll('.pop.open').forEach(p => { if (p !== except) p.classList.remove('open'); });
 
-/* ── View tabs: Bảng · Kanban (sẵn có) + view đã lưu (sửa / xoá) + Tạo View ── */
+/* ── Tiêu đề "Deals ⌄": chuyển sang collection khác (như menu đối tượng của HubSpot) ── */
+$('#objPop').innerHTML = `<div class="hd">Collection</div><button class="mi" style="font-weight:700"><span class="ms sm">check</span>Deals <small class="nil">(Deals_Pipeline)</small></button>`
+  + HX.OTHERS.map(o => `<button class="mi" data-toast="Mở collection ${o}"><span class="ms sm" style="visibility:hidden">check</span>${o}</button>`).join('')
+  + `<div class="sep"></div><button class="mi" data-toast="Mở trang Dữ liệu"><span class="ms sm">table_chart</span>Tất cả collection</button>`;
+$('#objBtn').onclick = e => { e.stopPropagation(); closePops($('#objPop')); $('#objPop').classList.toggle('open'); };
+
+/* ── View tabs ── */
 function renderTabs(){
-  const tabs = [{id:'builtin-table',name:'Bảng',type:'TABLE',b:1},{id:'builtin-kanban',name:'Kanban',type:'KANBAN',b:1},...api.views()];
-  $('#vtabs').innerHTML = tabs.map(v => `<button class="vtab" role="tab" aria-selected="${st.view === v.id}" data-view="${v.id}">
-      <span class="ms sm">${v.type === 'KANBAN' ? 'view_kanban' : 'table_rows'}</span>${esc(v.name)}
-      ${v.b ? '' : `<span class="va"><span data-vedit="${v.id}" title="Sửa view"><span class="ms xs">edit</span></span><span data-vdel="${v.id}" title="Xóa view"><span class="ms xs">close</span></span></span>`}</button>`).join('')
+  $('#vtabs').innerHTML = views().map(v => `<button class="vtab" role="tab" aria-selected="${st.view === v.id}" data-view="${v.id}">
+    <span class="ms sm">${(st.mode[v.id] || v.type) === 'KANBAN' ? 'view_kanban' : 'table_rows'}</span>${esc(v.name)}</button>`).join('')
     + `<button class="btn btn--text btn--icon" id="vAdd" title="Tạo View" aria-label="Tạo View"><span class="ms sm">add</span></button>`;
 }
 function viewForm(anchor, v){
-  const pop = $('#viewPop'); place(pop, anchor, 260);
-  pop.innerHTML = `<form class="vform"><b>${v ? 'Sửa View' : 'Tạo View'}</b>
+  const pop = $('#setPop'); closePops(pop);
+  pop.innerHTML = `<form class="pop-form"><b>${v ? 'Sửa View' : 'Tạo View'}</b>
     <label>Tên View<input name="n" value="${v ? esc(v.name) : ''}" required></label>
-    <label>Loại View<select name="t"><option value="TABLE" ${v && v.type === 'TABLE' ? 'selected' : ''}>Danh sách</option><option value="KANBAN" ${v && v.type === 'KANBAN' ? 'selected' : ''}>Kanban</option></select></label>
-    <div class="row"><button type="button" class="btn btn--secondary sm" data-vcancel>Huỷ</button><button class="btn btn--primary sm">${v ? 'Lưu thay đổi' : 'Tạo View'}</button></div></form>`;
+    <label>Loại View<select name="t"><option value="TABLE" ${v && v.type === 'TABLE' ? 'selected' : ''}>Danh sách</option><option value="KANBAN" ${!v || v.type === 'KANBAN' ? 'selected' : ''}>Kanban</option></select></label>
+    <div class="row"><button type="button" class="btn btn--secondary sm" data-pclose>Huỷ</button><button class="btn btn--primary sm">${v ? 'Lưu thay đổi' : 'Tạo View'}</button></div></form>`;
+  if (anchor.id === 'vAdd') place(pop, anchor, 290); else { pop.style.left = 'auto'; pop.style.right = '0'; pop.style.top = '38px'; }
   pop.classList.add('open'); pop.querySelector('input').focus();
   pop.querySelector('form').onsubmit = e => { e.preventDefault(); const n = e.target.n.value.trim(), t = e.target.t.value; if (!n) return;
     let vs = api.views();
-    if (v) vs = vs.map(x => x.id === v.id ? {...x, name:n, type:t} : x); else { const id = 'v' + Date.now(); vs = [...vs, {id, name:n, type:t}]; st.view = id; }
+    if (v) { vs = vs.map(x => x.id === v.id ? {...x, name:n, type:t} : x); st.mode[v.id] = t; }
+    else { const id = 'v' + Date.now(); vs = [...vs, {id, name:n, type:t}]; st.view = id; }
     api.saveViews(vs); pop.classList.remove('open'); toast(v ? 'Đã lưu thay đổi view' : 'Đã tạo view'); renderAll(); };
-  pop.querySelector('[data-vcancel]').onclick = () => pop.classList.remove('open');
+  pop.querySelector('[data-pclose]').onclick = () => pop.classList.remove('open');
 }
 $('#vtabs').onclick = e => {
-  const ed = e.target.closest('[data-vedit]'), dl = e.target.closest('[data-vdel]');
-  if (ed) { e.stopPropagation(); viewForm(ed, api.views().find(v => v.id === ed.dataset.vedit)); return; }
-  if (dl) { e.stopPropagation(); const v = api.views().find(x => x.id === dl.dataset.vdel);
-    confirmBox('Xóa view', `Xóa view “${esc(v.name)}”? Bản ghi không bị ảnh hưởng.`, 'Xóa view', () => { api.saveViews(api.views().filter(x => x.id !== v.id)); if (st.view === v.id) st.view = 'builtin-table'; renderAll(); toast('Đã xóa view'); }); return; }
-  if (e.target.closest('#vAdd')) { viewForm(e.target.closest('#vAdd')); return; }
+  if (e.target.closest('#vAdd')) { e.stopPropagation(); viewForm(e.target.closest('#vAdd')); return; }
   const t = e.target.closest('[data-view]'); if (t) { st.view = t.dataset.view; st.sel.clear(); st.page = 1; renderAll(); }
 };
 
-/* ── Thanh bộ lọc (RecordFilterBar): chip + Thêm bộ lọc + Xoá tất cả ── */
+/* ── ⚙ Cài đặt view: kiểu hiển thị · mật độ · sửa / xoá view · quản lý cột ── */
+$('#setBtn').onclick = e => { e.stopPropagation(); const pop = $('#setPop'), v = curView();
+  if (pop.classList.contains('open')) { pop.classList.remove('open'); return; } closePops(pop);
+  pop.style.left = 'auto'; pop.style.right = '0'; pop.style.top = '38px';
+  pop.innerHTML = `<div class="hd">Cài đặt view</div>
+    <div style="padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px">Kiểu hiển thị<span class="segtxt"><button data-m="TABLE" aria-pressed="${mode() === 'TABLE'}">Bảng</button><button data-m="KANBAN" aria-pressed="${mode() === 'KANBAN'}">Board</button></span></div>
+    <div style="padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px">Mật độ<span class="segtxt"><button data-d="normal" aria-pressed="${!document.body.classList.contains('compact')}">Thoáng</button><button data-d="compact" aria-pressed="${document.body.classList.contains('compact')}">Gọn</button></span></div>
+    <div class="sep"></div><div class="hd">Thao tác</div>
+    ${v.b ? '<div class="mi nil" style="cursor:default">View mặc định — không sửa / xoá</div>' : `<button class="mi" data-vedit><span class="ms sm">edit</span>Sửa view</button><button class="mi" data-vdel style="color:var(--error)"><span class="ms sm">delete</span>Xóa view</button>`}
+    <button class="mi" data-cols><span class="ms sm">view_column</span>Quản lý cột (trường dữ liệu)</button>`;
+  pop.classList.add('open');
+};
+$('#setPop').addEventListener('click', e => {
+  e.stopPropagation(); const v = curView();
+  const m = e.target.closest('[data-m]'); if (m) { st.mode[st.view] = m.dataset.m; $('#setPop').classList.remove('open'); renderAll(); return; }
+  const d = e.target.closest('[data-d]'); if (d) { document.body.classList.toggle('compact', d.dataset.d === 'compact'); $('#setPop').classList.remove('open'); renderAll(); return; }
+  if (e.target.closest('[data-cols]')) { $('#setPop').classList.remove('open'); toast('Mở trang quản lý cột (Fields) của Deals_Pipeline'); return; }
+  if (e.target.closest('[data-vedit]')) { viewForm($('#setBtn'), v); return; }
+  if (e.target.closest('[data-vdel]')) { $('#setPop').classList.remove('open');
+    confirmBox('Xóa view', `Xóa view “${esc(v.name)}”? Bản ghi không bị ảnh hưởng.`, 'Xóa view', () => { api.saveViews(api.views().filter(x => x.id !== v.id)); st.view = 'all'; renderAll(); toast('Đã xóa view'); }); }
+});
+document.querySelector('.seg').onclick = e => { const b = e.target.closest('[data-mode]'); if (b) { st.mode[st.view] = b.dataset.mode; renderAll(); } };
+$('#colBtn2').onclick = () => { document.body.classList.toggle('fcollapsed'); $('#colIc').textContent = document.body.classList.contains('fcollapsed') ? 'expand_more' : 'expand_less'; };
+
+/* ── Sắp xếp ── */
+$('#sortBtn').onclick = e => { e.stopPropagation(); const pop = $('#sortPop'); if (pop.classList.contains('open')) { pop.classList.remove('open'); return; } closePops(pop);
+  const s = st.sort || {key:'__createdAt', dir:'desc'};
+  pop.innerHTML = `<div class="pop-form"><label>Sắp xếp theo<select id="sKey">${[CREATED, ...FIELDS].map(f => `<option value="${f.key}" ${f.key === s.key ? 'selected' : ''}>${esc(f.name)}</option>`).join('')}</select></label>
+    <label>Thứ tự<select id="sDir"><option value="asc" ${s.dir === 'asc' ? 'selected' : ''}>Tăng dần</option><option value="desc" ${s.dir === 'desc' ? 'selected' : ''}>Giảm dần</option></select></label>
+    <div class="row"><button class="btn btn--secondary sm" id="sReset">Mặc định</button><button class="btn btn--primary sm" id="sOk">Áp dụng</button></div></div>`;
+  pop.classList.add('open');
+  $('#sOk').onclick = () => { st.sort = {key:$('#sKey').value, dir:$('#sDir').value}; pop.classList.remove('open'); renderAll(); };
+  $('#sReset').onclick = () => { st.sort = {key:'__createdAt', dir:'desc'}; pop.classList.remove('open'); renderAll(); };
+};
+$('#sortPop').addEventListener('click', e => e.stopPropagation());
+
+/* ── Thanh bộ lọc ── */
 function renderFilters(){
   const txt = fl => { const f = fieldOf(fl.key), op = opsOf(f).find(o => o[0] === fl.op)[1];
     const vv = ['is_empty','is_not_empty'].includes(fl.op) ? '' : ` “${esc(f.type === 'RELATION' ? fmt(fl.value, f) : isDate(f) ? new Date(fl.value).toLocaleDateString('vi-VN') : fl.value)}”`;
     return `<b>${esc(f.name)}</b> ${op}${vv}`; };
   $('#fbar').innerHTML = `<span class="lb"><span class="ms sm">filter_list</span>Bộ lọc</span>`
     + st.filters.map((fl, i) => `<span class="fchip">${txt(fl)}<button data-frm="${i}" aria-label="Xóa bộ lọc"><span class="ms xs">close</span></button></span>`).join('')
-    + `<button class="fadd" id="fAdd">+ Thêm bộ lọc</button>` + (st.filters.length ? `<button class="fclear" id="fClear">Xoá tất cả</button>` : '');
+    + `<button class="fadd" id="fAdd"><span class="ms xs">add</span>Thêm bộ lọc</button>` + (st.filters.length ? `<button class="fclear" id="fClear">Xoá tất cả</button>` : '');
 }
-function filterBuilder(anchor){
-  const pop = $('#fPop'); place(pop, anchor, 300);
-  pop.innerHTML = `<div class="fbuilder"><select id="fbF" aria-label="Trường">${filterFields.map(f => `<option value="${f.key}">${esc(f.name)}</option>`).join('')}</select>
+function filterBuilder(anchor, presetKey){
+  const pop = $('#fPop'); closePops(pop); place(pop, anchor, 300);
+  pop.innerHTML = `<div class="fbuilder"><select id="fbF" aria-label="Trường">${[CREATED, ...FIELDS].map(f => `<option value="${f.key}" ${f.key === presetKey ? 'selected' : ''}>${esc(f.name)}</option>`).join('')}</select>
     <select id="fbO" aria-label="Điều kiện"></select><span id="fbV"></span>
     <div class="row"><button class="btn btn--secondary sm" id="fbX">Huỷ</button><button class="btn btn--primary sm" id="fbOk">Áp dụng</button></div></div>`;
   const fS = $('#fbF', pop), oS = $('#fbO', pop), vB = $('#fbV', pop);
@@ -272,54 +344,69 @@ function filterBuilder(anchor){
   fS.onchange = syncO; oS.onchange = syncV; syncO();
   $('#fbX', pop).onclick = () => pop.classList.remove('open');
   $('#fbOk', pop).onclick = () => { const vi = $('#fbVal', pop); if (vi && vi.value === '') { vi.focus(); return; }
-    st.filters.push({key:fS.value, op:oS.value, value: vi ? vi.value : null}); st.page = 1; pop.classList.remove('open'); renderAll(); };
+    st.filters.push({key:fS.value, op:oS.value, value: vi ? vi.value : null}); st.page = 1; pop.classList.remove('open');
+    document.body.classList.remove('fcollapsed'); $('#colIc').textContent = 'expand_less'; renderAll(); };
+  pop.addEventListener('click', e => e.stopPropagation());
   pop.classList.add('open');
 }
 $('#fbar').onclick = e => {
   const rm = e.target.closest('[data-frm]'); if (rm) { st.filters.splice(+rm.dataset.frm, 1); renderAll(); return; }
-  if (e.target.closest('#fAdd')) { filterBuilder(e.target.closest('#fAdd')); return; }
+  if (e.target.closest('#fAdd')) { e.stopPropagation(); filterBuilder(e.target.closest('#fAdd')); return; }
   if (e.target.closest('#fClear')) { st.filters = []; renderAll(); }
 };
 
-/* ── Bảng (RecordTableView): sửa ô tại chỗ, sort ▲▼, đổi rộng cột, ẩn/hiện cột, chọn nhiều ── */
-const DEFW = f => f.primary ? 240 : f.type === 'LONG_TEXT' ? 220 : f.type === 'SELECT' ? 190 : f.type === 'NUMBER' ? 170 : 180;
+/* ── Bảng ── */
+const DEFW = f => f.primary ? 250 : f.type === 'LONG_TEXT' ? 220 : f.type === 'SELECT' ? 190 : f.type === 'NUMBER' ? 170 : 180;
 const W = f => st.widths[f.key] || DEFW(f);
 const visFields = () => FIELDS.filter(f => !st.hidden.includes(f.key));
 function renderTable(){
   const all = rows(), pages = Math.max(1, Math.ceil(all.length / PAGE)); st.page = Math.min(Math.max(1, st.page), pages);
   const list = all.slice((st.page - 1) * PAGE, st.page * PAGE), vis = visFields();
   const srt = k => st.sort && st.sort.key === k ? (st.sort.dir === 'asc' ? '▲' : '▼') : '';
-  const total = 44 + vis.reduce((s, f) => s + W(f), 0) + 160 + 56;
-  $('#body').innerHTML = `<div class="tw"><table style="width:${total}px;min-width:100%"><colgroup><col style="width:44px">${vis.map(f => `<col style="width:${W(f)}px">`).join('')}<col style="width:160px"><col style="width:56px"></colgroup>
+  const total = 44 + vis.reduce((s, f) => s + W(f), 0) + 170 + 52;
+  $('#body').innerHTML = `<div class="tw"><table style="width:${total}px;min-width:100%"><colgroup><col style="width:44px">${vis.map(f => `<col style="width:${W(f)}px">`).join('')}<col style="width:170px"><col style="width:52px"></colgroup>
     <thead><tr><th class="cb"><input type="checkbox" id="all" aria-label="Chọn tất cả" ${list.length && list.every(r => st.sel.has(r.id)) ? 'checked' : ''}></th>
-    ${vis.map(f => `<th data-sort="${f.key}" title="Sắp xếp">${esc(f.name)}<span class="srt">${srt(f.key)}</span><span class="rz" data-rz="${f.key}" title="Kéo để đổi bề rộng · bấm đúp để về mặc định"></span></th>`).join('')}
-    <th data-sort="__createdAt" title="Sắp xếp">Ngày tạo<span class="srt">${srt('__createdAt')}</span></th>
-    <th style="cursor:default"><button class="btn btn--text btn--icon" id="colBtn" title="Ẩn/hiện cột" aria-label="Ẩn/hiện cột"><span class="ms sm">view_column</span></button></th></tr></thead>
+    ${vis.map(f => `<th data-sort="${f.key}" title="Bấm để sắp xếp">${esc(f.name)}<span class="srt">${srt(f.key)}</span><button class="hm" data-hmenu="${f.key}" aria-label="Tuỳ chọn cột ${esc(f.name)}"><span class="ms xs">more_vert</span></button><span class="rz" data-rz="${f.key}" title="Kéo để đổi bề rộng · bấm đúp để về mặc định"></span></th>`).join('')}
+    <th data-sort="__createdAt">Ngày tạo<span class="srt">${srt('__createdAt')}</span></th>
+    <th style="cursor:default;text-align:center"><button class="btn btn--text btn--icon" id="colBtn" title="Thêm / ẩn cột" aria-label="Thêm / ẩn cột"><span class="ms sm">add</span></button></th></tr></thead>
     <tbody>${list.length ? list.map(r => `<tr data-id="${r.id}" class="${st.sel.has(r.id) ? 'sel' : ''}"><td class="cb"><input type="checkbox" data-sel="${r.id}" ${st.sel.has(r.id) ? 'checked' : ''} aria-label="Chọn ${esc(title(r))}"></td>
       ${vis.map(f => { const v = r.values[f.key];
-        if (f.primary) return `<td data-k="${f.key}"><span class="pri">${empty(v) ? '<span class="nil">—</span>' : `<span class="ini">${esc(String(v).replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase())}</span><span class="t">${esc(v)}</span>`}<button class="pv" data-open="${r.id}">Xem trước</button></span></td>`;
+        if (f.primary) return `<td class="pk"><span class="pri">${empty(v) ? `<a href="${DETAIL(r.id)}" class="nil">—</a>` : `<a href="${DETAIL(r.id)}">${esc(v)}</a>`}<button class="pvb" data-open="${r.id}" title="Xem trước" aria-label="Xem trước"><span class="ms xs">vertical_split</span></button></span></td>`;
         return `<td data-k="${f.key}" class="${f.type === 'NUMBER' ? 'num' : ''}" title="${typeof v === 'string' ? esc(v) : ''}">${display(v, f)}</td>`; }).join('')}
-      <td style="color:var(--on-surface-variant);font-size:13px;cursor:default">${createdFmt(r.createdAt)}</td>
-      <td style="cursor:pointer;text-align:center" data-open="${r.id}" title="Mở chi tiết"><span class="ms sm" style="color:var(--on-surface-variant)">chevron_right</span></td></tr>`).join('')
+      <td style="color:var(--on-surface-variant);font-size:13px">${createdFmt(r.createdAt)}</td><td></td></tr>`).join('')
       : `<tr><td colspan="${vis.length + 3}" class="empty">${st.q ? `Không tìm thấy kết quả cho “${esc(st.q)}”` : 'Chưa có bản ghi nào'}</td></tr>`}</tbody></table></div>
-    <div class="pop colpop" id="colPop" style="right:12px;top:44px"></div>`;
-  $('#pg').textContent = `${st.page} / ${pages}`; $('#prev').disabled = st.page <= 1; $('#next').disabled = st.page >= pages;
+    <div class="pop colpop" id="colPop" style="right:12px;top:44px"></div><div class="pop" id="hPop"></div>`;
+  $('#pager').style.visibility = ''; $('#pg').textContent = `${st.page} / ${pages}`; $('#prev').disabled = st.page <= 1; $('#next').disabled = st.page >= pages;
   footer(all.length, pages);
 }
 function footer(n, pages){
   const tot = api.list().length;
-  $('#footInfo').textContent = (st.filters.length || st.q) ? `Hiển thị ${n} / ${tot} bản ghi` : `${tot} bản ghi · Trang ${st.page}/${pages}`;
+  $('#footCount').textContent = `${n} bản ghi`;
+  $('#footInfo').textContent = (st.filters.length || st.q) ? `Hiển thị ${n} / ${tot} bản ghi` : (mode() === 'TABLE' ? `Trang ${st.page}/${pages}` : '');
   $('#count').textContent = `${tot} bản ghi`;
   $('#bulk').classList.toggle('on', st.sel.size > 0); $('#bulkN').textContent = `Đã chọn ${st.sel.size} bản ghi`;
 }
-function openColPop(){ const p = $('#colPop'); p.innerHTML = '<div class="hd">Ẩn/hiện cột</div>' + FIELDS.map(f => `<label><input type="checkbox" data-hide="${f.key}" ${st.hidden.includes(f.key) ? '' : 'checked'}>${esc(f.name)}</label>`).join(''); p.classList.add('open'); }
+function openColPop(){ const p = $('#colPop'); closePops(p); p.innerHTML = '<div class="hd">Hiển thị cột</div>' + FIELDS.map(f => `<label><input type="checkbox" data-hide="${f.key}" ${st.hidden.includes(f.key) ? '' : 'checked'}>${esc(f.name)}</label>`).join(''); p.classList.add('open'); }
+function headMenu(btn, key){
+  const p = $('#hPop'); closePops(p); const r = btn.getBoundingClientRect(), br = $('#body').getBoundingClientRect();
+  p.style.left = Math.min(r.left - br.left, br.width - 230) + 'px'; p.style.top = (r.bottom - br.top + 4) + 'px';
+  p.innerHTML = `<button class="mi" data-hs="asc"><span class="ms sm">arrow_upward</span>Sắp xếp tăng dần</button><button class="mi" data-hs="desc"><span class="ms sm">arrow_downward</span>Sắp xếp giảm dần</button>
+    <button class="mi" data-hf><span class="ms sm">filter_list</span>Lọc theo cột này</button><div class="sep"></div><button class="mi" data-hh><span class="ms sm">visibility_off</span>Ẩn cột</button>`;
+  p.onclick = e => { e.stopPropagation(); const s = e.target.closest('[data-hs]');
+    if (s) { st.sort = {key, dir:s.dataset.hs}; renderTable(); return; }
+    if (e.target.closest('[data-hf]')) { p.classList.remove('open'); document.body.classList.remove('fcollapsed'); filterBuilder($('#fAdd'), key); return; }
+    if (e.target.closest('[data-hh]')) { st.hidden.push(key); renderTable(); } };
+  p.classList.add('open');
+}
 $('#body').addEventListener('click', e => {
-  const op = e.target.closest('[data-open]'); if (op) { e.stopPropagation(); HX.openPanel(op.dataset.open); return; }
-  const c = e.target.closest('[data-card]'); if (c) { HX.openPanel(c.dataset.card); return; }
-  if (e.target.closest('#colBtn')) { $('#colPop').classList.contains('open') ? $('#colPop').classList.remove('open') : openColPop(); return; }
-  if (e.target.closest('#colPop')) return;
+  const op = e.target.closest('[data-open]'); if (op) { e.stopPropagation(); e.preventDefault(); HX.openPanel(op.dataset.open, {dock:true}); return; }
+  if (e.target.closest('a[href]')) return;
+  if (e.target.closest('#colBtn')) { e.stopPropagation(); $('#colPop').classList.contains('open') ? $('#colPop').classList.remove('open') : openColPop(); return; }
+  if (e.target.closest('#colPop,#hPop')) { e.stopPropagation(); return; }
+  const hm = e.target.closest('[data-hmenu]'); if (hm) { e.stopPropagation(); headMenu(hm, hm.dataset.hmenu); return; }
   const th = e.target.closest('th[data-sort]'); if (th && !e.target.closest('.rz')) { const k = th.dataset.sort;
     st.sort = !st.sort || st.sort.key !== k ? {key:k, dir:'asc'} : st.sort.dir === 'asc' ? {key:k, dir:'desc'} : null; renderTable(); return; }
+  const card = e.target.closest('[data-card]'); if (card && !e.target.closest('.qi')) { HX.openPanel(card.dataset.card, {dock:true}); return; }
   const td = e.target.closest('td[data-k]'); if (td && !td.classList.contains('editing')) {
     const r = api.get(td.parentElement.dataset.id), f = F[td.dataset.k]; td.classList.add('editing');
     td.replaceChildren(editor(f, r.values[f.key], nv => { if (nv !== r.values[f.key]) { api.update(r.id, f.key, nv); toast('Đã lưu'); } renderTable(); }, renderTable, 'table'));
@@ -329,69 +416,85 @@ $('#body').addEventListener('change', e => {
   if (e.target.id === 'all') { rows().slice((st.page-1)*PAGE, st.page*PAGE).forEach(r => e.target.checked ? st.sel.add(r.id) : st.sel.delete(r.id)); renderTable(); }
   else if (e.target.dataset.sel) { e.target.checked ? st.sel.add(e.target.dataset.sel) : st.sel.delete(e.target.dataset.sel); renderTable(); }
   else if (e.target.dataset.hide) { const k = e.target.dataset.hide; st.hidden = e.target.checked ? st.hidden.filter(x => x !== k) : [...st.hidden, k]; renderTable(); openColPop(); }
-  else if (e.target.id === 'grp') { st.groupBy[st.view] = e.target.value || null; renderKanban(); }
 });
 $('#body').addEventListener('dblclick', e => { const rz = e.target.closest('[data-rz]'); if (rz) { delete st.widths[rz.dataset.rz]; saveW(); renderTable(); } });
 $('#body').addEventListener('mousedown', e => {
   const rz = e.target.closest('[data-rz]'); if (!rz) return; e.preventDefault(); e.stopPropagation(); const k = rz.dataset.rz, x0 = e.clientX, w0 = W(F[k]);
-  const idx = visFields().findIndex(f => f.key === k), col = document.querySelectorAll('colgroup col')[1 + idx];
+  const col = document.querySelectorAll('colgroup col')[1 + visFields().findIndex(f => f.key === k)];
   const mv = ev => { st.widths[k] = Math.max(80, w0 + ev.clientX - x0); if (col) col.style.width = st.widths[k] + 'px'; };
   const up = () => { document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); saveW(); renderTable(); };
   document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
 });
 const saveW = () => { try { localStorage.setItem('smartdb-col-widths:' + HX.COLLECTION.id, JSON.stringify(st.widths)); } catch {} };
 
-/* ── Kanban: chọn trường lựa chọn làm cột, kéo thả để đổi giá trị ──
-   Như ERP: bản ghi chưa có giá trị ở trường làm cột thì không hiện trên board. */
+/* ── Board ──
+   Cột = các lựa chọn của trường làm cột (mặc định Giai Đoạn Pipeline). Kéo thả để đổi giá trị (ERP).
+   Chân cột: Tổng giá trị = Σ Tổng Cash-In Dự Kiến; Giá trị có trọng số = Σ (Cash-In × Tỷ Lệ Thành Công %),
+   tính từ 2 trường sẵn có của ERP. */
 const selectFields = FIELDS.filter(f => f.type === 'SELECT');
+const money = v => Math.round(v).toLocaleString('vi-VN');
 function renderKanban(){
-  const gk = st.groupBy[st.view] ?? null;
-  $('#toolsR').innerHTML = gk ? `<label for="grp" style="font-size:13px;color:var(--on-surface-variant)">Cột theo</label><select class="grpsel" id="grp">${selectFields.map(f => `<option value="${f.key}" ${f.key === gk ? 'selected' : ''}>${esc(f.name)}</option>`).join('')}</select>` : '';
-  $('#pg').textContent = '1 / 1'; $('#prev').disabled = $('#next').disabled = true;
-  if (!gk) {
-    $('#body').innerHTML = `<div class="kpick"><span>Chọn field để làm cột Kanban</span><select class="grpsel" id="grp"><option value="">Chọn field...</option>${selectFields.map(f => `<option value="${f.key}">${esc(f.name)}</option>`).join('')}</select></div>`;
-    footer(rows().length, 1); return;
-  }
-  const f = F[gk], list = rows();
-  const extra = r => FIELDS.filter(x => !x.primary && x.key !== gk && !empty(r.values[x.key])).slice(0, 3);
-  $('#body').innerHTML = `<div class="kb">${f.choices.map(c => { const items = list.filter(r => r.values[gk] === c);
-    return `<section class="kcol"><div class="kh"><span class="chip ${gk === 'giai_o_n_pipeline' ? chipCls(c) : ''}">${esc(c)}</span><span class="n">${items.length}</span></div>
-      <div class="kcards" data-drop="${esc(c)}">${items.length ? items.map(r => `<article class="kc" draggable="true" data-card="${r.id}"><span class="tt">${esc(title(r))}</span>
-        ${extra(r).map(x => `<span class="ln">${esc(x.name)}: <b>${esc(fmt(r.values[x.key], x))}</b></span>`).join('')}</article>`).join('') : '<div class="kempty">Chưa có bản ghi</div>'}</div></section>`; }).join('')}</div>`;
-  footer(list.length, 1);
+  const gk = groupKey(), f = F[gk], list = rows();
+  $('#grpBox').innerHTML = `<select class="grpsel" id="grp" aria-label="Cột theo" title="Trường làm cột">${selectFields.map(x => `<option value="${x.key}" ${x.key === gk ? 'selected' : ''}>Cột theo: ${esc(x.name)}</option>`).join('')}</select>`;
+  const noVal = list.filter(r => empty(r.values[gk])).length;
+  $('#body').innerHTML = `<div style="flex:1;display:flex;flex-direction:column;min-width:0">${noVal ? `<div class="knote" style="padding-top:8px">${noVal} bản ghi chưa có “${esc(f.name)}” không hiển thị trên board.</div>` : ''}<div class="kb">${f.choices.map(c => {
+    const items = list.filter(r => r.values[gk] === c);
+    const sum = items.reduce((s, r) => s + (Number(r.values[CASH]) || 0), 0);
+    const w = items.reduce((s, r) => s + (Number(r.values[CASH]) || 0) * (Number(r.values[RATE]) || 0) / 100, 0);
+    const pct = sum ? Math.round(w / sum * 100) : 0;
+    const wonLost = gk === STAGE && (c === '5. Closed Won' || c === '6. Closed Lost');
+    return `<section class="kcol"><div class="kh">${pill(f, c)}<span class="n">${items.length}</span></div>
+      <div class="kcards" data-drop="${esc(c)}">${items.length ? items.map(card).join('') : '<div class="kempty">Chưa có bản ghi</div>'}</div>
+      <div class="ksum"><span><b>${money(sum)}</b> | Tổng giá trị</span>
+        <span>${wonLost ? (c === '5. Closed Won' ? 'Thắng (100%)' : 'Thua (0%)') : `<b>${money(w)}</b> (${pct}%) | Giá trị có trọng số`} <span class="ms" title="Tổng Cash-In Dự Kiến × Tỷ Lệ Thành Công (%) của từng bản ghi">info</span></span></div></section>`; }).join('')}</div></div>`;
+  $('#pager').style.visibility = 'hidden';
+  footer(list.length - noVal, 1);
 }
-$('#toolsR').addEventListener('change', e => { if (e.target.id === 'grp') { st.groupBy[st.view] = e.target.value || null; renderKanban(); } });
+function card(r){
+  const v = r.values, L = (ic, t) => t ? `<span class="ln"><span class="ms">${ic}</span><span class="t">${t}</span></span>` : '';
+  return `<article class="kc" draggable="true" data-card="${r.id}">
+    <a class="tt" href="${DETAIL(r.id)}">${esc(title(r))}</a>
+    ${L('description', esc(v.t_n_deal || ''))}
+    ${L('event', v.ng_y_d_ki_n_ch_t ? 'Chốt ' + fmt(v.ng_y_d_ki_n_ch_t, F.ng_y_d_ki_n_ch_t) : '')}
+    ${L('payments', empty(v[CASH]) ? '' : `<b>${fmt(v[CASH], F[CASH])}</b>`)}
+    ${L('person', esc(v.sale_ph_tr_ch || ''))}
+    ${L('sell', empty(v.g_i_d_ch_v_m_c_ti_u) ? '' : esc(v.g_i_d_ch_v_m_c_ti_u))}
+    <div class="kf"><button class="qi" data-open="${r.id}" title="Xem trước" aria-label="Xem trước"><span class="ms sm">vertical_split</span></button>
+      <a class="qi" href="${DETAIL(r.id)}" title="Mở trang chi tiết" aria-label="Mở trang chi tiết"><span class="ms sm">open_in_new</span></a>
+      ${empty(v[RATE]) ? '' : `<span class="rate" title="Tỷ Lệ Thành Công">${v[RATE]}%</span>`}</div></article>`;
+}
+$('#grpBox').addEventListener('change', e => { if (e.target.id === 'grp') { st.groupBy[st.view] = e.target.value; renderKanban(); } });
 $('#body').addEventListener('dragstart', e => { const c = e.target.closest('[data-card]'); if (c) { c.classList.add('dragging'); e.dataTransfer.setData('text/plain', c.dataset.card); } });
 $('#body').addEventListener('dragend', e => e.target.closest('[data-card]')?.classList.remove('dragging'));
 $('#body').addEventListener('dragover', e => { const z = e.target.closest('[data-drop]'); if (z) { e.preventDefault(); z.classList.add('drop'); } });
 $('#body').addEventListener('dragleave', e => e.target.closest('[data-drop]')?.classList.remove('drop'));
 $('#body').addEventListener('drop', e => { const z = e.target.closest('[data-drop]'); if (!z) return; e.preventDefault();
-  const r = api.get(e.dataTransfer.getData('text/plain')), gk = st.groupBy[st.view];
+  const r = api.get(e.dataTransfer.getData('text/plain')), gk = groupKey();
   if (r && r.values[gk] !== z.dataset.drop) { api.update(r.id, gk, z.dataset.drop); toast(`Đã chuyển sang “${z.dataset.drop}”`); } renderKanban(); });
 
 /* ── Khác ── */
 function renderAll(){
   renderTabs(); renderFilters();
-  if (viewType() === 'KANBAN') { if (!(st.view in st.groupBy)) st.groupBy[st.view] = null; st.sel.clear(); renderKanban(); }
-  else { $('#toolsR').innerHTML = ''; renderTable(); }
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode()));
+  if (mode() === 'KANBAN') { st.sel.clear(); renderKanban(); } else { $('#grpBox').innerHTML = ''; renderTable(); }
 }
 HX.onChange = () => renderAll();
-$('#q').oninput = e => { st.q = e.target.value.trim(); $('#qx').style.display = st.q ? '' : 'none'; st.page = 1; renderAll(); };
-$('#qx').onclick = () => { $('#q').value = ''; st.q = ''; $('#qx').style.display = 'none'; renderAll(); };
-document.querySelector('.seg').onclick = e => { const b = e.target.closest('[data-density]'); if (!b) return;
-  document.querySelectorAll('[data-density]').forEach(x => x.setAttribute('aria-pressed', x === b)); document.body.classList.toggle('compact', b.dataset.density === 'compact'); };
-$('#moreBtn').onclick = e => { e.stopPropagation(); $('#morePop').classList.toggle('open'); };
-$('#morePop').onclick = e => { const t = e.target.closest('[data-toast]'); if (t) toast(t.dataset.toast); $('#morePop').classList.remove('open'); };
+$('#q').oninput = e => { st.q = e.target.value.trim(); st.page = 1; renderAll(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePops(); if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); $('#q').focus(); } });
+$('#moreBtn').onclick = e => { e.stopPropagation(); closePops($('#morePop')); $('#morePop').classList.toggle('open'); };
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-toast]'); if (t) { toast(t.dataset.toast); closePops(); return; }
+  if (e.target.closest('[data-cols]')) { closePops(); toast('Mở trang quản lý cột (Fields) của Deals_Pipeline'); return; }
+  if (!e.target.closest('.pop')) closePops();
+});
 $('#gsBtn').onclick = () => HX.sheetDialog();
 $('#impBtn').onclick = () => HX.importDialog();
-$('#colsBtn').onclick = e => { e.preventDefault(); toast('Mở trang quản lý cột (Fields) của collection'); };
 $('#newBtn').onclick = () => HX.openCreate(() => renderAll());
 $('#refresh').onclick = () => { renderAll(); toast('Đã làm mới'); };
 $('#exportBtn').onclick = () => toast(`Mockup: xuất ${rows().length} bản ghi ra tệp ${$('#fmt').value}`);
 $('#prev').onclick = () => { st.page--; renderAll(); }; $('#next').onclick = () => { st.page++; renderAll(); };
 $('#bulkCancel').onclick = () => { st.sel.clear(); renderAll(); };
 $('#bulkDel').onclick = () => confirmBox('Xoá bản ghi', `Xoá ${st.sel.size} bản ghi đã chọn? Không thể hoàn tác.`, 'Xoá', () => { const n = st.sel.size; api.remove([...st.sel]); st.sel.clear(); renderAll(); toast(`Đã xoá ${n} bản ghi`); });
-document.addEventListener('click', e => { if (!e.target.closest('.pop') && !e.target.closest('#moreBtn,#colBtn,#fAdd,#vAdd,[data-vedit]')) document.querySelectorAll('.pop.open').forEach(p => p.classList.remove('open')); });
 renderAll();
 </script>
 </body>

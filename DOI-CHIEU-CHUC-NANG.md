@@ -70,8 +70,28 @@ Nguồn ERP: erp.tuoitresoft.com, collection `Deals_Pipeline`, khảo sát trự
 
 ## 6. Đã gỡ khỏi bản mockup trước (không có trên ERP)
 
-Đã gỡ: timeline hoạt động; ghi chú/email/gọi/việc/lịch hẹn; tóm tắt AI trên bản ghi; báo giá, thanh toán, “workflow đang chạy”; tổng tiền & giá trị có trọng số theo cột Kanban; bộ lọc nhanh (Người phụ trách, Ngày tạo…); chọn pipeline; menu Liên hệ / Công ty / Phân khúc / Email marketing; nút gọi điện, trợ giúp, cài đặt trên thanh trên cùng.
+Đã gỡ: timeline hoạt động; ghi chú/email/gọi/việc/lịch hẹn; tóm tắt AI trên bản ghi; báo giá, thanh toán, “workflow đang chạy”; bộ lọc nhanh (Người phụ trách, Ngày tạo…); chọn pipeline; menu Liên hệ / Công ty / Phân khúc / Email marketing; nút gọi điện, trợ giúp, cài đặt trên thanh trên cùng.
 
 ## 7. Điểm ERP có mà mockup chỉ mô phỏng
 
 Import, Export, Kết nối Google Sheet, Ghim sidebar, trang Quản lý cột: có đủ nút và hộp thoại, nhưng mockup không đọc/ghi tệp thật và không gọi Google.
+
+## 8. UX HubSpot đã áp dụng (khảo sát trang Deals của HubSpot, 24/09/2026)
+
+| UX HubSpot | Áp dụng trong mockup | Chức năng ERP tương ứng |
+| --- | --- | --- |
+| Sidebar có mục "Deals" | Mục **Deals** trên sidebar | Collection Deals_Pipeline được "Ghim vào sidebar" (có sẵn trên ERP) |
+| Tiêu đề "Deals ⌄" chuyển đối tượng | Menu chọn collection khác (Leads, Sales_Activities…) | Trang Dữ liệu của ERP |
+| Mặc định mở dạng Board | Mở ở Board theo Giai Đoạn Pipeline | Kanban của ERP (ERP bắt chọn trường, mockup chọn sẵn Giai Đoạn Pipeline, vẫn đổi được) |
+| Bấm tên bản ghi → trang chi tiết | Tên trên bảng và trên thẻ Board mở trang chi tiết | "Mở full page" |
+| Nút Preview cạnh tên → panel dock bên phải | Nút Xem trước (bảng + thẻ) mở panel dock, bảng co lại | Drawer chi tiết |
+| Bấm ô → sửa tại chỗ; lựa chọn là danh sách pill có ô tìm kiếm | Như HubSpot | Sửa ô tại chỗ |
+| Nút Board / Table | Nút chuyển kiểu hiển thị | Tab Bảng / Kanban |
+| ⚙ View settings (kiểu view, xoá view…) | ⚙ Cài đặt view: kiểu hiển thị, mật độ, Sửa view, Xóa view, Quản lý cột | Sửa/Xoá view, Thoáng/Gọn, Cột |
+| Nút ⌃ thu gọn thanh lọc | Như HubSpot | — (chỉ giao diện) |
+| Nút "Sort by" | Nút Sắp xếp (trường + thứ tự) | Sắp xếp theo cột |
+| Menu ⋮ ở tiêu đề cột: sắp xếp, lọc theo cột, thêm cột | Sắp xếp tăng/giảm, Lọc theo cột này, Ẩn cột; "+" cuối tiêu đề để thêm/ẩn cột | Sort, bộ lọc, Ẩn/hiện cột |
+| Nhãn stage nhiều màu | Pill màu theo thứ tự lựa chọn; Won xanh lá, Lost đỏ | — (chỉ giao diện) |
+| Chân cột Board: Total amount + Weighted amount | **Tổng giá trị** = Σ Tổng Cash-In Dự Kiến; **Giá trị có trọng số** = Σ (Cash-In × Tỷ Lệ Thành Công %); cột Won/Lost ghi Thắng (100%) / Thua (0%) | Bổ sung theo yêu cầu, chỉ tính từ 2 trường sẵn có, không thêm dữ liệu mới |
+
+Không áp dụng vì ERP không có chức năng tương ứng: mở rộng liên kết trong dòng (›), Next Activity/Schedule, Freeze column, Save/Reset/Clone view, chọn pipeline, Automate.

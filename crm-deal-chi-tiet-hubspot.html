@@ -68,7 +68,7 @@
       <div class="col col-l">
         <section class="card">
           <div class="top">
-            <nav class="crumb" aria-label="Breadcrumb"><a href="#" id="toData">Dữ liệu</a><span>/</span><a href="crm-giao-dich-hubspot.html" id="toList"></a></nav>
+            <nav class="crumb" aria-label="Breadcrumb"><a href="crm-giao-dich-hubspot.html" id="toList" style="display:inline-flex;align-items:center"><span class="ms sm">chevron_left</span>Deals</a><span class="nil" id="toData" title="Collection gốc trên ERP">· Deals_Pipeline</span></nav>
             <div style="position:relative">
               <button class="btn btn--text sm" id="actBtn" aria-haspopup="menu">Thao tác<span class="ms xs">arrow_drop_down</span></button>
               <div class="pop" id="actPop" role="menu" style="right:0;top:32px">
@@ -139,8 +139,7 @@ else {
   const HL = ['t_ng_cash_in_d_ki_n','ng_y_d_ki_n_ch_t','giai_o_n_pipeline','t_l_th_nh_c_ng'];
   function render(){
     document.title = `${title(r)} — Deals_Pipeline`;
-    $('#toList').textContent = HX.COLLECTION.name;
-    $('#ttl').textContent = title(r);
+        $('#ttl').textContent = title(r);
     $('#sub').textContent = r.values.t_n_deal || '';
     $('#kv').innerHTML = [['giai_o_n_pipeline'],['t_ng_cash_in_d_ki_n'],['ng_y_d_ki_n_ch_t'],['sale_ph_tr_ch']].map(([k]) => `<dt>${esc(F[k].name)}</dt><dd>${display(r.values[k], F[k])}</dd>`).join('');
     HX.propList($('#leftProps'), r, 'page');
@@ -171,7 +170,6 @@ else {
     if (e.target.closest('[data-cols]')) { $('#actPop').classList.remove('open'); toast('Mở trang quản lý cột (Fields) của collection'); return; }
     if (!e.target.closest('#actPop')) $('#actPop').classList.remove('open');
   });
-  $('#toData').onclick = e => { e.preventDefault(); toast('Mở danh sách collection (Dữ liệu)'); };
 }
 </script>
 </body>

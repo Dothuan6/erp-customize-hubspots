@@ -86,6 +86,7 @@ body.nav-open .sidebar{transform:none}
 .nav-i:hover{background:var(--shell-hover)}
 .nav-i[aria-current="page"]{background:var(--shell-active);color:var(--shell-active-fg);font-weight:600}
 .nav-sp{flex:1}
+.nav-sep{height:1px;background:var(--shell-line);margin:6px 10px}
 .scrim{position:fixed;inset:0;z-index:940;background:rgba(0,0,0,.45);display:none}
 body.nav-open .scrim,body.panel-open .scrim{display:block}
 .main{min-width:0;min-height:0;padding:var(--frame-gap)}
@@ -119,6 +120,28 @@ body.nav-open .scrim,body.panel-open .scrim{display:block}
 .chip.lost{background:var(--error-container);color:var(--error)}
 .chip.muted{background:var(--surface-2);color:var(--on-surface-variant)}
 .nil{color:var(--on-surface-variant)}
+
+/* ── Nhãn lựa chọn kiểu HubSpot (pill màu theo thứ tự lựa chọn) — ngoại lệ màu phân loại, xem DS §3.3 ── */
+:root{--c1:#2D5BD7;--c2:#C2410C;--c3:#BE2A78;--c4:#7447DB;--c5:#E3B341;--c5-fg:#3A2A05;--c6:#2E7D32;--c7:#A61B1B}
+.pill{display:inline-flex;align-items:center;max-width:100%;height:22px;padding:0 8px;border-radius:4px;font-size:12px;font-weight:700;color:#fff;
+  background:var(--c1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill.c2{background:var(--c2)}.pill.c3{background:var(--c3)}.pill.c4{background:var(--c4)}.pill.c5{background:var(--c5);color:var(--c5-fg)}
+.pill.c6{background:var(--c6)}.pill.c7{background:var(--c7)}
+/* Trình chọn lựa chọn có ô tìm kiếm (thay <select>) */
+.selpop{position:absolute;z-index:70;width:240px;background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-md);box-shadow:var(--shadow-2);padding:8px;display:flex;flex-direction:column;gap:6px}
+.selpop input{height:32px;border:1px solid var(--outline);border-radius:var(--btn-radius);padding:0 10px;background:var(--surface);outline:none}
+.selpop input:focus{border-color:var(--primary)}
+.selpop .opts{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.selpop .opt{display:flex;align-items:center;min-height:32px;padding:0 6px;border-radius:var(--radius-sm);text-align:left}
+.selpop .opt:hover,.selpop .opt.cur{background:var(--surface-2)}
+.selpop .clear{font-size:12px;color:var(--on-surface-variant)}
+.selcell{display:flex;align-items:center;gap:6px;height:30px;padding:0 8px;border:1px solid var(--primary);border-radius:var(--radius-sm);background:var(--surface);min-width:0}
+/* Panel xem trước dạng dock (HubSpot Preview) */
+@media(min-width:1240px){
+  body.dock .main{padding-right:calc(var(--frame-gap) + 400px + 8px)}
+  body.dock .panel{top:calc(56px + var(--frame-gap));right:var(--frame-gap);bottom:var(--frame-gap);width:400px;border-radius:var(--frame-radius);box-shadow:none;border:1px solid var(--outline-variant)}
+  body.dock.panel-open .scrim{display:none}
+}
 
 /* ── Menu / popover ── */
 .pop{position:absolute;z-index:60;min-width:220px;background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-md);

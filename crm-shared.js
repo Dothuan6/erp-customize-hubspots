@@ -6,7 +6,9 @@
    dùng chung; lỗi storage thì chạy trong bộ nhớ.
    ═══════════════════════════════════════════════════════════════ */
 const HX = (() => {
-  const COLLECTION = { id: 'qwxvgrdlf0ly7v2cywzxgzch', name: 'Deals_Pipeline' };
+  const COLLECTION = { id: 'qwxvgrdlf0ly7v2cywzxgzch', name: 'Deals_Pipeline', label: 'Deals' };
+  // Các collection khác đang có trên ERP (menu chuyển đối tượng ở tiêu đề)
+  const OTHERS = ['Leads','Sales_Activities','Payments_CashIn','KPI_Weekly_Tracker','db_websites_management','NhanVien','PhongBan','ViTriTuyenDung','HoSoUngTuyen'];
   const STAGES = ['1. MQL Qualified','2. Discovery Call','3. Demo Scheduled','4. Proposal Sent','5. Closed Won','6. Closed Lost'];
   // Thứ tự = displayOrder trên ERP. primary = cột đầu (Mã Deal)
   const FIELDS = [
@@ -87,9 +89,13 @@ const HX = (() => {
     }
   }
   const chipCls = v => v === '5. Closed Won' ? 'won' : v === '6. Closed Lost' ? 'lost' : '';
+  // Màu pill theo thứ tự lựa chọn (như HubSpot): 1..5 màu phân loại, "Won" xanh lá, "Lost" đỏ
+  function pillCls(f, v) { if (v === '5. Closed Won') return 'c6'; if (v === '6. Closed Lost') return 'c7';
+    const i = (f.choices || []).indexOf(v); return i < 0 ? '' : 'c' + (i % 5 + 1); }
+  const pill = (f, v) => `<span class="pill ${pillCls(f, v)}" title="${esc(v)}">${esc(v)}</span>`;
   function display(v, f) {
     if (empty(v)) return '<span class="nil">—</span>';
-    if (f.type === 'SELECT') return `<span class="chip ${chipCls(v)}">${esc(v)}</span>`;
+    if (f.type === 'SELECT') return pill(f, v);
     if (f.type === 'RELATION') return `<span class="chip muted">${esc(fmt(v, f))}</span>`;
     return esc(fmt(v, f));
   }
@@ -103,7 +109,8 @@ const HX = (() => {
       setTimeout(onCancel, 1600); return d;
     }
     let el;
-    if (f.type === 'SELECT' || f.type === 'RELATION') {
+    if (f.type === 'SELECT') return selectEditor(f, value, onSave, onCancel);
+    if (f.type === 'RELATION') {
       el = document.createElement('select'); el.className = 'ed';
       const opts = f.type === 'SELECT' ? f.choices.map(c => [c, c]) : RELATED.map(x => [x.id, x.label]);
       el.innerHTML = `<option value="">— Chọn —</option>` + opts.map(([v, l]) => `<option value="${esc(v)}" ${v === value ? 'selected' : ''}>${esc(l)}</option>`).join('');
@@ -125,6 +132,28 @@ const HX = (() => {
     return el;
   }
 
+  /* Trình chọn lựa chọn kiểu HubSpot: ô tìm kiếm + danh sách pill; Esc / bấm ra ngoài = huỷ */
+  function selectEditor(f, value, onSave, onCancel) {
+    const cell = document.createElement('div'); cell.className = 'selcell';
+    cell.innerHTML = (empty(value) ? '<span class="nil">— Chọn —</span>' : pill(f, value)) + '<span class="ms xs" style="margin-left:auto">arrow_drop_down</span>';
+    const pop = document.createElement('div'); pop.className = 'selpop';
+    pop.innerHTML = `<input placeholder="Tìm kiếm" aria-label="Tìm lựa chọn"><div class="opts" role="listbox"></div>`;
+    const draw = q => { pop.querySelector('.opts').innerHTML = `<button class="opt clear" data-v="">— Bỏ chọn —</button>` + f.choices.filter(c => !q || c.toLowerCase().includes(q)).map(c => `<button class="opt ${c === value ? 'cur' : ''}" data-v="${esc(c)}" role="option">${pill(f, c)}</button>`).join(''); };
+    draw('');
+    let done = false;
+    const close = () => { pop.remove(); document.removeEventListener('mousedown', outside, true); };
+    const outside = e => { if (!pop.contains(e.target)) { if (!done) { done = true; close(); onCancel(); } } };
+    pop.addEventListener('click', e => { e.stopPropagation(); const o = e.target.closest('.opt'); if (!o || done) return; done = true; close(); onSave(o.dataset.v || null); });
+    const inp = pop.querySelector('input');
+    inp.oninput = () => draw(inp.value.trim().toLowerCase());
+    inp.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); done = true; close(); onCancel(); } if (e.key === 'Enter') { const o = pop.querySelector('.opt:not(.clear)'); o && o.click(); } };
+    cell.addEventListener('click', e => e.stopPropagation());
+    setTimeout(() => { const r = cell.getBoundingClientRect(); pop.style.position = 'fixed'; pop.style.left = Math.min(r.left, innerWidth - 250) + 'px';
+      pop.style.top = (r.bottom + 240 > innerHeight ? Math.max(8, r.top - 290) : r.bottom + 4) + 'px'; document.body.appendChild(pop); inp.focus();
+      document.addEventListener('mousedown', outside, true); }, 0);
+    return cell;
+  }
+
   /* ── Tiện ích UI ── */
   const $ = (s, r = document) => r.querySelector(s);
   let tt; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2400); }
@@ -141,7 +170,8 @@ const HX = (() => {
   }
 
   /* ── Shell: topbar + sidebar đúng menu ERP ── */
-  const NAV = [['forum','Cowork'],['home','Trang chủ'],['task_alt','Việc của tôi'],['table_chart','Dữ liệu','cur'],['account_tree','Workflow'],['description','Biểu mẫu'],['image','Media'],['bar_chart','Báo cáo']];
+  // "Deals" = collection Deals_Pipeline đã được "Ghim vào sidebar" (chức năng có sẵn của ERP)
+  const NAV = [['forum','Cowork'],['home','Trang chủ'],['task_alt','Việc của tôi'],['sep'],['handshake','Deals','cur'],['sep'],['table_chart','Dữ liệu'],['account_tree','Workflow'],['description','Biểu mẫu'],['image','Media'],['bar_chart','Báo cáo']];
   function shell() {
     $('#topbar').innerHTML = `
       <button class="icon-btn navbtn" id="navBtn" aria-label="Mở điều hướng"><span class="ms">menu</span></button>
@@ -152,7 +182,7 @@ const HX = (() => {
         <button class="icon-btn" aria-label="Thông báo: 86 chưa đọc" title="Thông báo"><span class="ms">notifications</span><span class="badge-count">86</span></button>
         <span class="avatar" title="Tài khoản">PN</span>
       </div>`;
-    $('#sidebar').innerHTML = NAV.map(([i, l, c]) => `<a class="nav-i" href="${c ? 'crm-giao-dich-hubspot.html' : '#'}" ${c ? 'aria-current="page"' : ''} title="${l}"><span class="ms">${i}</span><span class="lbl">${l}</span></a>`).join('')
+    $('#sidebar').innerHTML = NAV.map(([i, l, c]) => i === 'sep' ? '<div class="nav-sep"></div>' : `<a class="nav-i" href="${c ? 'crm-giao-dich-hubspot.html' : '#'}" ${c ? 'aria-current="page"' : ''} title="${l}"><span class="ms">${i}</span><span class="lbl">${l}</span></a>`).join('')
       + `<div class="nav-sp"></div><a class="nav-i" href="#" title="Cài đặt"><span class="ms">settings</span><span class="lbl">Cài đặt</span></a>`;
     $('#navBtn').onclick = () => document.body.classList.add('nav-open');
     $('#scrim').addEventListener('click', () => { document.body.classList.remove('nav-open'); closePanel(); });
@@ -183,7 +213,7 @@ const HX = (() => {
 
   /* ── Panel xem nhanh (RecordDetailDrawer): Thông tin · Lịch sử · Liên kết ── */
   let panelRecord = null, onChange = () => {};
-  function openPanel(id) {
+  function openPanel(id, opt = {}) {
     const r = api.get(id); if (!r) return; panelRecord = id;
     const p = $('#panel');
     p.innerHTML = `<div class="pn-h"><h2>${esc(title(r))}</h2>
@@ -199,9 +229,9 @@ const HX = (() => {
       else body.innerHTML = `<div class="soon"><span class="ms">${t === 'hist' ? 'history' : 'link'}</span>${t === 'hist' ? 'Lịch sử thay đổi (sắp ra mắt)' : 'Liên kết (sắp ra mắt)'}</div>`;
     };
     p.onclick = e => { const t = e.target.closest('.pn-tab'); if (t) tab(t.dataset.t); if (e.target.closest('[data-pclose]')) closePanel(); if (e.target.closest('[data-cols]')) { e.preventDefault(); toast('Mở trang quản lý cột (Fields) của collection'); } };
-    tab('info'); p.classList.add('open'); document.body.classList.add('panel-open');
+    tab('info'); p.classList.add('open'); document.body.classList.add('panel-open'); document.body.classList.toggle('dock', !!opt.dock);
   }
-  function closePanel() { $('#panel')?.classList.remove('open'); document.body.classList.remove('panel-open'); panelRecord = null; }
+  function closePanel() { $('#panel')?.classList.remove('open'); document.body.classList.remove('panel-open', 'dock'); panelRecord = null; }
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && panelRecord && !document.activeElement.classList.contains('ed')) closePanel(); });
 
   /* Danh sách thuộc tính: bấm để sửa (giống drawer / trang đầy đủ ERP) */
@@ -239,7 +269,7 @@ const HX = (() => {
     };
     p.onclick = e => { if (e.target.closest('[data-pclose]')) closePanel(); if (e.target.closest('#crSave')) submit(); };
     p.onkeydown = e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); submit(); } };
-    p.classList.add('open'); document.body.classList.add('panel-open'); setTimeout(() => $('#cf_m_deal', p).focus(), 50);
+    document.body.classList.remove('dock'); p.classList.add('open'); document.body.classList.add('panel-open'); setTimeout(() => $('#cf_m_deal', p).focus(), 50);
   }
 
   /* ── Hộp thoại đúng ERP ── */
@@ -266,6 +296,6 @@ const HX = (() => {
       (bg, close) => { const s = $('#wfSel', bg); s.onchange = () => $('#wfGo', bg).disabled = !s.value; $('#wfGo', bg).onclick = () => { close(); toast('Workflow đã được kích hoạt'); }; });
   }
 
-  return { COLLECTION, FIELDS, F, STAGES, WORKFLOWS, api, esc, empty, fmt, display, chipCls, createdFmt, title, editor, toast, modal, confirmBox,
+  return { OTHERS, COLLECTION, FIELDS, F, STAGES, WORKFLOWS, api, esc, empty, fmt, display, chipCls, pill, pillCls, createdFmt, title, editor, toast, modal, confirmBox,
     shell, openPanel, closePanel, propList, openCreate, importDialog, sheetDialog, workflowDialog, $, set onChange(fn) { onChange = fn; } };
 })();

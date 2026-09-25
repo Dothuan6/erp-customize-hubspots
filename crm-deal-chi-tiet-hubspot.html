@@ -73,7 +73,7 @@
               <button class="btn btn--text sm" id="actBtn" aria-haspopup="menu">Thao tác<span class="ms xs">arrow_drop_down</span></button>
               <div class="pop" id="actPop" role="menu" style="right:0;top:32px">
                 <button class="mi" role="menuitem" data-wf><span class="ms sm">account_tree</span>Kích hoạt Workflow</button>
-                <button class="mi" role="menuitem" data-cols><span class="ms sm">settings</span>Quản lý cột dữ liệu</button>
+                <a class="mi" role="menuitem" href="crm-quan-ly-truong-hubspot.html"><span class="ms sm">tune</span>Quản lý trường dữ liệu</a>
               </div>
             </div>
           </div>
@@ -83,7 +83,7 @@
         </section>
         <section class="card">
           <div class="ch"><span class="ms sm">expand_more</span>Thông tin bản ghi
-            <span class="r"><button class="btn btn--text btn--icon" data-cols title="Quản lý cột dữ liệu" aria-label="Quản lý cột dữ liệu"><span class="ms sm">settings</span></button></span></div>
+            <span class="r"><a class="btn btn--text btn--icon" href="crm-quan-ly-truong-hubspot.html" title="Quản lý trường dữ liệu" aria-label="Quản lý trường dữ liệu"><span class="ms sm">settings</span></a></span></div>
           <div class="cb"><div class="props short" id="leftProps"></div>
             <button class="btn btn--text sm more-props" id="moreProps">Xem tất cả thuộc tính</button></div>
           <div class="meta" id="meta"></div>
@@ -102,6 +102,7 @@
             <div class="sec"><h3>Giá trị & chi phí</h3><div class="props twocol" id="pMoney"></div></div>
             <div class="sec"><h3>Gói & thanh toán</h3><div class="props twocol" id="pPkg"></div></div>
             <div class="sec"><h3>Kết quả</h3><div class="props twocol" id="pResult"></div></div>
+            <div class="sec" id="secOther" hidden><h3>Trường khác</h3><div class="props twocol" id="pOther"></div></div>
           </div>
           <div class="pane" id="pane-hist"><div class="soon"><span class="ms">history</span>Lịch sử thay đổi (sắp ra mắt)</div></div>
         </section>
@@ -136,18 +137,26 @@ const id = new URLSearchParams(location.search).get('id') || api.list()[0]?.id;
 const r = api.get(id);
 if (!r) { document.getElementById('grid').innerHTML = '<div class="card soon" style="grid-column:1/-1"><span class="ms">search_off</span>Bản ghi không tìm thấy.<a class="btn btn--secondary" href="crm-giao-dich-hubspot.html">Về Deals_Pipeline</a></div>'; }
 else {
+  // Nhóm hiển thị — trường đã xoá thì bỏ qua; trường mới thêm vào nhóm "Trường khác"
+  const has = k => !!F[k], only = ks => ks.filter(has);
+  const G = { money:['ph_thu_tr_tr_c','ph_kh_i_t_o_setup','t_ng_cash_in_d_ki_n','s_ti_n_gi_m_gi','l_do_gi_m'], pkg:['g_i_d_ch_v_m_c_ti_u','th_i_h_n_thanh_to_n','lead_id','sale_ph_tr_ch'],
+    res:['giai_o_n_pipeline','t_l_th_nh_c_ng','ng_y_d_ki_n_ch_t','l_do_th_t_b_i','ng_y_c_p_nh_t_g_n_nh_t'] };
+  const grouped = new Set([...G.money, ...G.pkg, ...G.res, 'm_deal', 't_n_deal', 'test']);
   const HL = ['t_ng_cash_in_d_ki_n','ng_y_d_ki_n_ch_t','giai_o_n_pipeline','t_l_th_nh_c_ng'];
   function render(){
     document.title = `${title(r)} — Deals_Pipeline`;
         $('#ttl').textContent = title(r);
-    $('#sub').textContent = r.values.t_n_deal || '';
-    $('#kv').innerHTML = [['giai_o_n_pipeline'],['t_ng_cash_in_d_ki_n'],['ng_y_d_ki_n_ch_t'],['sale_ph_tr_ch']].map(([k]) => `<dt>${esc(F[k].name)}</dt><dd>${display(r.values[k], F[k])}</dd>`).join('');
+    $('#sub').textContent = F.t_n_deal && FIELDS[0].key !== 't_n_deal' ? (r.values.t_n_deal || '') : '';
+    $('#kv').innerHTML = only(['giai_o_n_pipeline','t_ng_cash_in_d_ki_n','ng_y_d_ki_n_ch_t','sale_ph_tr_ch']).map(k => `<dt>${esc(F[k].name)}</dt><dd>${display(r.values[k], F[k])}</dd>`).join('');
     HX.propList($('#leftProps'), r, 'page');
     $('#meta').innerHTML = `<span>Ngày tạo: ${createdFmt(r.createdAt)}</span>`;
-    $('#hl').innerHTML = HL.map(k => `<div class="it" data-hl="${k}"><div class="k">${esc(F[k].name)}</div><div class="val">${display(r.values[k], F[k])}</div></div>`).join('');
-    HX.propList($('#pMoney'), r, 'page', ['ph_thu_tr_tr_c','ph_kh_i_t_o_setup','t_ng_cash_in_d_ki_n','s_ti_n_gi_m_gi','l_do_gi_m']);
-    HX.propList($('#pPkg'), r, 'page', ['g_i_d_ch_v_m_c_ti_u','th_i_h_n_thanh_to_n','lead_id','sale_ph_tr_ch']);
-    HX.propList($('#pResult'), r, 'page', ['giai_o_n_pipeline','t_l_th_nh_c_ng','ng_y_d_ki_n_ch_t','l_do_th_t_b_i','ng_y_c_p_nh_t_g_n_nh_t']);
+    $('#hl').innerHTML = only(HL).map(k => `<div class="it" data-hl="${k}"><div class="k">${esc(F[k].name)}</div><div class="val">${display(r.values[k], F[k])}</div></div>`).join('');
+    HX.propList($('#pMoney'), r, 'page', only(G.money));
+    HX.propList($('#pPkg'), r, 'page', only(G.pkg));
+    HX.propList($('#pResult'), r, 'page', only(G.res));
+    const other = FIELDS.filter(f => !grouped.has(f.key)).map(f => f.key);
+    $('#secOther').hidden = !other.length; if (other.length) HX.propList($('#pOther'), r, 'page', other);
+    if (!F.test) { document.querySelector('.col-r .card').hidden = true; return; }
     const rel = r.values.test;
     $('#relCount').textContent = `(${rel ? 1 : 0})`;
     $('#relBox').innerHTML = rel ? `<div class="rel"><span class="ms">link</span><div><span class="lnk">${esc(fmt(rel, F.test))}</span><small>Trường liên kết “Test”</small></div></div>`
@@ -158,7 +167,8 @@ else {
 
   // Ô nổi bật: bấm để sửa trường tương ứng
   $('#hl').onclick = e => { const it = e.target.closest('[data-hl]'); if (!it || it.querySelector('.ed')) return; const f = F[it.dataset.hl], v = it.querySelector('.val');
-    v.replaceChildren(editor(f, r.values[f.key], nv => { if (nv !== r.values[f.key]) { api.update(r.id, f.key, nv); toast(`Đã lưu “${f.name}”`); } render(); }, render, 'page')); };
+    v.replaceChildren(editor(f, r.values[f.key], nv => { const err = nv !== r.values[f.key] && HX.check(f, nv, r.id);
+      if (err) toast(err); else if (nv !== r.values[f.key]) { api.update(r.id, f.key, nv); toast(`Đã lưu “${f.name}”`); } render(); }, render, 'page')); };
   // Trường RELATION “Test”: sửa ở trang chi tiết (đúng ERP)
   $('#relEdit').onclick = () => { $('#relBox').replaceChildren(editor(F.test, r.values.test, nv => { api.update(r.id, 'test', nv); toast('Đã lưu “Test”'); render(); }, render, 'page')); };
   $('#moreProps').onclick = e => { const p = $('#leftProps'); p.classList.toggle('short'); e.target.textContent = p.classList.contains('short') ? 'Xem tất cả thuộc tính' : 'Thu gọn'; };
@@ -167,7 +177,6 @@ else {
   $('#actBtn').onclick = e => { e.stopPropagation(); $('#actPop').classList.toggle('open'); };
   document.addEventListener('click', e => {
     if (e.target.closest('[data-wf]')) { $('#actPop').classList.remove('open'); HX.workflowDialog(r); return; }
-    if (e.target.closest('[data-cols]')) { $('#actPop').classList.remove('open'); toast('Mở trang quản lý cột (Fields) của collection'); return; }
     if (!e.target.closest('#actPop')) $('#actPop').classList.remove('open');
   });
 }

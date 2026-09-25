@@ -24,7 +24,7 @@ Nguồn ERP: erp.tuoitresoft.com, collection `Deals_Pipeline`, khảo sát trự
 | Tiêu đề collection + số bản ghi | Header trang |
 | Tabs view: Bảng · Kanban · view đã lưu (Sửa view / Xóa view) · Tạo View (Tên + Loại: Danh sách/Kanban) | Hàng tab view dưới tiêu đề; sửa/xoá hiện khi rê chuột |
 | Làm mới | Chân trang (icon) |
-| Cột → trang quản lý trường | Nút “Cột” ở header |
+| Cột → trang quản lý trường | Menu ⋮ và ⚙ → “Quản lý trường dữ liệu” (trang riêng, xem mục 9) |
 | Tạo mới (form đủ 17 trường, Ctrl+Enter) | Nút chính “Tạo mới” → panel bên phải |
 | “…” → Ghim vào sidebar / Ghim vào nhóm… | Menu “…” ở header |
 | Tìm kiếm bản ghi | Ô tìm kiếm trên thanh công cụ |
@@ -37,7 +37,7 @@ Nguồn ERP: erp.tuoitresoft.com, collection `Deals_Pipeline`, khảo sát trự
 | Bảng: bấm ô để sửa tại chỗ (Enter/blur lưu, Esc huỷ) | Như ERP |
 | Sắp xếp theo cột: tăng → giảm → bỏ; mặc định Ngày tạo giảm dần | Như ERP |
 | Kéo đổi bề rộng cột, bấm đúp về mặc định | Như ERP |
-| Ẩn/hiện cột | Nút cuối hàng tiêu đề |
+| Ẩn/hiện cột (≡ “Hiển thị cột”, danh sách 17 trường có tick) | Nút “+” cuối tiêu đề (thêm cột đang ẩn) và hộp “Chọn cột hiển thị” (Ctrl+Shift+L) — xem mục 9 |
 | Chọn nhiều → “Đã chọn N bản ghi · Xoá · Huỷ” | Thanh thao tác hàng loạt |
 | Mở panel chi tiết (mũi tên cuối dòng) | Nút “Xem trước” khi rê vào cột chính + mũi tên cuối dòng |
 | Phân trang Trước / Sau, “N bản ghi · Trang x/y”, “Hiển thị a / b bản ghi” khi lọc | Chân trang |
@@ -74,7 +74,7 @@ Nguồn ERP: erp.tuoitresoft.com, collection `Deals_Pipeline`, khảo sát trự
 
 ## 7. Điểm ERP có mà mockup chỉ mô phỏng
 
-Import, Export, Kết nối Google Sheet, Ghim sidebar, trang Quản lý cột: có đủ nút và hộp thoại, nhưng mockup không đọc/ghi tệp thật và không gọi Google.
+Import, Export, Kết nối Google Sheet, Ghim sidebar: có đủ nút và hộp thoại, nhưng mockup không đọc/ghi tệp thật và không gọi Google. Quản lý trường chạy thật trong mockup nhưng chỉ lưu trong trình duyệt (localStorage), không ghi lên ERP.
 
 ## 8. UX HubSpot đã áp dụng (khảo sát trang Deals của HubSpot, 24/09/2026)
 
@@ -95,3 +95,48 @@ Import, Export, Kết nối Google Sheet, Ghim sidebar, trang Quản lý cột: 
 | Chân cột Board: Total amount + Weighted amount | **Tổng giá trị** = Σ Tổng Cash-In Dự Kiến; **Giá trị có trọng số** = Σ (Cash-In × Tỷ Lệ Thành Công %); cột Won/Lost ghi Thắng (100%) / Thua (0%) | Bổ sung theo yêu cầu, chỉ tính từ 2 trường sẵn có, không thêm dữ liệu mới |
 
 Không áp dụng vì ERP không có chức năng tương ứng: mở rộng liên kết trong dòng (›), Next Activity/Schedule, Freeze column, Save/Reset/Clone view, chọn pipeline, Automate.
+
+## 9. Quản lý cột / trường dữ liệu (bổ sung 24/09/2026)
+
+Khảo sát ERP: trang `/data/:id/fields` (nút “Cột”) và popover “Hiển thị cột” (≡ cuối tiêu đề bảng). Khảo sát HubSpot: Settings › Properties (Deal properties) và hộp “Choose which columns you see” / nút “Add column” trên list Deals.
+
+### 9.1 Trang Quản lý trường — `crm-quan-ly-truong-hubspot.html`
+
+| Chức năng ERP (`/data/:id/fields`) | Trình bày trong mockup (kiểu HubSpot Properties) |
+| --- | --- |
+| “← Dữ liệu / Deals_Pipeline · 17 trường” | “‹ Deals”, tiêu đề “Trường dữ liệu”, ô “Collection: Deals (Deals_Pipeline) ▾”, tab “Trường (17)” |
+| Danh sách trường: ⠿ + icon loại + tên loại + tên trường | Bảng: ⠿ · Tên trường (link) + loại bên dưới · Cấu hình · Bắt buộc · Duy nhất · Thao tác |
+| Kéo ⠿ đổi thứ tự | Kéo ⠿; thêm menu “Khác” → Chuyển lên đầu / lên / xuống (dùng được bằng bàn phím). Tắt kéo khi đang lọc |
+| Rê chuột: ✎ sửa, 🗑 xóa | Rê chuột: nút “Chỉnh sửa” + “Khác ▾” (Xóa trường) như HubSpot; bấm tên cũng mở sửa |
+| “+ Thêm trường” → hộp “Chọn loại trường” (14 loại) → drawer “Thêm trường” | “Thêm trường” → panel phải “Tạo trường mới”, ô “Loại trường” có tìm kiếm (như Field type của HubSpot), đủ 14 loại |
+| 14 loại: Văn bản, Văn bản dài, Số, Tiền tệ, Ngày, Ngày giờ, Lựa chọn đơn, Lựa chọn nhiều, Trạng thái, Hộp kiểm, Người dùng, Tệp đính kèm, Liên kết, Đường dẫn | Như ERP |
+| Tên trường *, Bắt buộc, Duy nhất (mọi loại) | Như ERP |
+| Văn bản: Độ dài tối đa | Như ERP |
+| Số, Tiền tệ: Giá trị nhỏ nhất / lớn nhất | Như ERP |
+| Lựa chọn đơn / nhiều: Danh sách lựa chọn + “Thêm lựa chọn”, ✕ xóa | Như ERP; thêm ô màu xem trước (màu nhãn theo thứ tự) |
+| Trạng thái: Danh sách trạng thái + “Thêm trạng thái” | Như ERP |
+| Liên kết: Collection liên kết (12 collection) + Cột hiển thị (tuỳ chọn, mặc định “Tự động — trường văn bản đầu tiên”) | Như ERP. Trường “Test” → NhanVien |
+| Drawer “Chỉnh sửa trường”: không có ô đổi loại | Loại hiện dạng khoá, ghi chú “Không đổi được loại sau khi tạo” |
+| Hủy / Lưu | Như ERP; thêm “Xóa trường” trong panel sửa |
+
+Bổ sung nhỏ (UI, không thêm dữ liệu): tìm trường, lọc theo loại / Bắt buộc / Duy nhất; hộp xác nhận khi xóa có số bản ghi đang có dữ liệu; kiểm tra trùng tên trường, lựa chọn trùng, min > max; đổi tên lựa chọn thì cập nhật luôn bản ghi đang dùng lựa chọn đó.
+
+Cần dev xác nhận: hành vi xóa trường trên ERP (có hộp xác nhận không — mockup không bấm thử để tránh xóa dữ liệu thật); mã kiểu API của 7 loại chưa có trong Deals_Pipeline (CURRENCY, MULTI_SELECT, STATUS, CHECKBOX, USER, FILE, URL là tên mockup tự đặt).
+
+### 9.2 Cột hiển thị trên bảng Deals — `crm-giao-dich-hubspot.html`
+
+| Chức năng ERP | Trình bày trong mockup |
+| --- | --- |
+| ≡ cuối tiêu đề → “Hiển thị cột”: tick / bỏ tick 17 trường | Nút “+” cuối tiêu đề (HubSpot Add column): tìm và bấm để hiện trường đang ẩn; “Chọn cột hiển thị…”; “Tạo trường mới” |
+| (như trên) | Hộp “Chọn cột hiển thị” (HubSpot “Choose which columns you see”): trái tìm + tick, phải danh sách cột đang hiện với ✕; Áp dụng / Huỷ / Bỏ chọn tất cả. Mở từ ⚙, menu ⋮, nút “+” hoặc Ctrl+Shift+L |
+| Thứ tự cột = thứ tự trường | Giữ nguyên; hộp ghi “Đổi thứ tự trong Quản lý trường” (không thêm kéo thả cột riêng theo view) |
+| Menu ⋮ tiêu đề cột → Ẩn cột | Như trước |
+
+Cột ẩn được nhớ theo từng view trong trình duyệt. Không áp dụng từ HubSpot: Frozen columns, cột Associations (ERP không có).
+
+### 9.3 Ảnh hưởng tới các màn khác
+
+- Trường mới hiện ngay: cột trên bảng, thẻ trên panel xem trước, ô trong form “Tạo bản ghi”, nhóm “Trường khác” ở trang chi tiết.
+- Trường Lựa chọn đơn / Trạng thái mới dùng được cho “Cột theo” của Board.
+- Bắt buộc / Duy nhất / Độ dài / Min–Max được kiểm tra khi tạo bản ghi và khi sửa ô tại chỗ.
+- Trường bị xóa biến khỏi mọi màn; Board tự chuyển sang trường lựa chọn khác nếu xóa Giai Đoạn Pipeline.

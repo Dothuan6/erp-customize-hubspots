@@ -92,9 +92,10 @@ td.pk{cursor:default}
 tr:hover .pvb{display:grid}
 .pvb:hover{background:var(--primary-container)}
 .empty{padding:48px 16px;text-align:center;color:var(--on-surface-variant)}
-.colpop{max-height:360px;overflow-y:auto}
-.colpop label{display:flex;align-items:center;gap:8px;min-height:30px;padding:0 8px;font-size:13px;border-radius:var(--radius-sm);cursor:pointer}
-.colpop label:hover{background:var(--surface-2)}
+.colpop{text-align:left;font-weight:400;color:var(--on-surface);cursor:default}
+.colsrch{display:flex;align-items:center;gap:6px;height:34px;padding:0 10px;margin:2px 2px 6px;border:1px solid var(--outline);border-radius:var(--btn-radius);color:var(--on-surface-variant)}
+.colsrch input{flex:1;min-width:0;border:none;outline:none;background:none;color:var(--on-surface);font-size:13px}
+.collist{max-height:260px;overflow-y:auto}
 
 /* ── Board ── */
 .kb{flex:1;display:flex;gap:10px;padding:12px 16px;overflow-x:auto;align-items:stretch}
@@ -148,7 +149,8 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
           <button class="mi" role="menuitem" data-toast="Deals_Pipeline đã được ghim vào sidebar với tên “Deals”"><span class="ms sm">push_pin</span>Ghim vào sidebar</button>
           <button class="mi" role="menuitem" data-toast="Chọn nhóm để ghim"><span class="ms sm">folder</span>Ghim vào nhóm…</button>
           <div class="sep"></div>
-          <button class="mi" role="menuitem" data-cols><span class="ms sm">edit</span>Quản lý cột (trường dữ liệu)</button>
+          <button class="mi" role="menuitem" data-ecols><span class="ms sm">view_column</span>Chọn cột hiển thị</button>
+          <a class="mi" role="menuitem" href="crm-quan-ly-truong-hubspot.html"><span class="ms sm">tune</span>Quản lý trường dữ liệu</a>
           <button class="mi" role="menuitem" id="gsBtn"><span class="ms sm">sync</span>Kết nối Google Sheet</button>
         </div>
         <button class="btn btn--secondary hide-sm" id="impBtn">Import</button>
@@ -213,26 +215,35 @@ const OPS = {
   SELECT:[['eq','Bằng'],['neq','Khác']], DATE:[['eq','Bằng'],['neq','Khác'],['gt','Lớn hơn'],['lt','Nhỏ hơn']], RELATION:[['eq','Bằng'],['neq','Khác']]
 };
 const isDate = f => f.type === 'DATE' || f.type === 'DATETIME' || f.type === '__created';
-const opsOf = f => OPS[f.type === 'LONG_TEXT' ? 'TEXT' : isDate(f) ? 'DATE' : f.type] || OPS.TEXT;
+// Kiểu bổ sung dùng bộ điều kiện của kiểu gần nhất: Tiền tệ → Số · Trạng thái / Người dùng / Lựa chọn nhiều → Lựa chọn
+const OPS_OF = {LONG_TEXT:'TEXT', URL:'TEXT', FILE:'TEXT', CURRENCY:'NUMBER', STATUS:'SELECT', USER:'SELECT', MULTI_SELECT:'SELECT', CHECKBOX:'SELECT'};
+const opsOf = f => OPS[isDate(f) ? 'DATE' : OPS_OF[f.type] || f.type] || OPS.TEXT;
+const valChoices = f => f.type === 'CHECKBOX' ? ['Có','Không'] : HX.optsOf(f);
 const CREATED = {key:'__createdAt', name:'Ngày tạo', type:'__created'};
 const fieldOf = k => k === '__createdAt' ? CREATED : F[k];
 const PAGE = 50, STAGE = 'giai_o_n_pipeline', CASH = 't_ng_cash_in_d_ki_n', RATE = 't_l_th_nh_c_ng';
 
 /* View: "Tất cả Deals" (tương ứng Bảng/Kanban sẵn có của ERP) + view đã lưu.
    Mỗi view nhớ kiểu hiển thị riêng; mặc định mở ở Board theo Giai Đoạn Pipeline. */
-const st = { view:'all', q:'', filters:[], sort:{key:'__createdAt',dir:'desc'}, hidden:[], sel:new Set(), page:1,
+const st = { view:'all', q:'', filters:[], sort:{key:'__createdAt',dir:'desc'}, sel:new Set(), page:1,
   mode:{ all:'KANBAN' }, groupBy:{}, widths:{} };
 try { Object.assign(st.widths, JSON.parse(localStorage.getItem('smartdb-col-widths:' + HX.COLLECTION.id) || '{}')); } catch {}
+/* Cột ẩn — nhớ theo từng view (Chọn cột hiển thị) */
+const HKEY = 'hx-crm-hidden-v1';
+let HIDDEN = {}; try { HIDDEN = JSON.parse(localStorage.getItem(HKEY) || '{}'); } catch {}
+Object.defineProperty(st, 'hidden', { get: () => HIDDEN[st.view] || [], set: v => { HIDDEN[st.view] = v; try { localStorage.setItem(HKEY, JSON.stringify(HIDDEN)); } catch {} } });
 const views = () => [{id:'all', name:'Tất cả Deals', type:'KANBAN', b:1}, ...api.views()];
 const curView = () => views().find(v => v.id === st.view) || views()[0];
 const mode = () => st.mode[st.view] || curView().type;
-const groupKey = () => st.groupBy[st.view] || STAGE;
+const groupKey = () => { const k = st.groupBy[st.view] || STAGE; return F[k] ? k : (FIELDS.find(f => f.type === 'SELECT' || f.type === 'STATUS') || {}).key; };
 
 const valOf = (r, key) => key === '__createdAt' ? r.createdAt : r.values[key];
 function pass(r, fl){
   const f = fieldOf(fl.key), v = valOf(r, fl.key);
   if (isDate(f)) { if (empty(v)) return fl.op === 'neq'; const a = String(v).slice(0,10), b = String(fl.value).slice(0,10);
     return fl.op === 'eq' ? a === b : fl.op === 'neq' ? a !== b : fl.op === 'gt' ? a > b : a < b; }
+  if (f.type === 'MULTI_SELECT' && (fl.op === 'eq' || fl.op === 'neq')) { const has = [].concat(v || []).includes(fl.value); return fl.op === 'eq' ? has : !has; }
+  if (f.type === 'CHECKBOX') { const on = !!v === (fl.value === 'Có'); return fl.op === 'eq' ? on : !on; }
   switch (fl.op) {
     case 'eq': return String(v ?? '') === String(fl.value); case 'neq': return String(v ?? '') !== String(fl.value);
     case 'contains': return String(v ?? '').toLowerCase().includes(String(fl.value).toLowerCase());
@@ -293,14 +304,17 @@ $('#setBtn').onclick = e => { e.stopPropagation(); const pop = $('#setPop'), v =
     <div style="padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px">Mật độ<span class="segtxt"><button data-d="normal" aria-pressed="${!document.body.classList.contains('compact')}">Thoáng</button><button data-d="compact" aria-pressed="${document.body.classList.contains('compact')}">Gọn</button></span></div>
     <div class="sep"></div><div class="hd">Thao tác</div>
     ${v.b ? '<div class="mi nil" style="cursor:default">View mặc định — không sửa / xoá</div>' : `<button class="mi" data-vedit><span class="ms sm">edit</span>Sửa view</button><button class="mi" data-vdel style="color:var(--error)"><span class="ms sm">delete</span>Xóa view</button>`}
-    <button class="mi" data-cols><span class="ms sm">view_column</span>Quản lý cột (trường dữ liệu)</button>`;
+    <div class="sep"></div><div class="hd">Cột</div>
+    <button class="mi" data-ecols><span class="ms sm">view_column</span>Chọn cột hiển thị<small class="nil" style="margin-left:auto">Ctrl+Shift+L</small></button>
+    <a class="mi" href="${HX.FIELDS_URL}"><span class="ms sm">tune</span>Quản lý trường dữ liệu</a>`;
   pop.classList.add('open');
 };
 $('#setPop').addEventListener('click', e => {
   e.stopPropagation(); const v = curView();
   const m = e.target.closest('[data-m]'); if (m) { st.mode[st.view] = m.dataset.m; $('#setPop').classList.remove('open'); renderAll(); return; }
   const d = e.target.closest('[data-d]'); if (d) { document.body.classList.toggle('compact', d.dataset.d === 'compact'); $('#setPop').classList.remove('open'); renderAll(); return; }
-  if (e.target.closest('[data-cols]')) { $('#setPop').classList.remove('open'); toast('Mở trang quản lý cột (Fields) của Deals_Pipeline'); return; }
+  if (e.target.closest('[data-ecols]')) { $('#setPop').classList.remove('open'); editColumns(); return; }
+  if (e.target.closest('a[href]')) return;
   if (e.target.closest('[data-vedit]')) { viewForm($('#setBtn'), v); return; }
   if (e.target.closest('[data-vdel]')) { $('#setPop').classList.remove('open');
     confirmBox('Xóa view', `Xóa view “${esc(v.name)}”? Bản ghi không bị ảnh hưởng.`, 'Xóa view', () => { api.saveViews(api.views().filter(x => x.id !== v.id)); st.view = 'all'; renderAll(); toast('Đã xóa view'); }); }
@@ -337,9 +351,9 @@ function filterBuilder(anchor, presetKey){
   const fS = $('#fbF', pop), oS = $('#fbO', pop), vB = $('#fbV', pop);
   const syncV = () => { const f = fieldOf(fS.value), op = oS.value;
     if (['is_empty','is_not_empty'].includes(op)) { vB.innerHTML = ''; return; }
-    if (f.type === 'SELECT') vB.innerHTML = `<select id="fbVal" style="width:100%">${f.choices.map(c => `<option>${esc(c)}</option>`).join('')}</select>`;
+    if (opsOf(f) === OPS.SELECT && f.type !== 'RELATION') vB.innerHTML = `<select id="fbVal" style="width:100%">${valChoices(f).map(c => `<option>${esc(c)}</option>`).join('')}</select>`;
     else if (f.type === 'RELATION') vB.innerHTML = `<select id="fbVal" style="width:100%"><option value="t1">Bản ghi liên kết #1</option><option value="t2">Bản ghi liên kết #2</option><option value="t3">Bản ghi liên kết #3</option></select>`;
-    else vB.innerHTML = `<input id="fbVal" style="width:100%" placeholder="Giá trị..." type="${f.type === 'NUMBER' ? 'number' : isDate(f) ? 'date' : 'text'}">`; };
+    else vB.innerHTML = `<input id="fbVal" style="width:100%" placeholder="Giá trị..." type="${HX.isNum(f.type) ? 'number' : isDate(f) ? 'date' : 'text'}">`; };
   const syncO = () => { oS.innerHTML = opsOf(fieldOf(fS.value)).map(([v, l]) => `<option value="${v}">${l}</option>`).join(''); syncV(); };
   fS.onchange = syncO; oS.onchange = syncV; syncO();
   $('#fbX', pop).onclick = () => pop.classList.remove('open');
@@ -356,7 +370,7 @@ $('#fbar').onclick = e => {
 };
 
 /* ── Bảng ── */
-const DEFW = f => f.primary ? 250 : f.type === 'LONG_TEXT' ? 220 : f.type === 'SELECT' ? 190 : f.type === 'NUMBER' ? 170 : 180;
+const DEFW = f => f.primary ? 250 : f.type === 'LONG_TEXT' || f.type === 'MULTI_SELECT' ? 220 : HX.hasChoices(f.type) ? 190 : HX.isNum(f.type) ? 170 : f.type === 'CHECKBOX' ? 120 : 180;
 const W = f => st.widths[f.key] || DEFW(f);
 const visFields = () => FIELDS.filter(f => !st.hidden.includes(f.key));
 function renderTable(){
@@ -368,14 +382,14 @@ function renderTable(){
     <thead><tr><th class="cb"><input type="checkbox" id="all" aria-label="Chọn tất cả" ${list.length && list.every(r => st.sel.has(r.id)) ? 'checked' : ''}></th>
     ${vis.map(f => `<th data-sort="${f.key}" title="Bấm để sắp xếp">${esc(f.name)}<span class="srt">${srt(f.key)}</span><button class="hm" data-hmenu="${f.key}" aria-label="Tuỳ chọn cột ${esc(f.name)}"><span class="ms xs">more_vert</span></button><span class="rz" data-rz="${f.key}" title="Kéo để đổi bề rộng · bấm đúp để về mặc định"></span></th>`).join('')}
     <th data-sort="__createdAt">Ngày tạo<span class="srt">${srt('__createdAt')}</span></th>
-    <th style="cursor:default;text-align:center"><button class="btn btn--text btn--icon" id="colBtn" title="Thêm / ẩn cột" aria-label="Thêm / ẩn cột"><span class="ms sm">add</span></button></th></tr></thead>
+    <th style="cursor:default;text-align:center"><button class="btn btn--text btn--icon" id="colBtn" title="Thêm cột" aria-label="Thêm cột"><span class="ms sm">add</span></button></th></tr></thead>
     <tbody>${list.length ? list.map(r => `<tr data-id="${r.id}" class="${st.sel.has(r.id) ? 'sel' : ''}"><td class="cb"><input type="checkbox" data-sel="${r.id}" ${st.sel.has(r.id) ? 'checked' : ''} aria-label="Chọn ${esc(title(r))}"></td>
       ${vis.map(f => { const v = r.values[f.key];
         if (f.primary) return `<td class="pk"><span class="pri">${empty(v) ? `<a href="${DETAIL(r.id)}" class="nil">—</a>` : `<a href="${DETAIL(r.id)}">${esc(v)}</a>`}<button class="pvb" data-open="${r.id}" title="Xem trước" aria-label="Xem trước"><span class="ms xs">vertical_split</span></button></span></td>`;
-        return `<td data-k="${f.key}" class="${f.type === 'NUMBER' ? 'num' : ''}" title="${typeof v === 'string' ? esc(v) : ''}">${display(v, f)}</td>`; }).join('')}
+        return `<td data-k="${f.key}" class="${HX.isNum(f.type) ? 'num' : ''}" title="${typeof v === 'string' ? esc(v) : ''}">${display(v, f)}</td>`; }).join('')}
       <td style="color:var(--on-surface-variant);font-size:13px">${createdFmt(r.createdAt)}</td><td></td></tr>`).join('')
       : `<tr><td colspan="${vis.length + 3}" class="empty">${st.q ? `Không tìm thấy kết quả cho “${esc(st.q)}”` : 'Chưa có bản ghi nào'}</td></tr>`}</tbody></table></div>
-    <div class="pop colpop" id="colPop" style="right:12px;top:44px"></div><div class="pop" id="hPop"></div>`;
+    <div class="pop colpop" id="colPop" style="right:12px;top:44px;width:280px"></div><div class="pop" id="hPop"></div>`;
   $('#pager').style.visibility = ''; $('#pg').textContent = `${st.page} / ${pages}`; $('#prev').disabled = st.page <= 1; $('#next').disabled = st.page >= pages;
   footer(all.length, pages);
 }
@@ -386,7 +400,54 @@ function footer(n, pages){
   $('#count').textContent = `${tot} bản ghi`;
   $('#bulk').classList.toggle('on', st.sel.size > 0); $('#bulkN').textContent = `Đã chọn ${st.sel.size} bản ghi`;
 }
-function openColPop(){ const p = $('#colPop'); closePops(p); p.innerHTML = '<div class="hd">Hiển thị cột</div>' + FIELDS.map(f => `<label><input type="checkbox" data-hide="${f.key}" ${st.hidden.includes(f.key) ? '' : 'checked'}>${esc(f.name)}</label>`).join(''); p.classList.add('open'); }
+/* "+" cuối tiêu đề = Thêm cột (HubSpot Add column): tìm trường đang ẩn → bấm để hiện; tạo trường mới */
+function openColPop(q = ''){
+  const p = $('#colPop'); closePops(p);
+  const hid = FIELDS.filter(f => st.hidden.includes(f.key) && (!q || f.name.toLowerCase().includes(q)));
+  p.innerHTML = `<div class="colsrch"><span class="ms xs">search</span><input id="colQ" placeholder="Tìm trường" value="${esc(q)}" aria-label="Tìm trường"></div>
+    <div class="collist">${hid.length ? hid.map(f => `<button class="mi" data-show="${f.key}"><span class="ms sm">${HX.TYPE[f.type].icon}</span>${esc(f.name)}</button>`).join('')
+      : `<div class="nil" style="padding:10px;font-size:13px">${q ? 'Không có trường phù hợp' : 'Tất cả trường đang hiển thị'}</div>`}</div>
+    <div class="sep"></div><button class="mi" data-ecols><span class="ms sm">view_column</span>Chọn cột hiển thị…<small class="nil" style="margin-left:auto">Ctrl+Shift+L</small></button>
+    <a class="mi" href="${HX.FIELDS_URL}?new=1"><span class="ms sm">add</span>Tạo trường mới</a>`;
+  p.classList.add('open'); const qi = $('#colQ', p); qi.focus(); qi.setSelectionRange(q.length, q.length);
+  qi.oninput = () => openColPop(qi.value.trim().toLowerCase());
+}
+
+/* Hộp "Chọn cột hiển thị" — UX theo "Choose which columns you see" của HubSpot, chức năng = Hiển thị cột của ERP.
+   Trái: tìm + tick trường · Phải: cột đang hiển thị (bỏ bằng ×). Thứ tự cột = thứ tự trường (đổi ở Quản lý trường). */
+function editColumns(){
+  let shown = FIELDS.filter(f => !st.hidden.includes(f.key)).map(f => f.key), q = '';
+  HX.modal(`<div class="modal xl" role="dialog" aria-modal="true" aria-labelledby="ecT">
+    <div class="mh" id="ecT">Chọn cột hiển thị<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
+    <div class="ec"><div class="ec-l"><label class="srch"><input id="ecQ" placeholder="Tìm trường…" aria-label="Tìm trường"><span class="ms sm">search</span></label>
+        <div class="grp" id="ecG"></div><div class="lst" id="ecL"></div>
+        <div class="hint">Không thấy trường cần tìm? <a href="${HX.FIELDS_URL}?new=1">Tạo trường mới<span class="ms xs" style="vertical-align:-3px">open_in_new</span></a></div></div>
+      <div class="ec-r"><div class="top"><span id="ecN"></span></div><div class="lst" id="ecR"></div>
+        <div class="hint">Thứ tự cột theo thứ tự trường của collection. <a href="${HX.FIELDS_URL}">Đổi thứ tự trong Quản lý trường</a></div></div></div>
+    <div class="mf l"><button class="btn btn--primary" id="ecOk">Áp dụng</button><button class="btn btn--secondary" data-close>Huỷ</button><button class="lk" id="ecClr">Bỏ chọn tất cả</button></div></div>`, (bg, close) => {
+    const drawL = () => {
+      const list = FIELDS.filter(f => !q || f.name.toLowerCase().includes(q));
+      $('#ecG', bg).textContent = `Trường dữ liệu · ${HX.COLLECTION.name} (${list.length})`;
+      $('#ecL', bg).innerHTML = list.length ? list.map(f => `<label><input type="checkbox" data-k="${f.key}" ${shown.includes(f.key) ? 'checked' : ''}>${esc(f.name)}<small><span class="ms xs">${HX.TYPE[f.type].icon}</span>${HX.TYPE[f.type].name}</small></label>`).join('') : '<div class="ec-empty">Không có trường phù hợp</div>';
+    };
+    // Tick / bỏ tick chỉ vẽ lại cột phải — danh sách trái giữ nguyên vị trí cuộn
+    const drawR = () => {
+      $('#ecL', bg).querySelectorAll('[data-k]').forEach(i => { i.checked = shown.includes(i.dataset.k); });
+      const sel = FIELDS.filter(f => shown.includes(f.key));
+      $('#ecN', bg).textContent = `Cột đang hiển thị (${sel.length})`;
+      $('#ecR', bg).innerHTML = sel.length ? sel.map(f => `<div class="sel"><span class="ms sm">${HX.TYPE[f.type].icon}</span><span class="nm">${esc(f.name)}</span><button class="rm" data-rm="${f.key}" aria-label="Bỏ cột ${esc(f.name)}"><span class="ms xs">close</span></button></div>`).join('')
+        : '<div class="ec-empty">Chưa chọn cột nào — bảng chỉ còn cột Ngày tạo</div>';
+    };
+    drawL(); drawR(); $('#ecQ', bg).focus();
+    $('#ecQ', bg).oninput = e => { q = e.target.value.trim().toLowerCase(); drawL(); drawR(); };
+    $('#ecL', bg).onchange = e => { const k = e.target.dataset.k; if (!k) return; shown = e.target.checked ? [...shown, k] : shown.filter(x => x !== k); drawR(); };
+    $('#ecR', bg).onclick = e => { const b = e.target.closest('[data-rm]'); if (b) { shown = shown.filter(x => x !== b.dataset.rm); drawR(); } };
+    $('#ecClr', bg).onclick = () => { shown = []; drawR(); };
+    $('#ecOk', bg).onclick = () => { st.hidden = FIELDS.filter(f => !shown.includes(f.key)).map(f => f.key); close();
+      if (mode() !== 'TABLE') { st.mode[st.view] = 'TABLE'; } renderAll(); toast(`Đã áp dụng — hiển thị ${shown.length} cột`); };
+    bg.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  });
+}
 function headMenu(btn, key){
   const p = $('#hPop'); closePops(p); const r = btn.getBoundingClientRect(), br = $('#body').getBoundingClientRect();
   p.style.left = Math.min(r.left - br.left, br.width - 230) + 'px'; p.style.top = (r.bottom - br.top + 4) + 'px';
@@ -395,27 +456,29 @@ function headMenu(btn, key){
   p.onclick = e => { e.stopPropagation(); const s = e.target.closest('[data-hs]');
     if (s) { st.sort = {key, dir:s.dataset.hs}; renderTable(); return; }
     if (e.target.closest('[data-hf]')) { p.classList.remove('open'); document.body.classList.remove('fcollapsed'); filterBuilder($('#fAdd'), key); return; }
-    if (e.target.closest('[data-hh]')) { st.hidden.push(key); renderTable(); } };
+    if (e.target.closest('[data-hh]')) { st.hidden = [...st.hidden, key]; p.classList.remove('open'); renderTable(); toast('Đã ẩn cột — mở lại trong “Chọn cột hiển thị”'); } };
   p.classList.add('open');
 }
 $('#body').addEventListener('click', e => {
   const op = e.target.closest('[data-open]'); if (op) { e.stopPropagation(); e.preventDefault(); HX.openPanel(op.dataset.open, {dock:true}); return; }
   if (e.target.closest('a[href]')) return;
   if (e.target.closest('#colBtn')) { e.stopPropagation(); $('#colPop').classList.contains('open') ? $('#colPop').classList.remove('open') : openColPop(); return; }
-  if (e.target.closest('#colPop,#hPop')) { e.stopPropagation(); return; }
+  const sh = e.target.closest('[data-show]'); if (sh) { e.stopPropagation(); st.hidden = st.hidden.filter(x => x !== sh.dataset.show); renderTable(); toast('Đã thêm cột'); return; }
+  if (e.target.closest('[data-ecols]')) { e.stopPropagation(); closePops(); editColumns(); return; }
+  if (e.target.closest('#colPop,#hPop')) { if (!e.target.closest('a[href]')) e.stopPropagation(); return; }
   const hm = e.target.closest('[data-hmenu]'); if (hm) { e.stopPropagation(); headMenu(hm, hm.dataset.hmenu); return; }
   const th = e.target.closest('th[data-sort]'); if (th && !e.target.closest('.rz')) { const k = th.dataset.sort;
     st.sort = !st.sort || st.sort.key !== k ? {key:k, dir:'asc'} : st.sort.dir === 'asc' ? {key:k, dir:'desc'} : null; renderTable(); return; }
   const card = e.target.closest('[data-card]'); if (card && !e.target.closest('.qi')) { HX.openPanel(card.dataset.card, {dock:true}); return; }
   const td = e.target.closest('td[data-k]'); if (td && !td.classList.contains('editing')) {
     const r = api.get(td.parentElement.dataset.id), f = F[td.dataset.k]; td.classList.add('editing');
-    td.replaceChildren(editor(f, r.values[f.key], nv => { if (nv !== r.values[f.key]) { api.update(r.id, f.key, nv); toast('Đã lưu'); } renderTable(); }, renderTable, 'table'));
+    td.replaceChildren(editor(f, r.values[f.key], nv => { const err = nv !== r.values[f.key] && HX.check(f, nv, r.id);
+      if (err) toast(err); else if (nv !== r.values[f.key]) { api.update(r.id, f.key, nv); toast('Đã lưu'); } renderTable(); }, renderTable, 'table'));
   }
 });
 $('#body').addEventListener('change', e => {
   if (e.target.id === 'all') { rows().slice((st.page-1)*PAGE, st.page*PAGE).forEach(r => e.target.checked ? st.sel.add(r.id) : st.sel.delete(r.id)); renderTable(); }
   else if (e.target.dataset.sel) { e.target.checked ? st.sel.add(e.target.dataset.sel) : st.sel.delete(e.target.dataset.sel); renderTable(); }
-  else if (e.target.dataset.hide) { const k = e.target.dataset.hide; st.hidden = e.target.checked ? st.hidden.filter(x => x !== k) : [...st.hidden, k]; renderTable(); openColPop(); }
 });
 $('#body').addEventListener('dblclick', e => { const rz = e.target.closest('[data-rz]'); if (rz) { delete st.widths[rz.dataset.rz]; saveW(); renderTable(); } });
 $('#body').addEventListener('mousedown', e => {
@@ -431,22 +494,23 @@ const saveW = () => { try { localStorage.setItem('smartdb-col-widths:' + HX.COLL
    Cột = các lựa chọn của trường làm cột (mặc định Giai Đoạn Pipeline). Kéo thả để đổi giá trị (ERP).
    Chân cột: Tổng giá trị = Σ Tổng Cash-In Dự Kiến; Giá trị có trọng số = Σ (Cash-In × Tỷ Lệ Thành Công %),
    tính từ 2 trường sẵn có của ERP. */
-const selectFields = FIELDS.filter(f => f.type === 'SELECT');
+const selectFields = FIELDS.filter(f => f.type === 'SELECT' || f.type === 'STATUS');
 const money = v => Math.round(v).toLocaleString('vi-VN');
 function renderKanban(){
   const gk = groupKey(), f = F[gk], list = rows();
+  if (!f) { $('#grpBox').innerHTML = ''; $('#body').innerHTML = `<div class="empty" style="flex:1">Board cần ít nhất một trường Lựa chọn đơn hoặc Trạng thái. <a class="lnk" href="${HX.FIELDS_URL}?new=1">Thêm trường</a></div>`; footer(list.length, 1); return; }
   $('#grpBox').innerHTML = `<select class="grpsel" id="grp" aria-label="Cột theo" title="Trường làm cột">${selectFields.map(x => `<option value="${x.key}" ${x.key === gk ? 'selected' : ''}>Cột theo: ${esc(x.name)}</option>`).join('')}</select>`;
   const noVal = list.filter(r => empty(r.values[gk])).length;
   $('#body').innerHTML = `<div style="flex:1;display:flex;flex-direction:column;min-width:0">${noVal ? `<div class="knote" style="padding-top:8px">${noVal} bản ghi chưa có “${esc(f.name)}” không hiển thị trên board.</div>` : ''}<div class="kb">${f.choices.map(c => {
     const items = list.filter(r => r.values[gk] === c);
-    const sum = items.reduce((s, r) => s + (Number(r.values[CASH]) || 0), 0);
-    const w = items.reduce((s, r) => s + (Number(r.values[CASH]) || 0) * (Number(r.values[RATE]) || 0) / 100, 0);
+    const sum = F[CASH] ? items.reduce((s, r) => s + (Number(r.values[CASH]) || 0), 0) : 0;
+    const w = F[CASH] && F[RATE] ? items.reduce((s, r) => s + (Number(r.values[CASH]) || 0) * (Number(r.values[RATE]) || 0) / 100, 0) : 0;
     const pct = sum ? Math.round(w / sum * 100) : 0;
     const wonLost = gk === STAGE && (c === '5. Closed Won' || c === '6. Closed Lost');
     return `<section class="kcol"><div class="kh">${pill(f, c)}<span class="n">${items.length}</span></div>
       <div class="kcards" data-drop="${esc(c)}">${items.length ? items.map(card).join('') : '<div class="kempty">Chưa có bản ghi</div>'}</div>
-      <div class="ksum"><span><b>${money(sum)}</b> | Tổng giá trị</span>
-        <span>${wonLost ? (c === '5. Closed Won' ? 'Thắng (100%)' : 'Thua (0%)') : `<b>${money(w)}</b> (${pct}%) | Giá trị có trọng số`} <span class="ms" title="Tổng Cash-In Dự Kiến × Tỷ Lệ Thành Công (%) của từng bản ghi">info</span></span></div></section>`; }).join('')}</div></div>`;
+      ${!F[CASH] ? '' : `<div class="ksum"><span><b>${money(sum)}</b> | Tổng giá trị</span>
+        <span>${wonLost ? (c === '5. Closed Won' ? 'Thắng (100%)' : 'Thua (0%)') : `<b>${money(w)}</b> (${pct}%) | Giá trị có trọng số`} <span class="ms" title="Tổng Cash-In Dự Kiến × Tỷ Lệ Thành Công (%) của từng bản ghi">info</span></span></div>`}</section>`; }).join('')}</div></div>`;
   $('#pager').style.visibility = 'hidden';
   footer(list.length - noVal, 1);
 }
@@ -455,8 +519,8 @@ function card(r){
   return `<article class="kc" draggable="true" data-card="${r.id}">
     <a class="tt" href="${DETAIL(r.id)}">${esc(title(r))}</a>
     ${L('description', esc(v.t_n_deal || ''))}
-    ${L('event', v.ng_y_d_ki_n_ch_t ? 'Chốt ' + fmt(v.ng_y_d_ki_n_ch_t, F.ng_y_d_ki_n_ch_t) : '')}
-    ${L('payments', empty(v[CASH]) ? '' : `<b>${fmt(v[CASH], F[CASH])}</b>`)}
+    ${L('event', v.ng_y_d_ki_n_ch_t && F.ng_y_d_ki_n_ch_t ? 'Chốt ' + fmt(v.ng_y_d_ki_n_ch_t, F.ng_y_d_ki_n_ch_t) : '')}
+    ${L('payments', empty(v[CASH]) || !F[CASH] ? '' : `<b>${fmt(v[CASH], F[CASH])}</b>`)}
     ${L('person', esc(v.sale_ph_tr_ch || ''))}
     ${L('sell', empty(v.g_i_d_ch_v_m_c_ti_u) ? '' : esc(v.g_i_d_ch_v_m_c_ti_u))}
     <div class="kf"><button class="qi" data-open="${r.id}" title="Xem trước" aria-label="Xem trước"><span class="ms sm">vertical_split</span></button>
@@ -480,11 +544,12 @@ function renderAll(){
 }
 HX.onChange = () => renderAll();
 $('#q').oninput = e => { st.q = e.target.value.trim(); st.page = 1; renderAll(); };
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closePops(); if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); $('#q').focus(); } });
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'l') { e.preventDefault(); closePops(); editColumns(); return; }
+  if (e.key === 'Escape') closePops(); if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); $('#q').focus(); } });
 $('#moreBtn').onclick = e => { e.stopPropagation(); closePops($('#morePop')); $('#morePop').classList.toggle('open'); };
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-toast]'); if (t) { toast(t.dataset.toast); closePops(); return; }
-  if (e.target.closest('[data-cols]')) { closePops(); toast('Mở trang quản lý cột (Fields) của Deals_Pipeline'); return; }
+  if (e.target.closest('#morePop [data-ecols]')) { closePops(); editColumns(); return; }
   if (!e.target.closest('.pop')) closePops();
 });
 $('#gsBtn').onclick = () => HX.sheetDialog();

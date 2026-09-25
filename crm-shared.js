@@ -10,9 +10,26 @@ const HX = (() => {
   // Các collection khác đang có trên ERP (menu chuyển đối tượng ở tiêu đề)
   const OTHERS = ['Leads','Sales_Activities','Payments_CashIn','KPI_Weekly_Tracker','db_websites_management','NhanVien','PhongBan','ViTriTuyenDung','HoSoUngTuyen'];
   const STAGES = ['1. MQL Qualified','2. Discovery Call','3. Demo Scheduled','4. Proposal Sent','5. Closed Won','6. Closed Lost'];
-  // Thứ tự = displayOrder trên ERP. primary = cột đầu (Mã Deal)
-  const FIELDS = [
-    {key:'m_deal', name:'Mã Deal', type:'TEXT', primary:true},
+  // 14 loại trường — đúng hộp "Chọn loại trường" của ERP (/data/:id/fields, khảo sát 24/09/2026).
+  // [mã, tên hiển thị ERP, icon]. 7 mã đầu có trong API Deals_Pipeline; mã của 7 loại còn lại do mockup đặt.
+  const TYPES = [
+    ['TEXT','Văn bản','title'],['LONG_TEXT','Văn bản dài','notes'],['NUMBER','Số','tag'],['CURRENCY','Tiền tệ','payments'],
+    ['DATE','Ngày','calendar_today'],['DATETIME','Ngày giờ','schedule'],['SELECT','Lựa chọn đơn','radio_button_checked'],['MULTI_SELECT','Lựa chọn nhiều','library_add_check'],
+    ['STATUS','Trạng thái','label'],['CHECKBOX','Hộp kiểm','check_box'],['USER','Người dùng','person'],['FILE','Tệp đính kèm','attach_file'],
+    ['RELATION','Liên kết','sync_alt'],['URL','Đường dẫn','link']];
+  const TYPE = Object.fromEntries(TYPES.map(([c, n, i]) => [c, {code:c, name:n, icon:i}]));
+  const hasChoices = t => t === 'SELECT' || t === 'MULTI_SELECT' || t === 'STATUS';
+  const isNum = t => t === 'NUMBER' || t === 'CURRENCY';
+  // Người dùng mẫu cho trường kiểu "Người dùng"
+  const USERS = ['Minh Trần','Lan Lê','Phương Nguyễn'];
+  // Collection đích cho trường "Liên kết" — đúng danh sách trong drawer của ERP
+  const REL_TARGETS = ['db_websites_management','Leads','Deals_Pipeline','Sales_Activities','Payments_CashIn','KPI_Weekly_Tracker','Data','NhanVien','PhongBan','ViTriTuyenDung','HoSoUngTuyen','INOVINA_RP'];
+
+  // Thứ tự = displayOrder trên ERP (kéo ⠿ ở trang Quản lý trường để đổi). Trường đầu tiên = cột chính.
+  // Cấu hình mỗi trường đúng drawer ERP: Bắt buộc · Duy nhất · (Văn bản) Độ dài tối đa · (Số/Tiền tệ) Min–Max
+  // · (Lựa chọn/Trạng thái) Danh sách lựa chọn · (Liên kết) Collection liên kết + Cột hiển thị.
+  const DEFAULT_FIELDS = [
+    {key:'m_deal', name:'Mã Deal', type:'TEXT'},
     {key:'t_n_deal', name:'Tên Deal', type:'TEXT'},
     {key:'lead_id', name:'Lead Id', type:'TEXT'},
     {key:'g_i_d_ch_v_m_c_ti_u', name:'Gói Dịch Vụ Mục Tiêu', type:'SELECT', choices:['STARTER','PROFESSIONAL','ENTERPRISE BYOC']},
@@ -28,9 +45,15 @@ const HX = (() => {
     {key:'sale_ph_tr_ch', name:'Sale phụ trách', type:'TEXT'},
     {key:'l_do_th_t_b_i', name:'Lý do thất bại', type:'SELECT', choices:['Giá cao','Chưa có ngân sách','Dùng đối thủ','Không liên lạc được','Tính năng chưa đáp ứng']},
     {key:'ng_y_c_p_nh_t_g_n_nh_t', name:'Ngày cập nhật gần nhất', type:'DATETIME'},
-    {key:'test', name:'Test', type:'RELATION'},
+    {key:'test', name:'Test', type:'RELATION', target:'NhanVien', display:''},
   ];
-  const F = Object.fromEntries(FIELDS.map(f => [f.key, f]));
+  const FKEY = 'hx-crm-fields-v1';
+  const FIELDS = [], F = {};
+  function setFields(list) {
+    FIELDS.splice(0, FIELDS.length, ...list.map((f, i) => ({required:false, unique:false, ...f, primary: i === 0})));
+    Object.keys(F).forEach(k => delete F[k]); FIELDS.forEach(f => { F[f.key] = f; });
+  }
+  setFields((() => { try { const s = localStorage.getItem(FKEY); return s ? JSON.parse(s) : DEFAULT_FIELDS; } catch { return DEFAULT_FIELDS; } })());
   // Danh sách workflow — đúng tên đang có trên ERP (hộp "Kích hoạt Workflow")
   const WORKFLOWS = ['(1) SALE LIÊN HỆ & PHÂN BỔ LEADS','(2) TỰ ĐỘNG XẾP LỊCH DEMO & NHẮC LỊCH QUA ZALO/SMS','Tiếp nhận Lead từ HarnexAI',
     '(3) TỰ ĐỘNG TẠO BÁO GIÁ & HỢP ĐỒNG STARTER 6T KÈM MÃ VIETQR','Quy trình chăm sóc Lead mới','(5) CẢNH BÁO DEAL TẮC NGHẼN & TỰ ĐỘNG NUÔI DƯỠNG LẠI (RE-ENGAGEMENT)',
@@ -67,40 +90,74 @@ const HX = (() => {
   const api = {
     list: () => records,
     get: id => records.find(r => r.id === id),
-    update(id, key, value) { const r = api.get(id); if (!r) return; r.values[key] = value; r.values.ng_y_c_p_nh_t_g_n_nh_t = new Date().toISOString(); save(KEY, records); },
+    update(id, key, value) { const r = api.get(id); if (!r) return; r.values[key] = value; if (F.ng_y_c_p_nh_t_g_n_nh_t) r.values.ng_y_c_p_nh_t_g_n_nh_t = new Date().toISOString(); save(KEY, records); },
     create(values) { const r = { id: 'r' + Date.now(), createdAt: new Date().toISOString(), values }; records.unshift(r); save(KEY, records); return r; },
     remove(ids) { records = records.filter(r => !ids.includes(r.id)); save(KEY, records); },
     views: () => views,
     saveViews(v) { views = v; save(VKEY, views); },
-    reset() { try { localStorage.removeItem(KEY); localStorage.removeItem(VKEY); } catch {} location.reload(); },
+    /* Quản lý trường (/data/:id/fields của ERP): thêm · sửa · xoá · kéo đổi thứ tự */
+    saveFields(list) { setFields(list); save(FKEY, FIELDS.map(({primary, ...f}) => f)); },
+    addField(f) { const base = slug(f.name) || 'truong'; let key = base, n = 2; while (F[key]) key = base + '_' + n++;
+      const nf = {...f, key}; api.saveFields([...FIELDS, nf]); return F[key]; },
+    updateField(key, patch) { api.saveFields(FIELDS.map(f => f.key === key ? {...f, ...patch} : f)); },
+    removeField(key) { api.saveFields(FIELDS.filter(f => f.key !== key)); records.forEach(r => delete r.values[key]); save(KEY, records); },
+    moveField(key, to) { const list = [...FIELDS], i = list.findIndex(f => f.key === key); if (i < 0) return;
+      const [f] = list.splice(i, 1); list.splice(Math.max(0, Math.min(to, list.length)), 0, f); api.saveFields(list); },
+    reset() { try { [KEY, VKEY, FKEY, 'hx-crm-hidden-v1'].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
   };
+  // Tên trường → key kiểu ERP (bỏ dấu, ký tự lạ thành "_")
+  function slug(s) { return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40); }
+
+  /* Kiểm tra cấu hình trường khi lưu giá trị: Bắt buộc · Duy nhất · Độ dài tối đa · Min–Max */
+  function check(f, v, recId) {
+    const blank = v === null || v === undefined || v === '' || (Array.isArray(v) && !v.length) || (f.type === 'CHECKBOX' && v === false);
+    if (f.required && blank) return `“${f.name}” là trường bắt buộc`;
+    if (blank) return '';
+    if (f.type === 'TEXT' && f.maxLength && String(v).length > f.maxLength) return `“${f.name}” tối đa ${f.maxLength} ký tự`;
+    if (isNum(f.type)) { if (f.min != null && f.min !== '' && Number(v) < Number(f.min)) return `“${f.name}” không nhỏ hơn ${f.min}`;
+      if (f.max != null && f.max !== '' && Number(v) > Number(f.max)) return `“${f.name}” không lớn hơn ${f.max}`; }
+    if (f.unique && records.some(r => r.id !== recId && String(r.values[f.key] ?? '') === String(v))) return `“${f.name}” phải là giá trị duy nhất — đã có bản ghi dùng “${v}”`;
+    return '';
+  }
 
   /* ── Định dạng (giống formatCellValue của ERP) ── */
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const empty = v => v === null || v === undefined || v === '';
+  const empty = v => v === null || v === undefined || v === '' || (Array.isArray(v) && !v.length);
   function fmt(v, f) {
     if (empty(v)) return '';
     switch (f.type) {
       case 'NUMBER': return typeof v === 'number' ? v.toLocaleString('vi-VN') : String(v);
+      case 'CURRENCY': return (typeof v === 'number' ? v.toLocaleString('vi-VN') : String(v)) + ' ₫';
+      case 'MULTI_SELECT': return [].concat(v).join(', ');
+      case 'CHECKBOX': return v ? 'Có' : '';
       case 'DATE': case 'DATETIME': return new Date(v).toLocaleDateString('vi-VN');
       case 'LONG_TEXT': return String(v).length > 60 ? String(v).slice(0, 60) + '...' : String(v);
       case 'RELATION': return (RELATED.find(x => x.id === v) || {label: String(v)}).label;
       default: return String(v);
     }
   }
+  const inputType = t => isNum(t) ? 'number' : t === 'DATE' ? 'date' : t === 'DATETIME' ? 'datetime-local' : t === 'URL' ? 'url' : 'text';
+  const FIELDS_URL = 'crm-quan-ly-truong-hubspot.html';
   const chipCls = v => v === '5. Closed Won' ? 'won' : v === '6. Closed Lost' ? 'lost' : '';
   // Màu pill theo thứ tự lựa chọn (như HubSpot): 1..5 màu phân loại, "Won" xanh lá, "Lost" đỏ
   function pillCls(f, v) { if (v === '5. Closed Won') return 'c6'; if (v === '6. Closed Lost') return 'c7';
     const i = (f.choices || []).indexOf(v); return i < 0 ? '' : 'c' + (i % 5 + 1); }
   const pill = (f, v) => `<span class="pill ${pillCls(f, v)}" title="${esc(v)}">${esc(v)}</span>`;
   function display(v, f) {
+    if (f.type === 'CHECKBOX') return `<span class="ms sm cbx ${v ? 'on' : ''}" aria-label="${v ? 'Có' : 'Không'}">${v ? 'check_box' : 'check_box_outline_blank'}</span>`;
     if (empty(v)) return '<span class="nil">—</span>';
-    if (f.type === 'SELECT') return pill(f, v);
+    if (f.type === 'SELECT' || f.type === 'STATUS') return pill(f, v);
+    if (f.type === 'MULTI_SELECT') return [].concat(v).map(x => pill(f, x)).join(' ');
     if (f.type === 'RELATION') return `<span class="chip muted">${esc(fmt(v, f))}</span>`;
+    if (f.type === 'USER') return `<span class="uchip"><span class="av">${esc(String(v).split(' ').pop()[0] || '?')}</span>${esc(v)}</span>`;
+    if (f.type === 'FILE') return `<span class="chip muted"><span class="ms xs">attach_file</span>${esc(v)}</span>`;
+    if (f.type === 'URL') return `<a class="lnk" href="${esc(v)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(v)}</a>`;
     return esc(fmt(v, f));
   }
+  const optsOf = f => f.type === 'USER' ? USERS : (f.choices || []);
   const createdFmt = iso => { const d = new Date(iso), p = n => String(n).padStart(2, '0'); return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`; };
-  const title = r => r.values.m_deal || r.values.t_n_deal || '—';
+  const title = r => (FIELDS[0] && fmt(r.values[FIELDS[0].key], FIELDS[0])) || r.values.t_n_deal || '—';
 
   /* ── Trình sửa theo kiểu trường (FieldValueEditor): Enter/blur lưu, Esc huỷ ── */
   function editor(f, value, onSave, onCancel, where = 'table') {
@@ -109,7 +166,18 @@ const HX = (() => {
       setTimeout(onCancel, 1600); return d;
     }
     let el;
-    if (f.type === 'SELECT') return selectEditor(f, value, onSave, onCancel);
+    if (f.type === 'SELECT' || f.type === 'STATUS' || f.type === 'USER' || f.type === 'MULTI_SELECT') return selectEditor(f, value, onSave, onCancel);
+    if (f.type === 'CHECKBOX') { // bấm là đổi trạng thái
+      const d = document.createElement('span'); d.innerHTML = display(!value, f); setTimeout(() => onSave(!value), 0); return d; }
+    if (f.type === 'FILE') {
+      const lb = document.createElement('label'); lb.className = 'selcell'; lb.innerHTML = `<span class="ms xs">upload_file</span><span>Chọn tệp…</span><input type="file" hidden>`;
+      const inp = lb.querySelector('input'); let done = false;
+      inp.onchange = () => { done = true; onSave(inp.files[0] ? inp.files[0].name : value); };
+      lb.addEventListener('click', e => e.stopPropagation());
+      setTimeout(() => { inp.click(); const out = e => { if (!lb.contains(e.target)) { document.removeEventListener('mousedown', out, true); if (!done) { done = true; onCancel(); } } };
+        document.addEventListener('mousedown', out, true); }, 0);
+      return lb;
+    }
     if (f.type === 'RELATION') {
       el = document.createElement('select'); el.className = 'ed';
       const opts = f.type === 'SELECT' ? f.choices.map(c => [c, c]) : RELATED.map(x => [x.id, x.label]);
@@ -119,11 +187,13 @@ const HX = (() => {
       el = document.createElement('textarea'); el.className = 'ed'; el.value = value ?? '';
     } else {
       el = document.createElement('input'); el.className = 'ed';
-      el.type = f.type === 'NUMBER' ? 'number' : f.type === 'DATE' ? 'date' : f.type === 'DATETIME' ? 'datetime-local' : 'text';
+      el.type = inputType(f.type);
+      if (f.type === 'TEXT' && f.maxLength) el.maxLength = f.maxLength;
+      if (isNum(f.type)) { if (f.min != null && f.min !== '') el.min = f.min; if (f.max != null && f.max !== '') el.max = f.max; }
       el.value = empty(value) ? '' : f.type === 'DATETIME' ? String(value).slice(0, 16) : String(value);
     }
     let done = false;
-    const commit = () => { if (done) return; done = true; let v = el.value; if (f.type === 'NUMBER') v = v === '' ? null : Number(v);
+    const commit = () => { if (done) return; done = true; let v = el.value; if (isNum(f.type)) v = v === '' ? null : Number(v);
       if (f.type === 'DATETIME' && v) v = new Date(v).toISOString(); if (v === '') v = null; onSave(v); };
     el.addEventListener('keydown', e => { if (e.key === 'Escape') { done = true; onCancel(); } if (e.key === 'Enter' && f.type !== 'LONG_TEXT') commit(); });
     el.addEventListener('blur', () => setTimeout(commit, 60));
@@ -134,19 +204,30 @@ const HX = (() => {
 
   /* Trình chọn lựa chọn kiểu HubSpot: ô tìm kiếm + danh sách pill; Esc / bấm ra ngoài = huỷ */
   function selectEditor(f, value, onSave, onCancel) {
+    const multi = f.type === 'MULTI_SELECT', opts = optsOf(f);
+    let cur = multi ? [].concat(value || []) : value;
+    const lab = c => f.type === 'USER' ? display(c, f) : pill(f, c);
     const cell = document.createElement('div'); cell.className = 'selcell';
-    cell.innerHTML = (empty(value) ? '<span class="nil">— Chọn —</span>' : pill(f, value)) + '<span class="ms xs" style="margin-left:auto">arrow_drop_down</span>';
+    const drawCell = () => { cell.innerHTML = (empty(cur) ? '<span class="nil">— Chọn —</span>' : multi ? cur.map(lab).join(' ') : lab(cur)) + '<span class="ms xs" style="margin-left:auto">arrow_drop_down</span>'; };
+    drawCell();
     const pop = document.createElement('div'); pop.className = 'selpop';
-    pop.innerHTML = `<input placeholder="Tìm kiếm" aria-label="Tìm lựa chọn"><div class="opts" role="listbox"></div>`;
-    const draw = q => { pop.querySelector('.opts').innerHTML = `<button class="opt clear" data-v="">— Bỏ chọn —</button>` + f.choices.filter(c => !q || c.toLowerCase().includes(q)).map(c => `<button class="opt ${c === value ? 'cur' : ''}" data-v="${esc(c)}" role="option">${pill(f, c)}</button>`).join(''); };
+    pop.innerHTML = `<input placeholder="Tìm kiếm" aria-label="Tìm lựa chọn"><div class="opts" role="listbox" ${multi ? 'aria-multiselectable="true"' : ''}></div>${multi ? '<button class="btn btn--primary sm" data-ok>Xong</button>' : ''}`;
+    const draw = q => { pop.querySelector('.opts').innerHTML = `<button class="opt clear" data-v="">— Bỏ chọn —</button>` + opts.filter(c => !q || c.toLowerCase().includes(q)).map(c => {
+      const on = multi ? cur.includes(c) : c === cur;
+      return `<button class="opt ${on ? 'cur' : ''}" data-v="${esc(c)}" role="option" aria-selected="${on}">${multi ? `<span class="ms xs">${on ? 'check_box' : 'check_box_outline_blank'}</span>` : ''}${lab(c)}</button>`; }).join(''); };
     draw('');
     let done = false;
     const close = () => { pop.remove(); document.removeEventListener('mousedown', outside, true); };
-    const outside = e => { if (!pop.contains(e.target)) { if (!done) { done = true; close(); onCancel(); } } };
-    pop.addEventListener('click', e => { e.stopPropagation(); const o = e.target.closest('.opt'); if (!o || done) return; done = true; close(); onSave(o.dataset.v || null); });
+    const finish = () => { if (done) return; done = true; close(); onSave(multi ? (cur.length ? cur : null) : cur); };
+    const outside = e => { if (!pop.contains(e.target)) { if (multi) finish(); else if (!done) { done = true; close(); onCancel(); } } };
+    pop.addEventListener('click', e => { e.stopPropagation(); if (done) return;
+      if (e.target.closest('[data-ok]')) { finish(); return; }
+      const o = e.target.closest('.opt'); if (!o) return;
+      if (!multi) { cur = o.dataset.v || null; finish(); return; }
+      const v = o.dataset.v; cur = !v ? [] : cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v]; drawCell(); draw(inp.value.trim().toLowerCase()); });
     const inp = pop.querySelector('input');
     inp.oninput = () => draw(inp.value.trim().toLowerCase());
-    inp.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); done = true; close(); onCancel(); } if (e.key === 'Enter') { const o = pop.querySelector('.opt:not(.clear)'); o && o.click(); } };
+    inp.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); done = true; close(); onCancel(); } if (e.key === 'Enter') { if (multi) { finish(); return; } const o = pop.querySelector('.opt:not(.clear)'); o && o.click(); } };
     cell.addEventListener('click', e => e.stopPropagation());
     setTimeout(() => { const r = cell.getBoundingClientRect(); pop.style.position = 'fixed'; pop.style.left = Math.min(r.left, innerWidth - 250) + 'px';
       pop.style.top = (r.bottom + 240 > innerHeight ? Math.max(8, r.top - 290) : r.bottom + 4) + 'px'; document.body.appendChild(pop); inp.focus();
@@ -217,7 +298,7 @@ const HX = (() => {
     const r = api.get(id); if (!r) return; panelRecord = id;
     const p = $('#panel');
     p.innerHTML = `<div class="pn-h"><h2>${esc(title(r))}</h2>
-        <a class="btn btn--text sm" href="#" data-cols title="Quản lý cột dữ liệu"><span class="ms xs">settings</span>Cột</a>
+        <a class="btn btn--text sm" href="${FIELDS_URL}" title="Quản lý trường dữ liệu"><span class="ms xs">settings</span>Cột</a>
         <a class="btn btn--text sm" href="crm-deal-chi-tiet-hubspot.html?id=${r.id}">Mở trang đầy đủ<span class="ms xs">arrow_forward</span></a>
         <button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
       <div class="pn-tabs" role="tablist"><button class="pn-tab" role="tab" aria-selected="true" data-t="info">Thông tin</button><button class="pn-tab" role="tab" aria-selected="false" data-t="hist">Lịch sử</button><button class="pn-tab" role="tab" aria-selected="false" data-t="link">Liên kết</button></div>
@@ -228,7 +309,7 @@ const HX = (() => {
       if (t === 'info') { body.innerHTML = '<div class="props" id="pnProps"></div>'; propList($('#pnProps', p), r, 'panel'); }
       else body.innerHTML = `<div class="soon"><span class="ms">${t === 'hist' ? 'history' : 'link'}</span>${t === 'hist' ? 'Lịch sử thay đổi (sắp ra mắt)' : 'Liên kết (sắp ra mắt)'}</div>`;
     };
-    p.onclick = e => { const t = e.target.closest('.pn-tab'); if (t) tab(t.dataset.t); if (e.target.closest('[data-pclose]')) closePanel(); if (e.target.closest('[data-cols]')) { e.preventDefault(); toast('Mở trang quản lý cột (Fields) của collection'); } };
+    p.onclick = e => { const t = e.target.closest('.pn-tab'); if (t) tab(t.dataset.t); if (e.target.closest('[data-pclose]')) closePanel(); };
     tab('info'); p.classList.add('open'); document.body.classList.add('panel-open'); document.body.classList.toggle('dock', !!opt.dock);
   }
   function closePanel() { $('#panel')?.classList.remove('open'); document.body.classList.remove('panel-open', 'dock'); panelRecord = null; }
@@ -237,12 +318,14 @@ const HX = (() => {
   /* Danh sách thuộc tính: bấm để sửa (giống drawer / trang đầy đủ ERP) */
   function propList(box, r, where, keys) {
     const list = keys ? keys.map(k => F[k]) : FIELDS;
-    box.innerHTML = list.map(f => `<div class="prop" data-k="${f.key}"><label>${esc(f.name)}</label><div class="v">${display(r.values[f.key], f)}</div></div>`).join('');
+    box.innerHTML = list.filter(Boolean).map(f => `<div class="prop" data-k="${f.key}"><label>${esc(f.name)}${f.required ? ' <span class="req">*</span>' : ''}</label><div class="v">${display(r.values[f.key], f)}</div></div>`).join('');
     box.onclick = e => {
       const pr = e.target.closest('.prop'); if (!pr || pr.querySelector('.ed')) return;
       const f = F[pr.dataset.k], v = pr.querySelector('.v');
       v.replaceChildren(editor(f, r.values[f.key], nv => {
-        if (nv !== r.values[f.key]) { api.update(r.id, f.key, nv); toast(`Đã lưu “${f.name}”`); onChange(); }
+        const err = nv !== r.values[f.key] && check(f, nv, r.id);
+        if (err) toast(err);
+        else if (nv !== r.values[f.key]) { api.update(r.id, f.key, nv); toast(`Đã lưu “${f.name}”`); onChange(); }
         propList(box, r, where, keys);
       }, () => propList(box, r, where, keys), where));
     };
@@ -255,21 +338,29 @@ const HX = (() => {
       <form class="pn-b field-form" id="crForm">${FIELDS.map(f => {
         const id = 'cf_' + f.key;
         let input;
-        if (f.type === 'SELECT') input = `<select class="in" id="${id}"><option value="">— Chọn —</option>${f.choices.map(c => `<option>${esc(c)}</option>`).join('')}</select>`;
+        if (hasChoices(f.type) || f.type === 'USER') input = `<select class="in" id="${id}" ${f.type === 'MULTI_SELECT' ? 'multiple size="4"' : ''}>${f.type === 'MULTI_SELECT' ? '' : '<option value="">— Chọn —</option>'}${optsOf(f).map(c => `<option>${esc(c)}</option>`).join('')}</select>`;
         else if (f.type === 'RELATION') input = `<select class="in" id="${id}"><option value="">— Chọn —</option>${RELATED.map(x => `<option value="${x.id}">${esc(x.label)}</option>`).join('')}</select>`;
         else if (f.type === 'LONG_TEXT') input = `<textarea class="in" id="${id}"></textarea>`;
-        else input = `<input class="in" id="${id}" type="${f.type === 'NUMBER' ? 'number' : f.type === 'DATE' ? 'date' : f.type === 'DATETIME' ? 'datetime-local' : 'text'}">`;
-        return `<label for="${id}">${esc(f.name)}${input}</label>`;
-      }).join('')}</form>
+        else if (f.type === 'CHECKBOX') return `<label class="chk" for="${id}"><input type="checkbox" id="${id}">${esc(f.name)}${f.required ? ' <span class="req">*</span>' : ''}</label>`;
+        else if (f.type === 'FILE') input = `<input class="in" id="${id}" type="file">`;
+        else input = `<input class="in" id="${id}" type="${inputType(f.type)}" ${f.type === 'TEXT' && f.maxLength ? `maxlength="${f.maxLength}"` : ''}>`;
+        return `<label for="${id}">${esc(f.name)}${f.required ? ' <span class="req">*</span>' : ''}${input}</label>`;
+      }).join('')}<p class="err" id="crErr" role="alert"></p></form>
       <div class="pn-f"><button class="btn btn--primary" id="crSave" title="Tạo bản ghi (Ctrl+Enter)">Tạo bản ghi</button><button class="btn btn--secondary" data-pclose>Huỷ</button><small style="margin-left:auto;align-self:center;color:var(--on-surface-variant)">Ctrl+Enter</small></div>`;
     const submit = () => {
       const values = {};
-      FIELDS.forEach(f => { let v = $('#cf_' + f.key, p).value; if (v === '') v = null; else if (f.type === 'NUMBER') v = Number(v); else if (f.type === 'DATETIME') v = new Date(v).toISOString(); values[f.key] = v; });
+      for (const f of FIELDS) { const el = $('#cf_' + f.key, p); let v = el.value;
+        if (f.type === 'CHECKBOX') v = el.checked;
+        else if (f.type === 'MULTI_SELECT') v = [...el.selectedOptions].map(o => o.value);
+        else if (f.type === 'FILE') v = el.files[0] ? el.files[0].name : null;
+        if (v === '' || (Array.isArray(v) && !v.length)) v = null; else if (isNum(f.type)) v = Number(v); else if (f.type === 'DATETIME') v = new Date(v).toISOString();
+        const err = check(f, v, null); if (err) { $('#crErr', p).textContent = err; el.focus(); return; }
+        values[f.key] = v; }
       const r = api.create(values); closePanel(); toast('Đã tạo bản ghi'); onCreated && onCreated(r);
     };
     p.onclick = e => { if (e.target.closest('[data-pclose]')) closePanel(); if (e.target.closest('#crSave')) submit(); };
     p.onkeydown = e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); submit(); } };
-    document.body.classList.remove('dock'); p.classList.add('open'); document.body.classList.add('panel-open'); setTimeout(() => $('#cf_m_deal', p).focus(), 50);
+    document.body.classList.remove('dock'); p.classList.add('open'); document.body.classList.add('panel-open'); setTimeout(() => $('.field-form .in, .field-form input', p)?.focus(), 50);
   }
 
   /* ── Hộp thoại đúng ERP ── */
@@ -296,6 +387,7 @@ const HX = (() => {
       (bg, close) => { const s = $('#wfSel', bg); s.onchange = () => $('#wfGo', bg).disabled = !s.value; $('#wfGo', bg).onclick = () => { close(); toast('Workflow đã được kích hoạt'); }; });
   }
 
-  return { OTHERS, COLLECTION, FIELDS, F, STAGES, WORKFLOWS, api, esc, empty, fmt, display, chipCls, pill, pillCls, createdFmt, title, editor, toast, modal, confirmBox,
+  return { OTHERS, COLLECTION, FIELDS, F, STAGES, WORKFLOWS, TYPES, TYPE, USERS, REL_TARGETS, FIELDS_URL, hasChoices, isNum, optsOf, check, slug,
+    api, esc, empty, fmt, display, chipCls, pill, pillCls, createdFmt, title, editor, toast, modal, confirmBox,
     shell, openPanel, closePanel, propList, openCreate, importDialog, sheetDialog, workflowDialog, $, set onChange(fn) { onChange = fn; } };
 })();

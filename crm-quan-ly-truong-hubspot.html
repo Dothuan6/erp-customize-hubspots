@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi" data-brand="crm">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trường dữ liệu — Deals · HarnexAI CRM (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link rel="stylesheet" href="crm-shared.css">
+<style>
+/* ═══ Quản lý trường dữ liệu của collection Deals_Pipeline ═══
+   Chức năng: theo trang /data/:id/fields của ERP (khảo sát 24/09/2026)
+     · danh sách trường theo thứ tự, kéo ⠿ đổi thứ tự · Thêm trường (14 loại) · Chỉnh sửa · Xóa
+     · cấu hình: Tên trường*, Bắt buộc, Duy nhất, Độ dài tối đa (Văn bản), Giá trị nhỏ/lớn nhất (Số, Tiền tệ),
+       Danh sách lựa chọn / trạng thái, Collection liên kết + Cột hiển thị (Liên kết)
+   UX: theo Settings › Properties của HubSpot — bảng thuộc tính, lọc theo loại, tìm kiếm,
+     tên là link mở panel phải, nút "Chỉnh sửa" + menu "Khác" khi rê chuột, panel "Tạo thuộc tính" với ô chọn loại có tìm kiếm. */
+.frame{position:relative;overflow:auto}
+.wrap{padding:16px;max-width:1280px;width:100%}
+@media(min-width:905px){.wrap{padding:20px 28px}}
+.crumb{display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:var(--link)}
+.crumb:hover{text-decoration:underline}
+h1{font-size:24px;font-weight:600;margin:6px 0 4px}
+.lead{color:var(--on-surface-variant);font-size:14px;max-width:760px}
+.objbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0;padding:14px 16px;border:1px solid var(--outline-variant);border-radius:var(--radius-lg)}
+.objbar b{font-size:14px}
+.objsel{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 10px 0 12px;min-width:240px;border:1px solid var(--on-surface-variant);border-radius:var(--radius-sm);background:var(--surface);font-size:14px;justify-content:space-between}
+.objbar .go{margin-left:auto;font-weight:600;color:var(--link);font-size:14px;display:inline-flex;align-items:center;gap:4px}
+.objbar .go:hover{text-decoration:underline}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--outline-variant);margin-top:4px}
+.tab{height:40px;padding:0 18px;font-weight:600;font-size:14px;border:1px solid var(--outline-variant);border-bottom:none;border-radius:6px 6px 0 0;background:var(--surface-variant);color:var(--on-surface-variant)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--on-surface);margin-bottom:-1px;height:41px}
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:16px 0 12px}
+.dd{height:32px;border:none;background:none;font-weight:600;font-size:13px;color:var(--on-surface);padding:0 4px;cursor:pointer}
+.srch{display:flex;align-items:center;gap:6px;height:36px;width:300px;max-width:100%;padding:0 12px;border:1px solid var(--outline);border-radius:var(--btn-radius)}
+.srch input{flex:1;min-width:0;border:none;outline:none;background:none;font-size:14px}
+.bar .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+@media(max-width:599px){.bar .r{margin-left:0;width:100%}.bar .srch{flex:1;width:auto;min-width:0}.objsel{min-width:0;width:100%}.objbar>div{flex:1 1 100%}}
+.note{font-size:12px;color:var(--on-surface-variant);display:flex;align-items:center;gap:4px}
+
+/* Bảng trường */
+table{width:100%;border-collapse:separate;border-spacing:0}
+th{position:sticky;top:0;z-index:1;background:var(--surface);text-align:left;font-size:13px;font-weight:600;color:var(--on-surface);padding:10px 12px;border-bottom:2px solid var(--on-surface);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--outline-variant);vertical-align:middle;font-size:14px}
+tbody tr{background:var(--surface)}
+tbody tr:hover td{background:var(--surface-variant)}
+tr.drag td{opacity:.45}
+tr.over td{box-shadow:inset 0 2px 0 var(--primary)}
+td.h{width:36px;padding:0 0 0 8px;color:var(--on-surface-variant);cursor:grab}
+td.h.off{cursor:default;opacity:.35}
+.nm{display:flex;flex-direction:column;min-width:0}
+.nm a{font-weight:600;color:var(--link);align-self:flex-start}
+.nm a:hover{text-decoration:underline}
+.nm small{font-size:12px;color:var(--on-surface-variant);display:flex;align-items:center;gap:4px}
+.ty{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.ty .ms{color:var(--on-surface-variant)}
+.cfg{color:var(--on-surface-variant);font-size:13px}
+.tag{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:var(--radius-pill);font-size:12px;font-weight:600;background:var(--surface-2);color:var(--on-surface-variant);white-space:nowrap}
+.tag.req{background:var(--error-container);color:var(--error)}
+.tag.pk{background:var(--primary-container);color:var(--on-primary-container)}
+.acts{width:1%;white-space:nowrap;text-align:right;position:relative}
+.acts .in{display:inline-flex;gap:6px;opacity:0;transition:opacity var(--dur)}
+tr:hover .acts .in,tr:focus-within .acts .in{opacity:1}
+@media(hover:none){.acts .in{opacity:1}}
+.c-nm{min-width:240px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.tag.mob{display:none}
+@media(max-width:904px){
+  .c-cfg,.c-req,.c-uni{display:none}
+  .c-nm{min-width:0}
+  .tag.mob{display:inline-flex}
+  .acts .in{opacity:1}
+  .acts .edt{display:none}
+}
+.empty{padding:40px 16px;text-align:center;color:var(--on-surface-variant)}
+.foot{display:flex;align-items:center;gap:8px;padding:14px 0;font-size:13px;color:var(--on-surface-variant)}
+
+/* Panel tạo / sửa trường (HubSpot "Create new property") */
+.fp .pn-b{display:flex;flex-direction:column;gap:18px}
+.fl{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
+.fl .in{height:38px;border:1px solid var(--outline);border-radius:var(--radius-sm);padding:0 10px;background:var(--surface);font-weight:400}
+.fl .in:focus{outline:2px solid var(--primary);outline-offset:-1px;border-color:transparent}
+.fl small{font-weight:400;color:var(--on-surface-variant);font-size:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chk{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--primary)}
+.tsel{position:relative}
+.tbtn{width:100%;height:38px;display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--outline);border-radius:var(--radius-sm);background:var(--surface);font-weight:400;text-align:left}
+.tbtn .ms:last-child{margin-left:auto}
+.tbtn[disabled]{background:var(--surface-variant);cursor:not-allowed}
+.tpop{position:absolute;left:0;right:0;top:42px;z-index:5;background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-md);box-shadow:var(--shadow-2);padding:8px;display:none}
+.tpop.open{display:block}
+.tpop input{width:100%;height:34px;border:1px solid var(--primary);border-radius:var(--btn-radius);padding:0 12px;margin-bottom:6px;background:var(--surface);outline:none}
+.tpop .ls{max-height:260px;overflow-y:auto}
+.tpop button{display:flex;align-items:center;gap:10px;width:100%;min-height:34px;padding:0 8px;border-radius:var(--radius-sm);text-align:left;font-weight:400}
+.tpop button:hover,.tpop button.cur{background:var(--surface-2)}
+.tpop button .ms{color:var(--on-surface-variant)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.orow{display:flex;align-items:center;gap:8px}
+.orow .sw{width:12px;height:12px;border-radius:3px;flex:none;background:var(--c1)}
+.orow .sw.c2{background:var(--c2)}.orow .sw.c3{background:var(--c3)}.orow .sw.c4{background:var(--c4)}.orow .sw.c5{background:var(--c5)}.orow .sw.c6{background:var(--c6)}.orow .sw.c7{background:var(--c7)}
+.orow .in{flex:1;height:36px}
+.orow .del{width:32px;height:32px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant);border:1px solid var(--outline)}
+.orow .del:hover{color:var(--error);border-color:var(--error)}
+.addopt{align-self:flex-start;display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--link);height:28px}
+.info{font-size:12px;color:var(--on-surface-variant);background:var(--surface-variant);border-radius:var(--radius-md);padding:10px 12px;display:flex;gap:8px}
+.info .ms{font-size:18px;color:var(--on-surface-variant)}
+.fp .pn-f .lk{margin-left:auto;font-weight:600;color:var(--link);font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar" id="topbar"></header>
+  <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
+  <main class="main"><div class="frame"><div class="wrap">
+    <a class="crumb" href="crm-giao-dich-hubspot.html"><span class="ms sm">chevron_left</span>Deals</a>
+    <h1>Trường dữ liệu</h1>
+    <p class="lead">Trường dùng để lưu thông tin của từng bản ghi. Thứ tự trường là thứ tự cột trên bảng, trong panel xem trước và trong biểu mẫu tạo bản ghi.</p>
+
+    <div class="objbar">
+      <b>Collection:</b>
+      <div style="position:relative">
+        <button class="objsel" id="objBtn" aria-haspopup="menu">Deals <span class="nil">(Deals_Pipeline)</span><span class="ms sm">arrow_drop_down</span></button>
+        <div class="pop" id="objPop" role="menu" style="top:40px;left:0"></div>
+      </div>
+      <a class="go" href="crm-giao-dich-hubspot.html">Mở dữ liệu Deals<span class="ms xs">arrow_forward</span></a>
+    </div>
+
+    <div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true" id="tabF">Trường</button></div>
+
+    <div class="bar">
+      <select class="dd" id="tf" aria-label="Lọc theo loại trường"></select>
+      <select class="dd" id="pf" aria-label="Lọc theo thuộc tính"><option value="">Tất cả thuộc tính</option><option value="req">Bắt buộc</option><option value="uni">Duy nhất</option></select>
+      <div class="r">
+        <label class="srch"><input id="q" placeholder="Tìm trường" aria-label="Tìm trường"><span class="ms sm">search</span></label>
+        <button class="btn btn--primary" id="addBtn"><span class="ms sm">add</span>Thêm trường</button>
+      </div>
+    </div>
+
+    <table aria-label="Danh sách trường">
+      <thead><tr><th class="h" aria-label="Kéo để đổi thứ tự"></th><th class="c-nm">Tên trường</th><th class="c-cfg">Cấu hình</th><th class="c-req">Bắt buộc</th><th class="c-uni">Duy nhất</th><th style="text-align:right"><span class="nil" style="font-weight:400">Thao tác</span></th></tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+    <div class="foot" id="foot"></div>
+  </div><div class="pop" id="morePop" role="menu"></div></div></main>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="panel fp" id="panel" aria-label="Tạo / chỉnh sửa trường"></aside>
+<div class="modal-bg" id="modal"></div>
+<div class="demo" id="demo" role="group" aria-label="Điều khiển mockup"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="crm-shared.js"></script>
+<script>
+const {FIELDS,F,TYPES,TYPE,api,esc,toast,confirmBox,$} = HX;
+HX.shell();
+const st = { q:'', type:'', prop:'' };
+
+/* ── Menu chọn collection (như "Select an object" của HubSpot) ── */
+$('#objPop').innerHTML = `<button class="mi" style="font-weight:700"><span class="ms sm">check</span>Deals <small class="nil">(Deals_Pipeline)</small></button>`
+  + HX.OTHERS.map(o => `<button class="mi" data-toast="Mở trường của collection ${o}"><span class="ms sm" style="visibility:hidden">check</span>${o}</button>`).join('');
+$('#objBtn').onclick = e => { e.stopPropagation(); $('#morePop').classList.remove('open'); $('#objPop').classList.toggle('open'); };
+
+/* ── Lọc + tìm ── */
+function drawTypeFilter(){
+  const cur = $('#tf').value;
+  $('#tf').innerHTML = `<option value="">Tất cả loại trường</option>` + TYPES.filter(([c]) => FIELDS.some(f => f.type === c)).map(([c, n]) => `<option value="${c}">${n}</option>`).join('');
+  $('#tf').value = [...$('#tf').options].some(o => o.value === cur) ? cur : '';
+}
+$('#tf').onchange = e => { st.type = e.target.value; render(); };
+$('#pf').onchange = e => { st.prop = e.target.value; render(); };
+$('#q').oninput = e => { st.q = e.target.value.trim().toLowerCase(); render(); };
+const filtered = () => !!(st.q || st.type || st.prop);
+
+/* Tóm tắt cấu hình theo loại (đúng các ô trong drawer ERP) */
+function cfgText(f){
+  if (HX.hasChoices(f.type)) return `${(f.choices || []).length} ${f.type === 'STATUS' ? 'trạng thái' : 'lựa chọn'}` + ((f.choices || []).length ? ': ' + f.choices.slice(0, 3).map(esc).join(', ') + (f.choices.length > 3 ? '…' : '') : '');
+  if (f.type === 'TEXT') return f.maxLength ? `Tối đa ${f.maxLength} ký tự` : 'Không giới hạn độ dài';
+  if (HX.isNum(f.type)) { const a = f.min != null && f.min !== '', b = f.max != null && f.max !== '';
+    return a || b ? `${a ? f.min : '…'} – ${b ? f.max : '…'}` : 'Không giới hạn'; }
+  if (f.type === 'RELATION') return `Liên kết tới <b>${esc(f.target || '—')}</b>${f.display ? ' · hiển thị ' + esc(f.display) : ''}`;
+  return '—';
+}
+const used = k => HX.api.list().filter(r => !HX.empty(r.values[k]) && r.values[k] !== false).length;
+
+/* ── Bảng ── */
+function render(){
+  drawTypeFilter();
+  const list = FIELDS.filter(f => (!st.q || f.name.toLowerCase().includes(st.q) || f.key.includes(st.q)) && (!st.type || f.type === st.type)
+    && (!st.prop || (st.prop === 'req' ? f.required : f.unique)));
+  const dragOk = !filtered();
+  $('#tabF').textContent = `Trường (${FIELDS.length})`;
+  $('#tb').innerHTML = list.length ? list.map(f => { const T = TYPE[f.type];
+    return `<tr data-k="${f.key}" ${dragOk ? 'draggable="true"' : ''}>
+      <td class="h ${dragOk ? '' : 'off'}" title="${dragOk ? 'Kéo để đổi thứ tự' : 'Bỏ lọc / tìm kiếm để kéo đổi thứ tự'}"><span class="ms sm">drag_indicator</span></td>
+      <td class="c-nm"><div class="nm"><a href="#" data-edit="${f.key}">${esc(f.name)}</a><small><span class="ms xs">${T.icon}</span>${T.name}</small>
+        ${f.primary || f.required || f.unique ? `<div class="tags">${f.primary ? '<span class="tag pk" title="Trường đầu tiên là cột chính của bảng">Cột chính</span>' : ''}${f.required ? '<span class="tag req mob">Bắt buộc</span>' : ''}${f.unique ? '<span class="tag mob">Duy nhất</span>' : ''}</div>` : ''}</div></td>
+      <td class="c-cfg cfg">${cfgText(f)}</td>
+      <td class="c-req">${f.required ? '<span class="tag req">Bắt buộc</span>' : '<span class="nil">—</span>'}</td>
+      <td class="c-uni">${f.unique ? '<span class="tag">Duy nhất</span>' : '<span class="nil">—</span>'}</td>
+      <td class="acts"><span class="in"><button class="btn btn--secondary sm edt" data-edit="${f.key}">Chỉnh sửa</button>
+        <button class="btn btn--secondary sm" data-more="${f.key}" aria-haspopup="menu">Khác<span class="ms xs">arrow_drop_down</span></button></span></td></tr>`; }).join('')
+    : `<tr><td colspan="6" class="empty">Không có trường phù hợp${st.q ? ` với “${esc(st.q)}”` : ''}.</td></tr>`;
+  $('#foot').innerHTML = `${FIELDS.length} trường${filtered() ? ` · đang hiển thị ${list.length}` : ''} · <span class="note"><span class="ms xs">drag_indicator</span>${dragOk ? 'Kéo để đổi thứ tự — áp dụng cho cột bảng và biểu mẫu' : 'Bỏ lọc để kéo đổi thứ tự'}</span>`;
+}
+
+/* ── Kéo thả đổi thứ tự (ERP: drag ⠿) ── */
+let dragKey = null;
+$('#tb').addEventListener('dragstart', e => { const tr = e.target.closest('tr[data-k]'); if (!tr) return; dragKey = tr.dataset.k; tr.classList.add('drag'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragKey); });
+$('#tb').addEventListener('dragend', () => { dragKey = null; document.querySelectorAll('tr.drag,tr.over').forEach(x => x.classList.remove('drag', 'over')); });
+$('#tb').addEventListener('dragover', e => { const tr = e.target.closest('tr[data-k]'); if (!tr || !dragKey) return; e.preventDefault();
+  document.querySelectorAll('tr.over').forEach(x => x !== tr && x.classList.remove('over')); tr.classList.add('over'); });
+$('#tb').addEventListener('drop', e => { const tr = e.target.closest('tr[data-k]'); if (!tr || !dragKey || tr.dataset.k === dragKey) return; e.preventDefault();
+  const to = FIELDS.findIndex(f => f.key === tr.dataset.k); api.moveField(dragKey, to); render(); toast('Đã đổi thứ tự trường'); });
+
+/* ── Menu "Khác": đổi thứ tự bằng bàn phím · xoá ── */
+function moreMenu(btn, key){
+  const p = $('#morePop'), i = FIELDS.findIndex(f => f.key === key), fr = document.querySelector('.frame'), r = btn.getBoundingClientRect(), b = fr.getBoundingClientRect();
+  p.style.left = Math.max(8, r.right - b.left + fr.scrollLeft - 230) + 'px'; p.style.top = (r.bottom - b.top + fr.scrollTop + 4) + 'px'; p.style.width = '230px';
+  p.innerHTML = `<button class="mi" data-mv="0" ${i === 0 || filtered() ? 'disabled' : ''}><span class="ms sm">vertical_align_top</span>Chuyển lên đầu (cột chính)</button>
+    <button class="mi" data-mv="${i - 1}" ${i === 0 || filtered() ? 'disabled' : ''}><span class="ms sm">arrow_upward</span>Chuyển lên</button>
+    <button class="mi" data-mv="${i + 1}" ${i === FIELDS.length - 1 || filtered() ? 'disabled' : ''}><span class="ms sm">arrow_downward</span>Chuyển xuống</button>
+    <div class="sep"></div><button class="mi" data-del style="color:var(--error)"><span class="ms sm">delete</span>Xóa trường</button>`;
+  p.querySelectorAll('[disabled]').forEach(x => x.style.opacity = .45);
+  p.onclick = e => { e.stopPropagation(); const mv = e.target.closest('[data-mv]:not([disabled])');
+    if (mv) { api.moveField(key, +mv.dataset.mv); p.classList.remove('open'); render(); toast('Đã đổi thứ tự trường'); $(`[data-more="${key}"]`)?.focus(); return; }
+    if (e.target.closest('[data-del]')) { p.classList.remove('open'); delField(key); } };
+  $('#objPop').classList.remove('open'); p.classList.add('open'); p.querySelector('.mi:not([disabled])')?.focus();
+}
+function delField(key){
+  const f = F[key]; if (!f) return;
+  if (FIELDS.length === 1) { toast('Collection cần ít nhất một trường'); return; }
+  const n = used(key);
+  confirmBox('Xóa trường', `Xóa trường <b>“${esc(f.name)}”</b>? ${n ? `Dữ liệu của trường này ở <b>${n} bản ghi</b> sẽ bị xóa. ` : ''}Không thể hoàn tác.`, 'Xóa trường', () => {
+    api.removeField(key); render(); toast(`Đã xóa trường “${f.name}”`); });
+}
+
+/* ── Panel Tạo / Chỉnh sửa trường ── */
+function openField(key){
+  const f = key ? F[key] : null, p = $('#panel');
+  let type = f ? f.type : 'TEXT';
+  // Lựa chọn giữ giá trị gốc để đổi tên lựa chọn thì cập nhật luôn bản ghi đang dùng
+  let opts = f && f.choices ? f.choices.map(c => ({v:c, o:c})) : [];
+  p.innerHTML = `<div class="pn-h"><h2>${f ? 'Chỉnh sửa trường' : 'Tạo trường mới'}</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
+    <form class="pn-b" id="ff" novalidate>
+      <label class="fl"><span>Tên trường <span class="req">*</span></span><input class="in" id="fName" value="${f ? esc(f.name) : ''}" placeholder="Nhập tên trường…" autocomplete="off"></label>
+      <div class="fl"><span>Loại trường <span class="req">*</span></span>
+        <div class="tsel"><button type="button" class="tbtn" id="tBtn" ${f ? 'disabled' : ''} aria-haspopup="listbox"></button>
+          <div class="tpop" id="tPop"><input id="tQ" placeholder="Tìm loại trường" aria-label="Tìm loại trường"><div class="ls" id="tL" role="listbox"></div></div></div>
+        ${f ? '<small>Không đổi được loại sau khi tạo trường.</small>' : ''}</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label class="chk"><input type="checkbox" id="fReq" ${f && f.required ? 'checked' : ''}>Bắt buộc</label>
+        <label class="chk"><input type="checkbox" id="fUni" ${f && f.unique ? 'checked' : ''}>Duy nhất <small class="nil" style="font-size:12px">— không cho 2 bản ghi trùng giá trị</small></label>
+      </div>
+      <div id="cfg" style="display:flex;flex-direction:column;gap:12px"></div>
+      <p class="err" id="fErr" role="alert"></p>
+    </form>
+    <div class="pn-f"><button class="btn btn--primary" id="fSave">${f ? 'Lưu' : 'Tạo trường'}</button><button class="btn btn--secondary" data-pclose>Huỷ</button>
+      ${f ? `<button class="lk" id="fDel" style="color:var(--error)">Xóa trường</button>` : ''}</div>`;
+
+  const drawType = () => { const T = TYPE[type]; $('#tBtn', p).innerHTML = `<span class="ms sm">${T.icon}</span>${T.name}<span class="ms sm">arrow_drop_down</span>`; };
+  const drawTypes = q => { $('#tL', p).innerHTML = TYPES.filter(([, n]) => !q || n.toLowerCase().includes(q)).map(([c, n, i]) => `<button type="button" role="option" class="${c === type ? 'cur' : ''}" data-t="${c}"><span class="ms sm">${i}</span>${n}</button>`).join('') || '<div class="nil" style="padding:8px">Không có loại phù hợp</div>'; };
+  const drawOpts = () => { const box = $('#optBox', p); if (!box) return;
+    box.innerHTML = opts.map((o, i) => `<div class="orow"><span class="sw c${i % 5 + 1}" aria-hidden="true"></span><input class="in" data-o="${i}" value="${esc(o.v)}" placeholder="${type === 'STATUS' ? 'Trạng thái' : 'Lựa chọn'} ${i + 1}" aria-label="${type === 'STATUS' ? 'Trạng thái' : 'Lựa chọn'} ${i + 1}"><button type="button" class="del" data-odel="${i}" aria-label="Xóa ${esc(o.v || 'lựa chọn')}"><span class="ms xs">close</span></button></div>`).join(''); };
+  const drawCfg = () => {
+    const c = $('#cfg', p);
+    if (type === 'TEXT') c.innerHTML = `<label class="fl">Độ dài tối đa<input class="in" id="cMax" type="number" min="1" value="${f && f.maxLength || ''}" placeholder="Không giới hạn"></label>`;
+    else if (HX.isNum(type)) c.innerHTML = `<div class="two"><label class="fl">Giá trị nhỏ nhất<input class="in" id="cMin" type="number" value="${f && f.min != null ? f.min : ''}" placeholder="Không giới hạn"></label>
+      <label class="fl">Giá trị lớn nhất<input class="in" id="cMaxN" type="number" value="${f && f.max != null ? f.max : ''}" placeholder="Không giới hạn"></label></div>`;
+    else if (HX.hasChoices(type)) { if (!opts.length) opts = [{v:'', o:null}];
+      c.innerHTML = `<div class="fl"><span>${type === 'STATUS' ? 'Danh sách trạng thái' : 'Danh sách lựa chọn'} <span class="req">*</span></span><div class="opts" id="optBox"></div>
+        <button type="button" class="addopt" id="optAdd"><span class="ms xs">add</span>${type === 'STATUS' ? 'Thêm trạng thái' : 'Thêm lựa chọn'}</button>
+        <small>Màu nhãn theo thứ tự lựa chọn.</small></div>`; drawOpts(); }
+    else if (type === 'RELATION') { const tgt = f ? f.target : '';
+      const disp = tgt === HX.COLLECTION.name ? FIELDS.filter(x => x.type === 'TEXT') : [];
+      c.innerHTML = `<label class="fl"><span>Collection liên kết <span class="req">*</span></span><select class="in" id="cTgt"><option value="">-- Chọn collection --</option>${HX.REL_TARGETS.map(t => `<option ${t === tgt ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+        <label class="fl">Cột hiển thị (tuỳ chọn)<select class="in" id="cDisp"><option value="">Tự động — trường văn bản đầu tiên</option>${disp.map(x => `<option value="${x.key}" ${f && f.display === x.key ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
+        <div class="info"><span class="ms">info</span>Giá trị của trường Liên kết chỉ sửa được ở trang chi tiết bản ghi.</div>`; }
+    else c.innerHTML = '';
+  };
+  drawType(); drawCfg();
+
+  const tPop = $('#tPop', p);
+  $('#tBtn', p).onclick = () => { if (f) return; tPop.classList.toggle('open'); if (tPop.classList.contains('open')) { drawTypes(''); const q = $('#tQ', p); q.value = ''; q.focus(); } };
+  $('#tQ', p).oninput = e => drawTypes(e.target.value.trim().toLowerCase());
+  $('#tQ', p).onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); tPop.classList.remove('open'); $('#tBtn', p).focus(); } if (e.key === 'Enter') { e.preventDefault(); $('#tL button', p)?.click(); } };
+  $('#tL', p).onclick = e => { const b = e.target.closest('[data-t]'); if (!b) return; type = b.dataset.t; opts = []; tPop.classList.remove('open'); drawType(); drawCfg(); $('#tBtn', p).focus(); };
+  p.oninput = e => { const i = e.target.dataset.o; if (i !== undefined && opts[+i]) opts[+i].v = e.target.value; };
+  p.onclick = e => {
+    if (e.target.closest('[data-pclose]')) { closeP(); return; }
+    if (!e.target.closest('.tsel')) tPop.classList.remove('open');
+    if (e.target.closest('#optAdd')) { opts.push({v:'', o:null}); drawOpts(); $(`[data-o="${opts.length - 1}"]`, p).focus(); return; }
+    const od = e.target.closest('[data-odel]'); if (od) { opts.splice(+od.dataset.odel, 1); drawOpts(); return; }
+    if (e.target.closest('#fSave')) save();
+    if (e.target.closest('#fDel')) { closeP(); delField(f.key); }
+  };
+  p.onkeydown = e => { if (e.key === 'Enter' && e.target.id === 'fName') { e.preventDefault(); save(); }
+    if (e.key === 'Enter' && e.target.dataset.o !== undefined) { e.preventDefault(); $('#optAdd', p).click(); } };
+  $('#ff', p).onsubmit = e => { e.preventDefault(); save(); };
+
+  function save(){
+    const err = m => { $('#fErr', p).textContent = m; return false; };
+    const name = $('#fName', p).value.trim();
+    if (!name) { $('#fName', p).focus(); return err('Nhập tên trường'); }
+    if (FIELDS.some(x => x.key !== (f && f.key) && x.name.trim().toLowerCase() === name.toLowerCase())) { $('#fName', p).focus(); return err(`Đã có trường tên “${name}”`); }
+    const d = { name, type, required: $('#fReq', p).checked, unique: $('#fUni', p).checked };
+    if (type === 'TEXT') { const m = $('#cMax', p).value; d.maxLength = m ? Number(m) : null; }
+    if (HX.isNum(type)) { const a = $('#cMin', p).value, b = $('#cMaxN', p).value; d.min = a === '' ? null : Number(a); d.max = b === '' ? null : Number(b);
+      if (d.min != null && d.max != null && d.min > d.max) return err('Giá trị nhỏ nhất phải ≤ giá trị lớn nhất'); }
+    if (HX.hasChoices(type)) { const vals = opts.map(o => o.v.trim()).filter(Boolean);
+      if (!vals.length) return err(`Thêm ít nhất 1 ${type === 'STATUS' ? 'trạng thái' : 'lựa chọn'}`);
+      if (new Set(vals.map(v => v.toLowerCase())).size !== vals.length) return err('Các lựa chọn không được trùng nhau');
+      d.choices = vals; }
+    if (type === 'RELATION') { d.target = $('#cTgt', p).value; d.display = $('#cDisp', p).value; if (!d.target) return err('Chọn collection liên kết'); }
+    if (f) {
+      // Đổi tên lựa chọn → cập nhật giá trị ở các bản ghi đang dùng
+      if (HX.hasChoices(type)) opts.forEach(o => { const nv = o.v.trim(); if (o.o && nv && nv !== o.o) HX.api.list().forEach(r => {
+        const v = r.values[f.key]; if (Array.isArray(v)) { if (v.includes(o.o)) HX.api.update(r.id, f.key, v.map(x => x === o.o ? nv : x)); } else if (v === o.o) HX.api.update(r.id, f.key, nv); }); });
+      api.updateField(f.key, d); toast(`Đã lưu trường “${name}”`);
+    } else { api.addField(d); toast(`Đã tạo trường “${name}” — cột mới hiện trên bảng Deals`); }
+    closeP(); render();
+  }
+  p.classList.add('open'); document.body.classList.add('panel-open'); setTimeout(() => $('#fName', p).focus(), 60);
+}
+function closeP(){ $('#panel').classList.remove('open'); document.body.classList.remove('panel-open'); }
+
+/* ── Sự kiện chung ── */
+$('#addBtn').onclick = () => openField(null);
+$('#tb').onclick = e => { const ed = e.target.closest('[data-edit]'); if (ed) { e.preventDefault(); openField(ed.dataset.edit); return; }
+  const m = e.target.closest('[data-more]'); if (m) { e.stopPropagation(); const p = $('#morePop'); if (p.classList.contains('open') && p.dataset.k === m.dataset.more) { p.classList.remove('open'); return; } p.dataset.k = m.dataset.more; moreMenu(m, m.dataset.more); } };
+document.addEventListener('click', e => { const t = e.target.closest('[data-toast]'); if (t) toast(t.dataset.toast);
+  if (!e.target.closest('.pop')) document.querySelectorAll('.pop.open').forEach(p => p.classList.remove('open')); });
+document.addEventListener('keydown', e => { if (e.key !== 'Escape') return;
+  if ($('#modal').classList.contains('open')) return;
+  if (document.querySelector('.pop.open')) { document.querySelectorAll('.pop.open').forEach(p => p.classList.remove('open')); return; }
+  if ($('#panel').classList.contains('open')) closeP(); });
+$('#scrim').addEventListener('click', closeP);
+
+render();
+// Liên kết sâu: ?new=1 (từ "Tạo trường mới" ở bảng Deals) · ?edit=<key>
+const qs = new URLSearchParams(location.search);
+if (qs.get('new')) openField(null); else if (qs.get('edit') && F[qs.get('edit')]) openField(qs.get('edit'));
+</script>
+</body>
+</html>

@@ -53,6 +53,8 @@ h1{font-size:24px;font-weight:700;line-height:1.3}
 .cols div{flex:1;border-radius:6px;background:var(--surface-variant);border:1px solid var(--outline-variant);display:flex;flex-direction:column;gap:5px;padding:5px}
 .cols i{display:block;height:18px;border-radius:4px;background:var(--surface);border:1px solid var(--outline-variant)}
 .cols i.h{height:6px;border:none;background:var(--primary-container)}
+.rows{flex:1;display:flex;flex-direction:column;gap:5px}
+.rows i{display:block;height:14px;border-radius:4px;background:var(--surface-variant);border:1px solid var(--outline-variant)}
 .three{flex:1;display:grid;grid-template-columns:1fr 2fr 1fr;gap:6px}
 .three div{border-radius:6px;background:var(--surface-variant);border:1px solid var(--outline-variant)}
 .three .mid{background:linear-gradient(var(--primary) 0 6px,var(--surface-variant) 6px)}
@@ -71,7 +73,7 @@ footer{margin-top:28px;font-size:12px;color:var(--on-surface-variant)}
 <body>
 <header>
   <span class="mark">H</span><strong>HarnexAI CRM</strong>
-  <span class="sub">Mockup giao diện · cập nhật 23/09/2026</span>
+  <span class="sub">Mockup giao diện · cập nhật 24/09/2026</span>
 </header>
 <main>
   <div class="wrap">
@@ -99,11 +101,21 @@ footer{margin-top:28px;font-size:12px;color:var(--on-surface-variant)}
           <span class="go">Mở màn chi tiết <span class="ms">arrow_forward</span></span>
         </div>
       </a>
+      <a class="card" href="crm-quan-ly-truong-hubspot.html">
+        <div class="prev" aria-hidden="true"><div class="pv-side"></div><div class="pv-main"><div class="bar t"></div><div class="bar" style="width:55%"></div>
+          <div class="rows"><i></i><i></i><i></i><i></i><i></i></div></div></div>
+        <div class="body">
+          <h2><span class="ms">tune</span>Quản lý trường dữ liệu</h2>
+          <p>Trang trường của Deals_Pipeline (nút “Cột” trên ERP), trình bày kiểu Settings › Properties của HubSpot.</p>
+          <ul><li>Thêm trường với đủ 14 loại của ERP; sửa, xoá, kéo ⠿ đổi thứ tự</li><li>Bắt buộc, Duy nhất, độ dài tối đa, min–max, danh sách lựa chọn, collection liên kết</li><li>Trên bảng Deals: nút “+” thêm cột và hộp “Chọn cột hiển thị” (Ctrl+Shift+L)</li></ul>
+          <span class="go">Mở quản lý trường <span class="ms">arrow_forward</span></span>
+        </div>
+      </a>
     </div>
 
     <div class="note">
       <div><b><span class="ms">palette</span>Đổi giao diện</b>Trong mỗi màn, bấm nút “⚙ Giao diện” góc trái dưới để so sánh tông HubSpot với giao diện HarnexAI gốc, hoặc bật chế độ tối.</div>
-      <div><b><span class="ms">link</span>Hai màn liên kết với nhau</b>“Xem trước” hoặc thẻ Kanban mở panel; “Mở trang đầy đủ” sang trang chi tiết. Thay đổi được giữ trong trình duyệt để hai màn khớp nhau.</div>
+      <div><b><span class="ms">link</span>Các màn liên kết với nhau</b>“Xem trước” hoặc thẻ Kanban mở panel; “Mở trang đầy đủ” sang trang chi tiết; trường thêm / sửa ở Quản lý trường hiện ngay trên bảng, panel và trang chi tiết. Thay đổi được giữ trong trình duyệt.</div>
       <div><b><span class="ms">devices</span>Responsive</b>Dùng được trên desktop, tablet và điện thoại. Dưới 905px, thanh điều hướng thu vào nút menu.</div>
     </div>
     <footer>Mockup phục vụ trao đổi thiết kế, chưa kết nối dữ liệu thật. Bấm “⚙ Giao diện → Dữ liệu mẫu” để khôi phục dữ liệu ban đầu. Bảng đối chiếu chức năng: DOI-CHIEU-CHUC-NANG.md trong repo.</footer>

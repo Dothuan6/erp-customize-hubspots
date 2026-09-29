@@ -178,3 +178,18 @@ Khảo sát lại trang Contacts của HubSpot (portal 247428660) rồi chỉnh 
 | Menu Thao tác | Theo dõi, Xem tất cả thuộc tính, Lịch sử thuộc tính, Lịch sử liên kết, Tìm trên Google, Nhân bản, Gộp, Xoá | Đủ; Lịch sử thuộc tính & Gộp gắn nhãn "Sắp có" | Audit log, API gộp |
 | Tab giữa | Catch-up (Overview/Health) · Activities · Customize | Tổng quan: tóm tắt AI (demo), Việc sắp tới, Tương tác gần đây + "Tạo hoạt động ▾"; Sức khoẻ: 3 thẻ AI "sắp ra mắt" | Cần module AI |
 | Card phải | Companies (Primary, Domain ↗ ⧉, Phone, nhãn liên kết, xem tất cả), Deals, Attachments | Đủ | Nhãn liên kết contact↔company cần bảng liên kết có cột nhãn |
+
+## 12. Phần 2 — Companies: chỉnh sát HubSpot (29/09/2026)
+
+| Khu vực | HubSpot | Prototype sau chỉnh | Cần BE ERP? |
+|---|---|---|---|
+| Danh sách — views | All companies / My companies / + | Như HubSpot | Không |
+| Bộ lọc nhanh | Company owner, Create date, Last activity date, Lead status + Advanced filters | Như HubSpot (có thêm Ngành, Lifecycle, Thành phố, Quốc gia khi bấm ⊕) | Last activity: trường tính |
+| Cột bảng | Company name (logo, mở rộng dòng), Owner, Create date, Phone, Last activity, City, Country/Region, Industry | Như HubSpot; thêm trường **Quốc gia/Khu vực** và **Lead status** cho Company | Thêm 2 trường vào collection Company |
+| Record — định danh | Logo, tên ✎, domain ↗ ⧉, 6 nút nhanh | Như HubSpot (bỏ dòng ngành/thành phố dưới domain) | Không |
+| Key information | Owner, City, Lifecycle (pill), Lead status, Industry, Last contacted | Như HubSpot | Last contacted: trường tính |
+| Menu Thao tác của Key information | Customize properties, View all properties, View property history, Enrich record 🔒, Fill smart properties 🔒 | Như HubSpot (2 mục khoá = ngoài phạm vi) | Audit log |
+| Menu Thao tác đầu trang | Follow … Merge, Clone, Delete | Dùng chung với Contact | Như Phần 1 |
+| Tab Catch-up | 2 mục xếp dọc, thu gọn được: **Overview** (Company insights + Recent interactions) và **Health** (Sentiment, Challenges, Positive feedback) | Đã đổi cả Contact & Company sang 2 mục xếp dọc (trước là nút chuyển) | AI |
+| Card Contacts | Tên, công ty, Email ⧉, Phone, nhãn "Contact with Primary Company", View all | Như HubSpot | Không |
+| Card khác | Deals, Tickets, Payments, Attachments | Deals, Tệp đính kèm (Tickets/Payments ngoài phạm vi) | — |

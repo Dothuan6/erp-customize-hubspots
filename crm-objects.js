@@ -41,6 +41,8 @@ const HXC = (() => {
     {key:'owner', name:'Company owner', type:'USER'},
     {key:'city', name:'Thành phố', type:'TEXT'},
     {key:'lifecycle', name:'Lifecycle stage', type:'SELECT', choices:LIFECYCLE},
+    {key:'country', name:'Quốc gia/Khu vực', type:'TEXT'},
+    {key:'leadstatus', name:'Lead status', type:'SELECT', choices:LEAD_STATUS},
     {key:'employees', name:'Số nhân sự', type:'NUMBER'},
   ];
 
@@ -73,10 +75,10 @@ const HXC = (() => {
       const d = deals.get('r0' + n); const st = d ? d.values[STAGE] : null;
       const created = d ? addDays(d.createdAt, -2) : iso('2026-07-15');
       companies.push({ id:'co' + n, createdAt: created, values:{ name, domain, industry, phone:'028 ' + (3800 + Number(n) * 17) + ' ' + (1000 + Number(n) * 37), owner: d ? d.values[SALE] : ME, city,
-        lifecycle: st === WON ? 'Customer' : st === LOST ? 'Lead' : 'Opportunity', employees: emp } });
+        lifecycle: st === WON ? 'Customer' : st === LOST ? 'Lead' : 'Opportunity', employees: emp, country:'Việt Nam', leadstatus: st === WON ? null : st === LOST ? 'Không phù hợp' : 'Có deal' } });
       if (d) dealLinks[d.id] = { company:'co' + n, contacts:[] };
     });
-    companies.push({ id:'co14', createdAt: iso('2026-09-26', 14), values:{ name:'Titan Bases', domain:'titanbases.com', industry:'Công nghệ', phone:'', owner: ME, city:'TP. Hồ Chí Minh', lifecycle:'Lead', employees: 8 } });
+    companies.push({ id:'co14', createdAt: iso('2026-09-26', 14), values:{ name:'Titan Bases', domain:'titanbases.com', industry:'Công nghệ', phone:'', owner: ME, city:'TP. Hồ Chí Minh', lifecycle:'Lead', employees: 8, country:'Việt Nam', leadstatus:'Mới' } });
     // [id, họ, tên, chức danh, công ty, nguồn, deal, nhãn]
     const CT = [
       ['01','Nguyễn Thị','Hạnh','Giám đốc vận hành','13','Giới thiệu','r013','Người quyết định'],
@@ -160,6 +162,8 @@ const HXC = (() => {
     return { companies, contacts, dealLinks, products, lineItems, liFields, activities, events:[] };
   }
   let db = load() || seed();
+  // Nâng cấp dữ liệu cũ trong trình duyệt (Phần 2: thêm Quốc gia, Lead status cho Company)
+  db.companies.forEach(c => { if (!('country' in c.values)) c.values.country = 'Việt Nam'; if (!('leadstatus' in c.values)) c.values.leadstatus = c.values.lifecycle === 'Customer' ? null : c.values.lifecycle === 'Opportunity' ? 'Có deal' : 'Mới'; });
   if (!load()) persist();
 
   /* ── Truy vấn & liên kết ── */
@@ -290,7 +294,7 @@ const HXC = (() => {
   /* Panel tạo Contact / Company (HubSpot "Create Contact"), có mục "Liên kết với" */
   function createPanel(t, opts = {}) {
     const p = $('#panel'); const o = OBJ[t];
-    const fields = t === 'contact' ? ['email','firstname','lastname','owner','jobtitle','phone','lifecycle','leadstatus','source'] : ['domain','name','owner','industry','city','phone','lifecycle','employees'];
+    const fields = t === 'contact' ? ['email','firstname','lastname','owner','jobtitle','phone','lifecycle','leadstatus','source'] : ['domain','name','owner','industry','city','country','phone','lifecycle','leadstatus','employees'];
     const inp = f => f.type === 'SELECT' || f.type === 'USER'
       ? `<select class="in" id="cf_${f.key}"><option value="">— Chọn —</option>${(f.type === 'USER' ? USERS : f.choices).map(c => `<option ${c === (opts.preset || {})[f.key] || (f.type === 'USER' && c === ME && !(opts.preset || {})[f.key]) || (f.key === 'lifecycle' && c === 'Lead' && !(opts.preset || {})[f.key]) ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>`
       : `<input class="in" id="cf_${f.key}" type="${f.type === 'NUMBER' ? 'number' : f.key === 'email' ? 'email' : 'text'}" value="${esc((opts.preset || {})[f.key] || '')}">`;
@@ -379,21 +383,22 @@ const HXC = (() => {
   function assocCard(el, fromT, fromId, toT, refresh) {
     const rows = related(fromT, fromId, toT); const o = OBJ[toT];
     const item = r => {
-      const lines = toT === 'contact' ? [['Email', esc(r.values.email || '—')], ['Điện thoại', esc(r.values.phone || '—')]]
+      const cco = toT === 'contact' ? assoc.companyOfContact(r.id) : null;
+      const lines = toT === 'contact' ? [...(cco ? [['', esc(cco.values.name)]] : []), ['Email', r.values.email ? `<a class="lk" href="mailto:${esc(r.values.email)}">${esc(r.values.email)}</a><button class="ac-cp" data-accp="${esc(r.values.email)}" aria-label="Sao chép email"><span class="ms xs">content_copy</span></button>` : '—'], ['Số điện thoại', esc(r.values.phone || '—')]]
         : toT === 'company' ? [['Domain công ty', r.values.domain ? `<a class="lk" href="https://${esc(r.values.domain)}" target="_blank" rel="noopener">${esc(r.values.domain)}<span class="ms xs" style="vertical-align:-3px">open_in_new</span></a><button class="ac-cp" data-accp="${esc(r.values.domain)}" aria-label="Sao chép domain"><span class="ms xs">content_copy</span></button>` : '—'], ['Số điện thoại', esc(r.values.phone || '—')]]
         : [['Amount', HX.F[CASH] ? esc(fmt(r.values[CASH], HX.F[CASH]) || '—') : '—'], ['Ngày chốt', r.values[CLOSE] ? dOnly(r.values[CLOSE]) : '—'], ['Giai đoạn', HX.F[STAGE] ? display(r.values[STAGE], HX.F[STAGE]) : '—']];
       const primary = (fromT === 'contact' && toT === 'company') || (fromT === 'deal' && toT === 'company');
       return `<div class="ac-it"><div class="ac-top"><span class="av sm">${esc(initials(titleOf(toT, r)))}</span><a href="${url(toT, r.id)}" class="ac-name">${esc(titleOf(toT, r))}</a>${primary ? '<span class="tag pk">Primary</span>' : ''}
           <button class="btn btn--text btn--icon ac-more" data-acm="${r.id}" aria-label="Tuỳ chọn liên kết"><span class="ms sm">more_horiz</span></button></div>
-        ${lines.map(([k, v]) => `<div class="ac-ln"><span>${k}:</span> ${v}</div>`).join('')}
-        ${fromT === 'deal' && toT === 'contact' ? `<button class="ac-lbl" data-lbl="${r.id}">${r.label ? `<span class="tag">${esc(r.label)}</span>` : 'Thêm nhãn liên kết'}</button>` : toT !== 'deal' ? `<button class="ac-lbl" data-toast="Nhãn liên kết Contact ↔ Company (vd. Nhân viên, Người quyết định) — cần bảng liên kết có cột nhãn ở ERP">Thêm nhãn liên kết</button>` : ''}</div>`;
+        ${lines.map(([k, v]) => `<div class="ac-ln">${k ? `<span>${k}:</span> ` : ''}${v}</div>`).join('')}
+        ${fromT === 'deal' && toT === 'contact' ? `<button class="ac-lbl" data-lbl="${r.id}">${r.label ? `<span class="tag">${esc(r.label)}</span>` : 'Thêm nhãn liên kết'}</button>` : fromT === 'company' && toT === 'contact' && cco && cco.id === fromId ? `<span class="tag" style="align-self:flex-start;margin-top:4px">Contact với công ty chính</span>` : toT !== 'deal' ? `<button class="ac-lbl" data-toast="Nhãn liên kết Contact ↔ Company (vd. Nhân viên, Người quyết định) — cần bảng liên kết có cột nhãn ở ERP">Thêm nhãn liên kết</button>` : ''}</div>`;
     };
     el.innerHTML = `<div class="ch"><span class="ms sm">expand_more</span>${o.plural} (${rows.length})<span class="r"><button class="btn btn--text sm" data-acadd><span class="ms xs">add</span>Thêm</button><button class="btn btn--text btn--icon" data-toast="Chọn thuộc tính hiển thị trên card ${o.plural} (mockup)" aria-label="Cài đặt card"><span class="ms sm">settings</span></button></span></div>
       <div class="cb">${rows.length ? rows.map(item).join('') : `<div class="ac-empty"><span class="ms">${o.icon}</span>${toT === 'deal' ? 'Theo dõi cơ hội doanh thu liên kết với bản ghi này.' : toT === 'company' ? 'Xem doanh nghiệp liên kết với bản ghi này.' : 'Xem những người liên kết với bản ghi này.'}</div>`}
       ${rows.length ? `<a class="ac-all" href="${o.list}">Xem tất cả ${o.plural} liên kết <span class="ms xs">open_in_new</span></a>` : ''}</div><div class="pop" id="acPop-${toT}"></div>`;
     el.onclick = e => {
       if (e.target.closest('[data-acadd]')) { addAssocPanel(fromT, fromId, toT, refresh); return; }
-      const cp = e.target.closest('[data-accp]'); if (cp) { navigator.clipboard?.writeText(cp.dataset.accp).catch(() => {}); toast('Đã sao chép domain'); return; }
+      const cp = e.target.closest('[data-accp]'); if (cp) { navigator.clipboard?.writeText(cp.dataset.accp).catch(() => {}); toast('Đã sao chép'); return; }
       const lb = e.target.closest('[data-lbl]'); if (lb) { const pop = el.querySelector('.pop'); place(pop, lb, el); pop.innerHTML = `<div class="hd">Nhãn liên kết</div>` + ['', ...ASSOC_LABELS].map(l => `<button class="mi" data-setlbl="${esc(l)}" data-cid="${lb.dataset.lbl}">${l || '— Không nhãn —'}</button>`).join(''); pop.classList.add('open'); e.stopPropagation(); return; }
       const sl = e.target.closest('[data-setlbl]'); if (sl) { setLabel(fromId, sl.dataset.cid, sl.dataset.setlbl); refresh(); toast('Đã cập nhật nhãn'); return; }
       const m = e.target.closest('[data-acm]'); if (m) { const pop = el.querySelector('.pop'); place(pop, m, el);

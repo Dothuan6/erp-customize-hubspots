@@ -22,8 +22,8 @@ function HXList(T) {
     expand:[['company','Companies'],['deal','Deals']], board:'lifecycle',
   } : {
     views:[['all','Tất cả companies'],['mine','Companies của tôi']],
-    quick:['owner','_created','_lastact','industry'], quickMore:['lifecycle','city'],
-    cols:['owner','_created','phone','_lastact','city','industry'], colsMore:['domain','lifecycle','employees','_contacts','_deals'],
+    quick:['owner','_created','_lastact','leadstatus'], quickMore:['industry','lifecycle','city','country'],
+    cols:['owner','_created','phone','_lastact','city','country','industry'], colsMore:['domain','lifecycle','leadstatus','employees','_contacts','_deals'],
     expand:[['contact','Contacts'],['deal','Deals']], board:'lifecycle',
   };
   const DATE_P = [['today','Hôm nay','Cả ngày hôm nay'],['yesterday','Hôm qua','24 giờ của ngày trước'],['week','Tuần này','Từ thứ Hai tuần này'],['lastweek','Tuần trước','Thứ Hai – Chủ nhật tuần trước'],
@@ -195,7 +195,7 @@ function HXList(T) {
       <div class="pn-b"><a class="btn btn--secondary sm" href="${HXC.url(T, id)}" style="margin-bottom:12px">Xem bản ghi<span class="ms xs">arrow_forward</span></a>
         <h3 class="pvh">${T === 'contact' ? 'Thông tin chính' : 'Về công ty này'}</h3><div class="props" id="pvProps"></div>
         <h3 class="pvh">Liên kết</h3><div id="pvAssoc" class="pva"></div></div>`;
-    HXC.props($('#pvProps', p), T, r, T === 'contact' ? ['email','phone','owner','lifecycle','leadstatus','jobtitle'] : ['domain','owner','industry','phone','city','lifecycle'], draw);
+    HXC.props($('#pvProps', p), T, r, T === 'contact' ? ['email','phone','owner','lifecycle','leadstatus','jobtitle'] : ['domain','owner','city','lifecycle','leadstatus','industry'], draw);
     $('#pvAssoc', p).innerHTML = CFG.expand.map(([k, l]) => { const rel = HXC.related(T, id, k); return `<div><b>${l} (${rel.length})</b>${rel.length ? rel.map(x => `<a class="lk b" href="${HXC.url(k, x.id)}">${esc(HXC.titleOf(k, x))}</a>`).join('') : '<span class="nil">--</span>'}</div>`; }).join('');
     p.onclick = e => { if (e.target.closest('[data-pclose]')) HX.closePanel(); };
     p.classList.add('open'); document.body.classList.add('panel-open', 'dock');

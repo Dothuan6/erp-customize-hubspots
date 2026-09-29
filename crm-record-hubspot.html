@@ -55,6 +55,11 @@
 .pane{display:none;padding:14px}
 .pane.on{display:block}
 /* Catch-up */
+.cu-sec{margin-bottom:6px}
+.cu-h{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:600;padding:4px 0 10px}
+.ib2{width:24px;height:24px;border-radius:var(--radius-sm);display:inline-grid;place-items:center;vertical-align:-6px;color:var(--on-surface-variant)}
+.ib2:hover{background:var(--surface-2);color:var(--on-surface)}
+.cu-src{display:flex;align-items:center;gap:2px;margin-top:8px}
 .cu-seg{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden;margin-bottom:14px}
 .cu-seg button{height:30px;padding:0 14px;font-size:12.5px;font-weight:600;color:var(--on-surface-variant)}
 .cu-seg button[aria-pressed="true"]{background:var(--primary-container);color:var(--on-primary-container)}
@@ -96,7 +101,7 @@ html[data-theme="dark"] .ai{background:#311B92;color:#D1C4E9}
     <div class="col col-l">
       <section class="card" id="idCard"></section>
       <section class="card" id="keyCard"><div class="ch"><button class="tg" id="keyTg" aria-expanded="true"><span class="ms sm" id="keyIc">expand_more</span><span id="propT"></span></button>
-        <span class="r"><button class="btn btn--text sm" data-actmenu="key">Thao tác<span class="ms xs">arrow_drop_down</span></button><button class="btn btn--text btn--icon" id="propCfg" title="Chọn thuộc tính hiển thị" aria-label="Chọn thuộc tính hiển thị"><span class="ms sm">settings</span></button></span></div>
+        <span class="r"><button class="btn btn--text sm" data-keymenu>Thao tác<span class="ms xs">arrow_drop_down</span></button><button class="btn btn--text btn--icon" id="propCfg" title="Chọn thuộc tính hiển thị" aria-label="Chọn thuộc tính hiển thị"><span class="ms sm">settings</span></button></span></div>
         <div class="cb" id="keyBody"><div class="props" id="props"></div><button class="btn btn--text sm" data-allprops style="margin-top:6px">Xem tất cả thuộc tính</button></div>
         <div class="meta" id="meta"></div></section>
     </div>
@@ -124,11 +129,11 @@ const ID = qs.get('id') || (HXC.list(T)[0] || {}).id;
 const O = HXC.OBJ[T];
 HX.shell(T === 'contact' ? 'contacts' : T === 'company' ? 'companies' : 'deals');
 const r = HXC.get(T, ID);
-let tl, cuMode = 'overview';
+let tl;
 
 // Cấu hình theo loại bản ghi (Company / Deal sẽ tinh chỉnh ở Phần 2, 3)
-const KEYS = { contact:['owner','phone','city','lifecycle','leadstatus'], company:['domain','industry','owner','phone','city','lifecycle','employees'] };
-const KEY_T = { contact:'Thông tin chính', company:'Về công ty này', deal:'Về Deal này' };
+const KEYS = { contact:['owner','phone','city','lifecycle','leadstatus'], company:['owner','city','lifecycle','leadstatus','industry'] };
+const KEY_T = { contact:'Thông tin chính', company:'Thông tin chính', deal:'Về Deal này' };
 
 if (!r) { $('#grid').innerHTML = `<div class="card soon" style="grid-column:1/-1"><span class="ms">search_off</span>Không tìm thấy bản ghi.<a class="btn btn--secondary" href="${O.list}">Về ${O.plural}</a></div>`; }
 else {
@@ -152,7 +157,7 @@ else {
     if (T === 'contact') { const co = HXC.assoc.companyOfContact(ID);
       sub = `${r.values.jobtitle || co ? `<span>${esc(r.values.jobtitle || '')}${co ? `${r.values.jobtitle ? ' tại ' : ''}<a href="${HXC.url('company', co.id)}">${esc(co.values.name)}</a>` : ''}</span>` : ''}
         ${r.values.email ? `<span class="kv"><a href="mailto:${esc(r.values.email)}">${esc(r.values.email)}</a><a class="ib" href="mailto:${esc(r.values.email)}" title="Mở email" aria-label="Mở email"><span class="ms xs">open_in_new</span></a><button class="ib" data-copy="${esc(r.values.email)}" title="Sao chép" aria-label="Sao chép email"><span class="ms xs">content_copy</span></button></span>` : ''}`; }
-    if (T === 'company') sub = `${r.values.domain ? `<span class="kv"><a href="https://${esc(r.values.domain)}" target="_blank" rel="noopener">${esc(r.values.domain)}</a><a class="ib" href="https://${esc(r.values.domain)}" target="_blank" rel="noopener" aria-label="Mở website"><span class="ms xs">open_in_new</span></a><button class="ib" data-copy="${esc(r.values.domain)}" aria-label="Sao chép domain"><span class="ms xs">content_copy</span></button></span>` : ''}<span class="nil">${esc(r.values.industry || '')}${r.values.city ? ' · ' + esc(r.values.city) : ''}</span>`;
+    if (T === 'company') sub = `${r.values.domain ? `<span class="kv"><a href="https://${esc(r.values.domain)}" target="_blank" rel="noopener">${esc(r.values.domain)}</a><a class="ib" href="https://${esc(r.values.domain)}" target="_blank" rel="noopener" aria-label="Mở website"><span class="ms xs">open_in_new</span></a><button class="ib" data-copy="${esc(r.values.domain)}" aria-label="Sao chép domain"><span class="ms xs">content_copy</span></button></span>` : ''}`;
     if (T === 'deal') sub = `${F[HXC.CASH] ? `<span class="kv"><span>Amount:</span><b>${esc(fmt(r.values[HXC.CASH], F[HXC.CASH]) || '—')}</b></span>` : ''}
         ${F[HXC.CLOSE] ? `<span class="kv"><span>Ngày dự kiến chốt:</span><b>${r.values[HXC.CLOSE] ? HXC.dOnly(r.values[HXC.CLOSE]) : '—'}</b></span>` : ''}
         <span class="kv"><span>Pipeline:</span><span class="tag">Deals_Pipeline</span></span>
@@ -170,7 +175,7 @@ else {
     if (T === 'deal') HX.propList($('#props'), r, 'page');
     else {
       HXC.props($('#props'), T, r, KEYS[T], () => refreshAll());
-      if (T === 'contact') { const lc = HXC.lastContacted(T, ID);
+      { const lc = HXC.lastContacted(T, ID);
         $('#props').insertAdjacentHTML('beforeend', `<div class="prop ro" title="Tự tính từ cuộc gọi / cuộc họp gần nhất"><label>Liên hệ gần nhất</label><div class="v">${lc ? HXC.dt(lc) : '<span class="nil">--</span>'}</div></div>`); }
     }
     $('#meta').textContent = `Ngày tạo: ${HXC.dt(r.createdAt)}`;
@@ -184,42 +189,48 @@ else {
     cards.forEach(c => c === 'lineitems' ? HXC.lineItemsCard($('#rc-lineitems'), ID, refreshAll) : HXC.assocCard($('#rc-' + c), T, ID, c, refreshAll));
   }
 
-  /* ── Tab Tổng quan (Catch-up) ── */
+  /* ── Tab Tổng quan (Catch-up): 2 mục thu gọn được xếp dọc như HubSpot — Tổng quan (Overview) · Sức khoẻ (Health) ── */
+  const cuOpen = { ov:true, hl:true };
+  const OBJ_VI = { contact:'contact', company:'công ty' };
   function summary() {
-    const co = T === 'contact' ? HXC.assoc.companyOfContact(ID) : null;
     const deals = HXC.related(T, ID, 'deal'), open = deals.filter(d => ![HXC.WON, HXC.LOST].includes(d.values[HXC.STAGE]));
     const sum = open.reduce((s, d) => s + (Number(d.values[HXC.CASH]) || 0), 0);
     const acts = HXC.activitiesOf(T, ID).filter(a => a.type !== 'SYSTEM');
     const last = acts.find(a => a.at <= HXC.TODAY.toISOString());
-    const lines = [
-      `<b>${esc(name())}</b>${r.values.jobtitle ? ` là ${esc(r.values.jobtitle)}` : ''}${co ? ` tại <b>${esc(co.values.name)}</b>` : ''}, lifecycle stage <b>${esc(r.values.lifecycle || '—')}</b>${r.values.leadstatus ? `, lead status <b>${esc(r.values.leadstatus)}</b>` : ''}; owner ${esc(r.values.owner || 'chưa có')}.`,
+    let first;
+    if (T === 'contact') { const co = HXC.assoc.companyOfContact(ID);
+      first = `<b>${esc(name())}</b>${r.values.jobtitle ? ` là ${esc(r.values.jobtitle)}` : ''}${co ? ` tại <b>${esc(co.values.name)}</b>` : ''}, lifecycle stage <b>${esc(r.values.lifecycle || '—')}</b>${r.values.leadstatus ? `, lead status <b>${esc(r.values.leadstatus)}</b>` : ''}; owner ${esc(r.values.owner || 'chưa có')}.`; }
+    else { const cts = HXC.assoc.contactsOfCompany(ID);
+      first = `<b>${esc(name())}</b>${r.values.industry ? ` (ngành ${esc(r.values.industry)}${r.values.city ? ', ' + esc(r.values.city) : ''})` : ''}, lifecycle stage <b>${esc(r.values.lifecycle || '—')}</b>; ${cts.length ? `<b>${cts.length} contact</b> liên kết: ${cts.slice(0, 3).map(c => esc(HXC.fullName(c)) + (c.values.jobtitle ? ` (${esc(c.values.jobtitle)})` : '')).join(', ')}${cts.length > 3 ? '…' : ''}` : 'chưa có contact liên kết'}.`; }
+    const lines = [first,
       open.length ? `Có <b>${open.length} deal đang mở</b> với tổng giá trị <b>${HXC.money(sum)}</b> (${open.map(d => esc(HX.title(d))).join(', ')}).` : `Chưa có deal đang mở${deals.length ? ` (${deals.length} deal đã đóng)` : ''}.`,
-      last ? `Tương tác gần nhất: ${esc(({NOTE:'ghi chú',CALL:'cuộc gọi',MEETING:'cuộc họp',TASK:'task'})[last.type] || 'hoạt động')} “${esc(last.title || last.body || '')}” ngày ${HXC.dOnly(last.at)} bởi ${esc(last.by)}.` : 'Chưa có tương tác nào được ghi nhận.',
+      last ? `Tương tác gần nhất: ${esc(({NOTE:'ghi chú',CALL:'cuộc gọi',MEETING:'cuộc họp',TASK:'task'})[last.type] || 'hoạt động')} “${esc(last.title || last.body || '')}” ngày ${HXC.dOnly(last.at)} bởi ${esc(last.by)}.` : 'Chưa có hoạt động hay trao đổi nào được ghi nhận. Thêm hoạt động hoặc liên kết để có bản tóm tắt mới.',
     ];
     return `<ul class="cu-sum">${lines.map(l => `<li>${l}</li>`).join('')}</ul>`;
   }
   function drawCatchup() {
-    if (T !== 'contact') return;
+    if (T === 'deal') return;
     const acts = HXC.activitiesOf(T, ID).filter(a => a.type !== 'SYSTEM');
     const up = acts.filter(a => (a.type === 'TASK' && !a.done) || (a.type === 'MEETING' && a.at > HXC.TODAY.toISOString()));
     const recent = acts.filter(a => !up.includes(a)).slice(0, 3);
     const IC = { NOTE:'edit_note', CALL:'call', MEETING:'event', TASK:'task_alt' }, TN = { NOTE:'Ghi chú', CALL:'Cuộc gọi', MEETING:'Cuộc họp', TASK:'Task' };
     const item = a => `<div class="ri"><span class="ms sm">${IC[a.type]}</span><div style="flex:1;min-width:0"><b>${TN[a.type]}${a.title ? ': ' + esc(a.title) : ''}</b>${a.body && a.body !== a.title ? `<div class="nil" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.body)}</div>` : ''}<div class="nil" style="font-size:12px">${a.type === 'TASK' ? 'Hạn ' + (a.due ? HXC.dOnly(a.due) : '—') : HXC.dt(a.at)} · ${esc(a.by)}</div></div></div>`;
     const createBtn = `<button class="btn btn--secondary sm" data-createact>Tạo hoạt động<span class="ms xs">arrow_drop_down</span></button>`;
-    $('#pane-cu').innerHTML = `<div class="cu-seg" role="group" aria-label="Chế độ tổng quan"><button data-cu="overview" aria-pressed="${cuMode === 'overview'}">Tổng quan</button><button data-cu="health" aria-pressed="${cuMode === 'health'}">Sức khoẻ</button></div>`
-      + (cuMode === 'overview' ? `
-      <div class="cu-card"><h3>Thông tin chi tiết về contact<span class="ai"><span class="ms xs">auto_awesome</span>AI · demo</span></h3>${summary()}
-        <label class="ask"><span class="ms sm">auto_awesome</span><input id="askQ" placeholder="Đặt câu hỏi về contact này…"><button class="btn btn--text btn--icon" data-ask aria-label="Gửi câu hỏi"><span class="ms sm">send</span></button></label>
-        <div class="nil" style="font-size:11.5px;margin-top:6px">Mockup tóm tắt từ dữ liệu có sẵn. Bản thật cần tích hợp AI (ngoài phạm vi ERP hiện tại).</div></div>
-      <div class="cu-card"><h3>Việc sắp tới (${up.length})<span class="r"></span></h3>${up.length ? up.map(item).join('') : '<div class="nil" style="font-size:13px">Không có task hay cuộc họp sắp tới.</div>'}</div>
+    const gen = `<div class="nil" style="font-size:11.5px;margin-bottom:6px">Tạo lúc ${HXC.dt(new Date().toISOString())} <button class="ib2" data-toast="Tạo lại bản tóm tắt (mockup)" aria-label="Tạo lại"><span class="ms xs">refresh</span></button></div>`;
+    const sec = (k, title, body) => `<section class="cu-sec"><button class="cu-h" data-cusec="${k}" aria-expanded="${cuOpen[k]}"><span class="ms sm">${cuOpen[k] ? 'expand_more' : 'chevron_right'}</span>${title}</button>${cuOpen[k] ? body : ''}</section>`;
+    $('#pane-cu').innerHTML = sec('ov', 'Tổng quan', `
+      <div class="cu-card"><h3>Thông tin chi tiết về ${OBJ_VI[T]}<span class="r"><span class="ai"><span class="ms xs">auto_awesome</span>AI · demo</span></span></h3>${gen}${summary()}
+        <div class="cu-src"><span class="nil" style="font-size:12px">${acts.length + 1} nguồn</span><button class="ib2" data-toast="Cảm ơn phản hồi (mockup)" aria-label="Hữu ích"><span class="ms xs">thumb_up</span></button><button class="ib2" data-toast="Cảm ơn phản hồi (mockup)" aria-label="Không hữu ích"><span class="ms xs">thumb_down</span></button><button class="ib2" data-toast="Đã sao chép tóm tắt" aria-label="Sao chép"><span class="ms xs">content_copy</span></button></div>
+        <label class="ask"><span class="ms sm">auto_awesome</span><input id="askQ" placeholder="Đặt câu hỏi về ${OBJ_VI[T]} này…"><button class="btn btn--text btn--icon" data-ask aria-label="Gửi câu hỏi"><span class="ms sm">send</span></button></label></div>
+      <div class="cu-card"><h3>Việc sắp tới (${up.length})</h3>${up.length ? up.map(item).join('') : '<div class="nil" style="font-size:13px">Không có task hay cuộc họp sắp tới.</div>'}</div>
       <div class="cu-card"><h3>Tương tác gần đây<span class="r">${recent.length ? createBtn : ''}</span></h3>${recent.length ? recent.map(item).join('') + `<button class="btn btn--text sm" data-goact style="margin-top:6px">Xem tất cả hoạt động</button>`
-        : `<div class="cu-empty"><span class="ms">forum</span><b style="color:var(--on-surface)">Chưa có tương tác gần đây</b>Ghi lại cuộc gọi, cuộc họp hoặc ghi chú để theo dõi mối quan hệ.${createBtn}</div>`}</div>`
-      : `<div class="hl">${[['sentiment_satisfied','Cảm xúc (Sentiment)','Đánh giá thái độ của contact qua email, cuộc gọi.'],['report','Thách thức','Các khó khăn contact nhắc tới trong tương tác.'],['thumb_up','Phản hồi tích cực','Điểm contact đánh giá cao.']].map(([i, t, d]) => `<div class="cu-card"><h3><span class="ms sm">${i}</span>${t}</h3><div class="cu-empty" style="padding:8px 0"><span class="ai">AI · sắp ra mắt</span>${d}</div></div>`).join('')}</div>
-        <p class="nil" style="font-size:12px">HubSpot tạo các mục này bằng AI từ nội dung email / cuộc gọi. ERP chưa có module AI & email → để trạng thái “sắp ra mắt”.</p>`);
+        : `<div class="cu-empty"><span class="ms">forum</span>Chưa có hoạt động nào trên bản ghi này.${createBtn}</div>`}</div>`)
+      + sec('hl', 'Sức khoẻ', `${[['sentiment_satisfied','Cảm xúc (Sentiment)','Chưa có dữ liệu cảm xúc.'],['report','Thách thức','Chưa ghi nhận thách thức nào.'],['thumb_up','Phản hồi tích cực','Chưa ghi nhận phản hồi tích cực.']].map(([i, t, d]) => `<div class="cu-card"><h3><span class="ms sm">${i}</span>${t}<span class="r"><span class="ai">AI · sắp ra mắt</span></span></h3><div class="nil" style="font-size:13px">${d}</div></div>`).join('')}
+        <p class="nil" style="font-size:12px">HubSpot sinh các mục này bằng AI từ email / cuộc gọi. ERP chưa có module AI & email nên để trạng thái “sắp ra mắt”.</p>`);
   }
   function drawTabs() {
-    const tabs = T === 'contact' ? [['cu','Tổng quan'],['act','Hoạt động']] : [['act','Hoạt động']];
-    const def = T === 'contact' ? 'cu' : 'act';
+    const tabs = T !== 'deal' ? [['cu','Tổng quan'],['act','Hoạt động']] : [['act','Hoạt động']];
+    const def = T !== 'deal' ? 'cu' : 'act';
     $('#tabs').innerHTML = tabs.map(([k, l]) => `<button class="tab" role="tab" aria-selected="${k === def}" data-pane="${k}">${l}</button>`).join('')
       + `<button class="btn btn--text sm cust" data-toast="Tuỳ chỉnh bố cục record: thêm / ẩn / sắp xếp tab và card (mockup)"><span class="ms sm">settings</span>Tuỳ chỉnh</button>`;
     document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 'pane-' + def));
@@ -242,6 +253,12 @@ else {
     <button class="mi" data-clone><span class="ms sm">content_copy</span>Nhân bản</button>
     <button class="mi" data-toast="Gộp 2 bản ghi trùng (giữ liên kết & hoạt động) — cần API gộp ở BE"><span class="ms sm">merge</span>Gộp<span class="soonb">Sắp có</span></button>
     <button class="mi" data-del style="color:var(--error)"><span class="ms sm">delete</span>Xoá</button>`;
+  const keyMenu = () => `<button class="mi" data-toast="Chọn & sắp xếp thuộc tính hiển thị trong “${KEY_T[T]}” (mockup)"><span class="ms sm">tune</span>Tuỳ chỉnh thuộc tính</button>
+    <button class="mi" data-allprops><span class="ms sm">list_alt</span>Xem tất cả thuộc tính</button>
+    <button class="mi" data-toast="Lịch sử thuộc tính cần audit log ở BE (ERP chưa có)"><span class="ms sm">history</span>Xem lịch sử thuộc tính<span class="soonb">Sắp có</span></button>
+    <div class="sep"></div>
+    <button class="mi" data-toast="Làm giàu dữ liệu từ nguồn ngoài — ngoài phạm vi" style="color:var(--on-surface-variant)"><span class="ms sm">lock</span>Làm giàu dữ liệu bản ghi</button>
+    <button class="mi" data-toast="Điền thuộc tính thông minh bằng AI — ngoài phạm vi" style="color:var(--on-surface-variant)"><span class="ms sm">lock</span>Điền thuộc tính thông minh</button>`;
   const MORE = [['CALL','call','Ghi lại cuộc gọi'],['MEETING','event','Ghi lại cuộc họp'],['EMAIL','mail','Ghi lại email'],['_sms','sms','Ghi lại SMS'],['_wa','chat','Ghi lại WhatsApp'],['_li','work','Ghi lại tin nhắn LinkedIn'],['_seq','send','Đăng ký vào chuỗi email']];
   function moreMenu(anchor) {
     const p = openFp(anchor, `<label class="srch2"><input id="moQ" placeholder="Tìm"><span class="ms sm">search</span></label><div id="moL"></div><div class="sep"></div><button class="mi" data-toast="Kéo thả để sắp xếp lại 5 nút hoạt động ở thẻ định danh (mockup)"><span class="ms sm">swap_horiz</span>Sắp xếp lại nút hoạt động</button>`, 300);
@@ -275,12 +292,13 @@ else {
 
   document.addEventListener('click', e => {
     const am = e.target.closest('[data-actmenu]'); if (am) { e.stopPropagation(); fp.classList.contains('open') && fp.dataset.src === am.dataset.actmenu ? closeFp() : (openFp(am, actMenu(), 260, true), fp.dataset.src = am.dataset.actmenu); return; }
+    const km = e.target.closest('[data-keymenu]'); if (km) { e.stopPropagation(); fp.classList.contains('open') && fp.dataset.src === 'key' ? closeFp() : (openFp(km, keyMenu(), 260, true), fp.dataset.src = 'key'); return; }
     const t = e.target.closest('[data-toast]'); if (t) { toast(t.dataset.toast); closeFp(); return; }
     const qa = e.target.closest('[data-qa]');
     if (qa) { const k = qa.dataset.qa; if (k === 'MORE') { e.stopPropagation(); moreMenu(qa); fp.dataset.src = 'more'; return; } openComposer(k); return; }
     const mo = e.target.closest('[data-mo]'); if (mo) { closeFp(); const k = mo.dataset.mo; if (k[0] === '_') toast('Kênh này nằm ngoài phạm vi giai đoạn 2'); else openComposer(k); return; }
     const ca = e.target.closest('[data-createact]'); if (ca) { e.stopPropagation(); openFp(ca, [['NOTE','edit_note','Ghi chú'],['EMAIL','mail','Email'],['CALL','call','Cuộc gọi'],['TASK','task_alt','Task'],['MEETING','event','Cuộc họp']].map(([k, i, l]) => `<button class="mi" data-mo="${k}"><span class="ms sm">${i}</span>${l}</button>`).join(''), 200); fp.dataset.src = 'create'; return; }
-    const cu = e.target.closest('[data-cu]'); if (cu) { cuMode = cu.dataset.cu; drawCatchup(); return; }
+    const cs = e.target.closest('[data-cusec]'); if (cs) { cuOpen[cs.dataset.cusec] = !cuOpen[cs.dataset.cusec]; drawCatchup(); return; }
     if (e.target.closest('[data-goact]')) { goTab('act'); return; }
     if (e.target.closest('[data-ask]')) { toast('“Đặt câu hỏi” cần tích hợp AI — mockup chỉ hiển thị giao diện'); return; }
     const tab = e.target.closest('.tab'); if (tab) { goTab(tab.dataset.pane); return; }

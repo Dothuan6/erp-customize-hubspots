@@ -54,6 +54,8 @@
 .tabs .cust{margin-left:auto}
 .pane{display:none;padding:14px}
 .pane.on{display:block}
+.dte{display:inline-flex;align-items:center;gap:3px;font-weight:600;border-radius:var(--radius-sm);padding:1px 4px;margin-left:-4px}
+.dte:hover{background:var(--surface-2)}
 /* Catch-up */
 .cu-sec{margin-bottom:6px}
 .cu-h{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:600;padding:4px 0 10px}
@@ -133,6 +135,8 @@ let tl;
 
 // Cấu hình theo loại bản ghi (Company / Deal sẽ tinh chỉnh ở Phần 2, 3)
 const KEYS = { contact:['owner','phone','city','lifecycle','leadstatus'], company:['owner','city','lifecycle','leadstatus','industry'] };
+// “Về Deal này” (HubSpot: Deal owner · Last contacted · Deal type · Priority · Closed lost reason) → trường ERP tương ứng
+const DEAL_KEYS = ['sale_ph_tr_ch','g_i_d_ch_v_m_c_ti_u','th_i_h_n_thanh_to_n','t_l_th_nh_c_ng','l_do_th_t_b_i'];
 const KEY_T = { contact:'Thông tin chính', company:'Thông tin chính', deal:'Về Deal này' };
 
 if (!r) { $('#grid').innerHTML = `<div class="card soon" style="grid-column:1/-1"><span class="ms">search_off</span>Không tìm thấy bản ghi.<a class="btn btn--secondary" href="${O.list}">Về ${O.plural}</a></div>`; }
@@ -159,12 +163,12 @@ else {
         ${r.values.email ? `<span class="kv"><a href="mailto:${esc(r.values.email)}">${esc(r.values.email)}</a><a class="ib" href="mailto:${esc(r.values.email)}" title="Mở email" aria-label="Mở email"><span class="ms xs">open_in_new</span></a><button class="ib" data-copy="${esc(r.values.email)}" title="Sao chép" aria-label="Sao chép email"><span class="ms xs">content_copy</span></button></span>` : ''}`; }
     if (T === 'company') sub = `${r.values.domain ? `<span class="kv"><a href="https://${esc(r.values.domain)}" target="_blank" rel="noopener">${esc(r.values.domain)}</a><a class="ib" href="https://${esc(r.values.domain)}" target="_blank" rel="noopener" aria-label="Mở website"><span class="ms xs">open_in_new</span></a><button class="ib" data-copy="${esc(r.values.domain)}" aria-label="Sao chép domain"><span class="ms xs">content_copy</span></button></span>` : ''}`;
     if (T === 'deal') sub = `${F[HXC.CASH] ? `<span class="kv"><span>Amount:</span><b>${esc(fmt(r.values[HXC.CASH], F[HXC.CASH]) || '—')}</b></span>` : ''}
-        ${F[HXC.CLOSE] ? `<span class="kv"><span>Ngày dự kiến chốt:</span><b>${r.values[HXC.CLOSE] ? HXC.dOnly(r.values[HXC.CLOSE]) : '—'}</b></span>` : ''}
+        ${F[HXC.CLOSE] ? `<span class="kv"><span>Ngày dự kiến chốt:</span><button class="dte" id="closeEd" title="Bấm để đổi ngày chốt"><span class="ms xs">calendar_month</span>${r.values[HXC.CLOSE] ? HXC.dOnly(r.values[HXC.CLOSE]) : '—'}</button></span>` : ''}
         <span class="kv"><span>Pipeline:</span><span class="tag">Deals_Pipeline</span></span>
         ${F[HXC.STAGE] ? `<span class="kv"><span>Giai đoạn:</span><span id="stageEd" style="cursor:pointer" title="Bấm để đổi giai đoạn">${display(r.values[HXC.STAGE], F[HXC.STAGE])}</span></span>` : ''}`;
     $('#idCard').innerHTML = `<div class="top"><a class="back" href="${O.list}"><span class="ms sm">chevron_left</span>${O.plural}</a>
         <button class="btn btn--text sm" data-actmenu="id" aria-haspopup="menu">Thao tác<span class="ms xs">arrow_drop_down</span></button></div>
-      <div class="idt"><span class="ic ${T === 'company' ? 'sq' : ''}">${T === 'deal' ? '<span class="ms">handshake</span>' : esc(HXC.initials(name()))}</span><div style="min-width:0"><h1>${esc(name())}</h1>${T !== 'deal' ? `<button class="ren" data-rename title="Đổi tên" aria-label="Đổi tên"><span class="ms sm">edit</span></button>` : ''}${T === 'deal' && r.values.t_n_deal ? `<div class="nil" style="font-size:13px">${esc(r.values.t_n_deal)}</div>` : ''}</div></div>
+      <div class="idt"><span class="ic ${T === 'company' ? 'sq' : ''}">${T === 'deal' ? '<span class="ms">handshake</span>' : esc(HXC.initials(name()))}</span><div style="min-width:0"><h1>${esc(name())}</h1><button class="ren" data-rename title="Đổi tên" aria-label="Đổi tên"><span class="ms sm">edit</span></button>${T === 'deal' && r.values.t_n_deal ? `<div class="nil" style="font-size:13px">${esc(r.values.t_n_deal)}</div>` : ''}</div></div>
       <div class="sub">${sub}</div>
       <div class="qa">${[['NOTE','edit_note','Ghi chú'],['EMAIL','mail','Email'],['CALL','call','Gọi'],['TASK','task_alt','Task'],['MEETING','event','Họp'],['MORE','more_horiz','Thêm']].map(([k, i, l]) => `<button data-qa="${k}" title="${l}"><span class="o"><span class="ms sm">${i}</span></span>${l}</button>`).join('')}</div>`;
   }
@@ -172,7 +176,9 @@ else {
   /* ── Thông tin chính ── */
   function drawProps() {
     $('#propT').textContent = KEY_T[T];
-    if (T === 'deal') HX.propList($('#props'), r, 'page');
+    if (T === 'deal') { HX.propList($('#props'), r, 'page', DEAL_KEYS.filter(k => F[k]));
+      const lc = HXC.lastContacted(T, ID);
+      $('#props').querySelector('[data-k="sale_ph_tr_ch"]')?.insertAdjacentHTML('afterend', `<div class="prop ro" title="Tự tính từ cuộc gọi / cuộc họp gần nhất"><label>Liên hệ gần nhất</label><div class="v">${lc ? HXC.dt(lc) : '<span class="nil">--</span>'}</div></div>`); }
     else {
       HXC.props($('#props'), T, r, KEYS[T], () => refreshAll());
       { const lc = HXC.lastContacted(T, ID);
@@ -185,7 +191,7 @@ else {
   function drawRight() {
     const cards = T === 'contact' ? ['company','deal'] : T === 'company' ? ['contact','deal'] : ['contact','company','lineitems'];
     $('#right').innerHTML = cards.map(c => `<section class="card" id="rc-${c}"></section>`).join('')
-      + (T !== 'deal' ? `<section class="card"><div class="ch"><span class="ms sm">expand_more</span>Tệp đính kèm<span class="r"><button class="btn btn--text sm" data-toast="Tải tệp lên (sắp ra mắt — dùng trường Tệp của ERP)"><span class="ms xs">add</span>Thêm</button></span></div><div class="ac-empty" style="padding:0 14px 16px"><span class="ms">attach_file</span>Xem các tệp đính kèm vào hoạt động hoặc tải lên bản ghi này.</div></section>` : '');
+      + (true ? `<section class="card"><div class="ch"><span class="ms sm">expand_more</span>Tệp đính kèm<span class="r"><button class="btn btn--text sm" data-toast="Tải tệp lên (sắp ra mắt — dùng trường Tệp của ERP)"><span class="ms xs">add</span>Thêm</button></span></div><div class="ac-empty" style="padding:0 14px 16px"><span class="ms">attach_file</span>Xem các tệp đính kèm vào hoạt động hoặc tải lên bản ghi này.</div></section>` : '');
     cards.forEach(c => c === 'lineitems' ? HXC.lineItemsCard($('#rc-lineitems'), ID, refreshAll) : HXC.assocCard($('#rc-' + c), T, ID, c, refreshAll));
   }
 
@@ -286,6 +292,7 @@ else {
   function renamePop(anchor) {
     const p = openFp(anchor, T === 'contact'
       ? `<div class="pop-form"><label>Họ<input id="rnL" value="${esc(r.values.lastname || '')}"></label><label>Tên<input id="rnF" value="${esc(r.values.firstname || '')}"></label><div class="row"><button class="btn btn--secondary sm" data-rnx>Huỷ</button><button class="btn btn--primary sm" data-rnok>Lưu</button></div></div>`
+      : T === 'deal' ? `<div class="pop-form"><label>Tên Deal<input id="rnD" value="${esc(r.values.t_n_deal || '')}"></label><div class="nil" style="font-size:11.5px;font-weight:400">Mã Deal (${esc(name())}) là khoá chính của ERP, không đổi được.</div><div class="row"><button class="btn btn--secondary sm" data-rnx>Huỷ</button><button class="btn btn--primary sm" data-rnok>Lưu</button></div></div>`
       : `<div class="pop-form"><label>Tên công ty<input id="rnN" value="${esc(r.values.name || '')}"></label><div class="row"><button class="btn btn--secondary sm" data-rnx>Huỷ</button><button class="btn btn--primary sm" data-rnok>Lưu</button></div></div>`, 280);
     p.querySelector('input').focus();
   }
@@ -304,7 +311,7 @@ else {
     const tab = e.target.closest('.tab'); if (tab) { goTab(tab.dataset.pane); return; }
     const rn = e.target.closest('[data-rename]'); if (rn) { e.stopPropagation(); renamePop(rn); fp.dataset.src = 'rename'; return; }
     if (e.target.closest('[data-rnx]')) { closeFp(); return; }
-    if (e.target.closest('[data-rnok]')) { if (T === 'contact') { HXC.update(T, ID, 'lastname', $('#rnL').value.trim()); HXC.update(T, ID, 'firstname', $('#rnF').value.trim()); } else HXC.update(T, ID, 'name', $('#rnN').value.trim() || r.values.name);
+    if (e.target.closest('[data-rnok]')) { if (T === 'contact') { HXC.update(T, ID, 'lastname', $('#rnL').value.trim()); HXC.update(T, ID, 'firstname', $('#rnF').value.trim()); } else if (T === 'deal') HX.api.update(ID, 't_n_deal', $('#rnD').value.trim()); else HXC.update(T, ID, 'name', $('#rnN').value.trim() || r.values.name);
       closeFp(); toast('Đã đổi tên'); refreshAll(); return; }
     const cp = e.target.closest('[data-copy]'); if (cp) { navigator.clipboard?.writeText(cp.dataset.copy).catch(() => {}); toast('Đã sao chép'); return; }
     if (e.target.closest('[data-allprops]')) { closeFp(); allProps(); return; }
@@ -322,6 +329,8 @@ else {
     if (e.target.closest('[data-del]')) { closeFp();
       confirmBox(`Xoá ${O.label.toLowerCase()}`, `Xoá “${esc(name())}”? Liên kết với bản ghi khác sẽ bị gỡ. Không thể hoàn tác.`, 'Xoá', () => {
         if (T === 'deal') HX.api.remove([ID]); else HXC.remove(T, [ID]); location.href = O.list; }); return; }
+    const ce = e.target.closest('#closeEd'); if (ce && !ce.querySelector('.ed')) { const f = F[HXC.CLOSE];
+      ce.replaceChildren(HX.editor(f, r.values[HXC.CLOSE], nv => { if (nv !== r.values[HXC.CLOSE]) { HX.api.update(ID, HXC.CLOSE, nv); toast('Đã đổi ngày dự kiến chốt'); } refreshAll(); }, drawId, 'page')); return; }
     const se = e.target.closest('#stageEd'); if (se && !se.querySelector('.selcell')) { const f = F[HXC.STAGE];
       se.replaceChildren(HX.editor(f, r.values[HXC.STAGE], nv => { if (nv && nv !== r.values[HXC.STAGE]) { HX.api.update(ID, HXC.STAGE, nv); toast(`Đã chuyển sang “${nv}”`); } refreshAll(); }, drawId, 'page')); return; }
     if (!e.target.closest('#fpop')) closeFp();

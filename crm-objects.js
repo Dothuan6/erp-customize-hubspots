@@ -231,21 +231,21 @@ const HXC = (() => {
   }
 
   /* ── Activities ── */
-  function logEvent(t, id, text, extra = []) {
+  function logEvent(t, id, text, extra = [], title) {
     const refs = { contacts:[], companies:[], deals:[] }; const add = (tt, ii) => refs[tt === 'contact' ? 'contacts' : tt === 'company' ? 'companies' : 'deals'].push(ii);
     add(t, id); extra.forEach(([tt, ii]) => add(tt, ii));
-    db.events.unshift({ id:'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), type:'SYSTEM', at:new Date().toISOString(), by: ME, body:text, ...refs }); persist();
+    db.events.unshift({ id:'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), type:'SYSTEM', at:new Date().toISOString(), by: ME, body:text, ...(title ? { title } : {}), ...refs }); persist();
   }
   // Ghi lại mọi lần đổi giai đoạn Deal (từ board, bảng, panel, trang chi tiết)
   const origUpdate = deals.update.bind(deals);
   deals.update = (id, key, value) => { const r = deals.get(id), old = r ? r.values[key] : undefined; origUpdate(id, key, value);
-    if (key === STAGE && old !== value) logEvent('deal', id, `Deal stage: ${old || '—'} → ${value || '—'}`, [...link(id).contacts.map(c => ['contact', c.id]), ...(link(id).company ? [['company', link(id).company]] : [])]); };
+    if (key === STAGE && old !== value) logEvent('deal', id, old ? `${ME} đã chuyển ${HX.title(r)} từ “${old}” sang “${value || '—'}”.` : `${ME} đã chuyển ${HX.title(r)} sang “${value}”.`, [...link(id).contacts.map(c => ['contact', c.id]), ...(link(id).company ? [['company', link(id).company]] : [])], 'Hoạt động Deal'); };
   const refKey = t => t === 'contact' ? 'contacts' : t === 'company' ? 'companies' : 'deals';
   function activitiesOf(t, id) {
     const k = refKey(t);
     const own = [...db.activities, ...db.events].filter(a => (a[k] || []).includes(id));
     const r = get(t, id);
-    const created = r ? [{ id:'created-' + id, type:'SYSTEM', at: r.createdAt, by: t === 'deal' ? (r.values[SALE] || ME) : r.values.owner || ME, body:`${OBJ[t].label} được tạo từ CRM` }] : [];
+    const created = r ? [{ id:'created-' + id, type:'SYSTEM', at: r.createdAt, by: t === 'deal' ? (r.values[SALE] || ME) : r.values.owner || ME, body:`${OBJ[t].label} này được tạo bởi ${t === 'deal' ? (r.values[SALE] || ME) : r.values.owner || ME}`, title:'Đã tạo' }] : [];
     return [...own, ...created].sort((a, b) => b.at.localeCompare(a.at));
   }
   // Liên kết tự động khi tạo hoạt động (như HubSpot): Contact → + Company + Deal đang mở; Deal → + Contacts + Company
@@ -420,7 +420,7 @@ const HXC = (() => {
     const card = a => {
       const who = a.type === 'SYSTEM' ? '' : ` bởi <b>${esc(a.by)}</b>`;
       const head = a.type === 'TASK' ? `<button class="tk ${a.done ? 'on' : ''}" data-done="${a.id}" aria-label="${a.done ? 'Đánh dấu chưa xong' : 'Đánh dấu hoàn thành'}"><span class="ms sm">${a.done ? 'check_circle' : 'radio_button_unchecked'}</span></button><b class="${a.done ? 'strike' : ''}">${esc(a.title || a.body)}</b>`
-        : a.type === 'MEETING' ? `<b>${esc(a.title || 'Cuộc họp')}</b>` : `<b>${TNAME[a.type]}</b><span class="nil">${who}</span>`;
+        : a.type === 'MEETING' ? `<b>${esc(a.title || 'Cuộc họp')}</b>` : a.type === 'SYSTEM' && a.title ? `<b>${esc(a.title)}</b>${a.title === 'Hoạt động Deal' ? '<span class="ms xs" style="color:var(--on-surface-variant)">handshake</span>' : ''}` : `<b>${TNAME[a.type]}</b><span class="nil">${who}</span>`;
       const meta = a.type === 'TASK' ? `<div class="tm">Hạn: <b>${a.due ? dOnly(a.due) : '—'}</b> · Ưu tiên: ${esc(a.prio || 'Không')} · Người làm: ${esc(a.assignee || a.by)}${!a.done && a.due && a.due < TODAY.toISOString().slice(0, 10) ? ' · <span class="od">Quá hạn</span>' : ''}</div>`
         : a.type === 'MEETING' ? `<div class="tm">${dt(a.at)} · ${a.dur || 30} phút · Kết quả: <b>${esc(a.outcome || '—')}</b>${(a.attendees || []).length ? ' · Tham dự: ' + a.attendees.map(i => get('contact', i)).filter(Boolean).map(fullName).map(esc).join(', ') : ''}</div>`
         : a.type === 'CALL' ? `<div class="tm">${esc(a.dir || 'Gọi đi')} · Kết quả: <b>${esc(a.outcome || '—')}</b></div>` : '';

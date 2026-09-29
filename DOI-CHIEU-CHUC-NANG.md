@@ -193,3 +193,20 @@ Khảo sát lại trang Contacts của HubSpot (portal 247428660) rồi chỉnh 
 | Tab Catch-up | 2 mục xếp dọc, thu gọn được: **Overview** (Company insights + Recent interactions) và **Health** (Sentiment, Challenges, Positive feedback) | Đã đổi cả Contact & Company sang 2 mục xếp dọc (trước là nút chuyển) | AI |
 | Card Contacts | Tên, công ty, Email ⧉, Phone, nhãn "Contact with Primary Company", View all | Như HubSpot | Không |
 | Card khác | Deals, Tickets, Payments, Attachments | Deals, Tệp đính kèm (Tickets/Payments ngoài phạm vi) | — |
+
+## 13. Phần 3 — Deals: chỉnh sát HubSpot (29/09/2026)
+
+| Khu vực | HubSpot | Prototype sau chỉnh | Cần BE ERP? |
+|---|---|---|---|
+| Header | "Deals ⌄", ⋮, "Add deals ▾" | "Thêm deals ▾" (Tạo mới / Import) thay 2 nút riêng | Không |
+| Thanh công cụ | Search · Filter · Sort by · Pipeline ⌄ · Board/Table · ⚙ · ⌃ | Thêm nút Bộ lọc và nút **Deals_Pipeline ⌄** (ERP hiện chỉ có 1 pipeline) | Nhiều pipeline: cần trường Pipeline |
+| Bộ lọc nhanh | Deal owner, Create date, Last activity date, Close date, ⊕, ✎, Advanced filters | Như HubSpot (Sale phụ trách, Ngày tạo, Ngày hoạt động gần nhất, Ngày dự kiến chốt). Bộ lọc điều kiện ERP cũ giữ nguyên, chuyển vào "Bộ lọc nâng cao" | Ngày hoạt động gần nhất: trường tính |
+| Cột mặc định | Deal name, Stage, Amount, Close date, Next activity, Owner | Mã Deal, Tên Deal, Giai đoạn, Tổng Cash-In (Amount), Ngày dự kiến chốt, Sale phụ trách, **Hoạt động tiếp theo**, Ngày tạo. Các trường khác thêm lại bằng "+" | Thứ tự cột = thứ tự trường ERP |
+| Hoạt động tiếp theo | Task/cuộc họp gần nhất, hoặc "Schedule ▾" (Schedule a meeting / Create a task) | Như HubSpot; mở cửa sổ soạn task/cuộc họp ngay trên danh sách | Trường tính |
+| Mở rộng dòng | Chevron → chọn đối tượng liên kết → bảng lồng | Contacts (kèm nhãn liên kết) / Companies | Back-reference |
+| Board | Thẻ: tên, ngày tạo, ngày chốt, amount, owner; chân thẻ: Note · Task · "No upcoming"; chân cột: Total / Weighted amount | Như HubSpot (+ tên deal, công ty liên kết). Bỏ nhãn % trên thẻ, % vẫn có ở chân cột | Không |
+| Footer | Đếm · làm mới · Export · reset · clone | Đủ | Không |
+| Record — định danh | Tên ✎, Amount, Close date 📅 (sửa tại chỗ), Pipeline, Deal stage (bấm để đổi) | Như HubSpot; ✎ đổi **Tên Deal** (Mã Deal là khoá chính ERP, không đổi) | Không |
+| About this deal | Owner, Last contacted, Deal type, Priority, Closed lost reason | Sale phụ trách, Liên hệ gần nhất, Gói dịch vụ, Thời hạn thanh toán, Tỷ lệ thành công, Lý do thất bại (ánh xạ sang trường ERP) | Không |
+| Timeline | "Deal Activity — X moved Deal từ A sang B", "Created — This deal was created by X" | "Hoạt động Deal — X đã chuyển DEAL-… từ A sang B", "Đã tạo — Deal này được tạo bởi X"; hiện cả trên Contact/Company liên kết | Audit log |
+| Card phải | Contacts, Companies, Tickets, Payments, Attachments | Contacts, Companies, **Line items** (yêu cầu dự án), Tệp đính kèm | — |

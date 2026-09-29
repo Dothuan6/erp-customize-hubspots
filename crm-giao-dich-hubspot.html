@@ -48,7 +48,41 @@
 .segtxt button{height:28px;padding:0 10px;font-size:12px;font-weight:600;color:var(--on-surface-variant)}
 .segtxt button[aria-pressed="true"]{background:var(--primary-container);color:var(--on-primary-container)}
 
-.fbar{display:flex;align-items:center;gap:6px;padding:8px 16px 10px;flex-wrap:wrap}
+.fbar{display:flex;align-items:center;gap:2px;padding:8px 12px 10px;flex-wrap:wrap}
+#filterBtn[aria-pressed="true"]{background:var(--surface-2)}
+.qf{display:inline-flex;align-items:center;gap:2px;height:28px;padding:0 6px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:600;color:var(--on-surface);white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis}
+.qf:hover{background:var(--surface-2)} .qf.on{background:var(--primary-container);color:var(--on-primary-container)}
+.qsep{width:1px;height:18px;background:var(--outline-variant);margin:0 6px}
+.qa{width:28px;height:28px}
+.qp{display:flex;flex-direction:column;gap:6px}
+.qp .srch2{height:32px;flex:none}
+.qp-op{display:inline-flex;align-items:center;gap:2px;align-self:flex-start;font-size:12.5px;font-weight:600;padding:2px 6px;border-radius:var(--radius-sm);background:var(--surface-2)}
+.qp-l{max-height:280px;overflow-y:auto;display:flex;flex-direction:column}
+.qp-d{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 10px;border-radius:var(--radius-sm);text-align:left}
+.qp-d:hover{background:var(--surface-2)} .qp-d.cur{background:var(--primary-container);color:var(--on-primary-container)}
+.qp-d b{font-weight:600;font-size:13px} .qp-d small{font-size:11.5px;color:var(--on-surface-variant)}
+.qp-f{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--outline-variant);padding-top:6px}
+#fPop{max-height:min(460px,70vh);overflow-y:auto}
+#fPop .mi input{accent-color:var(--primary)}
+.xbtn{width:22px;height:22px;border-radius:var(--radius-sm);display:grid;place-items:center;flex:none;color:var(--on-surface-variant);margin-left:-6px}
+.xbtn:hover{background:var(--surface-variant);color:var(--on-surface)}
+.xbtn .ms{transition:transform .15s} .xbtn.on .ms{transform:rotate(90deg)}
+.xrow>td{background:var(--surface-2)!important;height:auto!important;padding:8px 12px 12px 56px!important;white-space:normal;max-width:none!important;cursor:default}
+.xin{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:8px 10px;max-width:900px}
+.xh{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.xh .btn{margin-left:auto}
+table.xt{border-collapse:collapse;width:100%;table-layout:auto}
+.xt th,.xt td{height:34px;padding:0 10px;border-bottom:1px solid var(--outline-variant);font-size:13px;text-align:left;white-space:nowrap;position:static}
+.xt th{font-weight:500;color:var(--on-surface-variant);font-size:12px;background:none}
+.xt tr:last-child td{border-bottom:none}
+.na{display:inline-flex;align-items:center;gap:4px;font-weight:600;font-size:13px;border-radius:var(--radius-sm);padding:2px 4px}
+.na:hover{background:var(--surface-variant)}
+.na.has{font-weight:500}
+.na .ms{font-size:16px;color:var(--on-surface-variant)}
+.kc .nx{margin-left:auto;display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;border:1px solid #F5C26B;background:#FEF6E7;color:#7A4A00;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.kc .nx.has{border-color:var(--outline-variant);background:var(--surface-2);color:var(--on-surface)}
+html[data-theme="dark"] .kc .nx{background:#3D2E12;color:#F5C26B;border-color:#7A5A1F}
+.kc .sub2{font-size:12px;color:var(--on-surface-variant);margin-top:-3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 body.fcollapsed .fbar{display:none}
 .fbar .lb{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--on-surface-variant)}
 .fchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 4px 0 10px;border-radius:var(--radius-pill);background:var(--primary-container);color:var(--on-primary-container);font-size:12px}
@@ -146,7 +180,7 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
       <span class="count" id="count"></span>
       <div class="ph-act">
         <button class="btn btn--secondary btn--icon" id="moreBtn" aria-label="Thêm thao tác" aria-haspopup="menu"><span class="ms sm">more_vert</span></button>
-        <div class="pop" id="morePop" role="menu" style="top:38px;right:0">
+        <div class="pop" id="morePop" role="menu" style="top:38px;right:130px">
           <button class="mi" role="menuitem" data-toast="Deals_Pipeline đã được ghim vào sidebar với tên “Deals”"><span class="ms sm">push_pin</span>Ghim vào sidebar</button>
           <button class="mi" role="menuitem" data-toast="Chọn nhóm để ghim"><span class="ms sm">folder</span>Ghim vào nhóm…</button>
           <div class="sep"></div>
@@ -154,8 +188,8 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
           <a class="mi" role="menuitem" href="crm-quan-ly-truong-hubspot.html"><span class="ms sm">tune</span>Quản lý trường dữ liệu</a>
           <button class="mi" role="menuitem" id="gsBtn"><span class="ms sm">sync</span>Kết nối Google Sheet</button>
         </div>
-        <button class="btn btn--secondary hide-sm" id="impBtn">Import</button>
-        <button class="btn btn--primary" id="newBtn">Tạo mới</button>
+        <button class="btn btn--primary" id="addBtn" aria-haspopup="menu">Thêm deals<span class="ms xs">arrow_drop_down</span></button>
+        <div class="pop" id="addPop" role="menu" style="top:38px;right:0"><button class="mi" id="newBtn"><span class="ms sm">add</span>Tạo mới</button><button class="mi" id="impBtn"><span class="ms sm">upload_file</span>Import</button></div>
       </div>
     </div>
 
@@ -163,11 +197,13 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
 
     <div class="tools">
       <label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm kiếm ( / )"></label>
+      <button class="btn btn--secondary" id="filterBtn" aria-pressed="true"><span class="ms sm">filter_list</span>Bộ lọc</button>
       <div style="position:relative">
         <button class="btn btn--secondary" id="sortBtn"><span class="ms sm">swap_vert</span>Sắp xếp</button>
         <div class="pop" id="sortPop" style="top:38px;left:0"></div>
       </div>
       <div class="tools-r">
+        <button class="btn btn--secondary sm" id="pipeBtn" data-toast="ERP hiện có 1 pipeline (Deals_Pipeline). Nhiều pipeline cần thêm trường Pipeline ở BE">Deals_Pipeline<span class="ms xs">expand_more</span></button>
         <span id="grpBox"></span>
         <div class="seg" role="group" aria-label="Kiểu hiển thị">
           <button data-mode="KANBAN" title="Board" aria-label="Board"><span class="ms sm">view_kanban</span></button>
@@ -192,6 +228,8 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
         <button class="btn btn--secondary btn--icon" id="refresh" title="Làm mới" aria-label="Làm mới"><span class="ms sm">refresh</span></button>
         <select class="fmt" id="fmt" aria-label="Định dạng xuất"><option>.xlsx</option><option>.csv</option></select>
         <button class="btn btn--secondary" id="exportBtn"><span class="ms sm">ios_share</span>Export</button>
+        <button class="btn btn--secondary btn--icon" id="resetBtn" title="Khôi phục view" aria-label="Khôi phục view"><span class="ms sm">undo</span></button>
+        <button class="btn btn--secondary btn--icon" id="cloneBtn" title="Nhân bản view" aria-label="Nhân bản view"><span class="ms sm">content_copy</span></button>
       </div>
     </div>
   </div></main>
@@ -228,18 +266,41 @@ const PAGE = 50, STAGE = 'giai_o_n_pipeline', CASH = 't_ng_cash_in_d_ki_n', RATE
 /* View: "Tất cả Deals" (tương ứng Bảng/Kanban sẵn có của ERP) + view đã lưu.
    Mỗi view nhớ kiểu hiển thị riêng; mặc định mở ở Board theo Giai Đoạn Pipeline. */
 const st = { view:'all', q:'', filters:[], sort:{key:'__createdAt',dir:'desc'}, sel:new Set(), page:1,
-  mode:{ all:'KANBAN' }, groupBy:{}, widths:{} };
+  mode:{ all:'KANBAN' }, groupBy:{}, widths:{}, qf:{}, quick:null, exp:{} };
 try { Object.assign(st.widths, JSON.parse(localStorage.getItem('smartdb-col-widths:' + HX.COLLECTION.id) || '{}')); } catch {}
 /* Cột ẩn — nhớ theo từng view (Chọn cột hiển thị) */
 const HKEY = 'hx-crm-hidden-v1';
 let HIDDEN = {}; try { HIDDEN = JSON.parse(localStorage.getItem(HKEY) || '{}'); } catch {}
 Object.defineProperty(st, 'hidden', { get: () => HIDDEN[st.view] || [], set: v => { HIDDEN[st.view] = v; try { localStorage.setItem(HKEY, JSON.stringify(HIDDEN)); } catch {} } });
+if (!HIDDEN.all) { HIDDEN.all = FIELDS.filter(f => !f.primary && ![ 't_n_deal', STAGE, CASH, 'ng_y_d_ki_n_ch_t', 'sale_ph_tr_ch' ].includes(f.key)).map(f => f.key); }
 const views = () => [{id:'all', name:'Tất cả Deals', type:'KANBAN', b:1}, ...api.views()];
 const curView = () => views().find(v => v.id === st.view) || views()[0];
 const mode = () => st.mode[st.view] || curView().type;
 const groupKey = () => { const k = st.groupBy[st.view] || STAGE; return F[k] ? k : (FIELDS.find(f => f.type === 'SELECT' || f.type === 'STATUS') || {}).key; };
 
-const valOf = (r, key) => key === '__createdAt' ? r.createdAt : r.values[key];
+/* Hoạt động gần nhất / tiếp theo (tính từ Activities liên kết với Deal) */
+const NOWI = () => HXC.TODAY.toISOString();
+const lastAct = r => { const a = HXC.activitiesOf('deal', r.id).find(x => x.type !== 'SYSTEM' && x.at <= NOWI()); return a ? a.at : null; };
+const nextAct = r => HXC.activitiesOf('deal', r.id).filter(a => (a.type === 'TASK' && !a.done) || (a.type === 'MEETING' && a.at > NOWI()))
+  .map(a => ({ a, when: a.type === 'TASK' ? (a.due || a.at) : a.at })).sort((x, y) => String(x.when).localeCompare(String(y.when)))[0] || null;
+const LASTACT = {key:'__lastact', name:'Ngày hoạt động gần nhất', type:'__created'};
+const valOf = (r, key) => key === '__createdAt' ? r.createdAt : key === '__lastact' ? lastAct(r) : r.values[key];
+
+/* ── Bộ lọc nhanh (HubSpot: Deal owner · Create date · Last activity date · Close date · ⊕ · ✎ · Advanced filters) ── */
+const CLOSE = 'ng_y_d_ki_n_ch_t', OWNER = 'sale_ph_tr_ch';
+const QUICK0 = [OWNER, '__createdAt', '__lastact', CLOSE].filter(k => k.startsWith('__') || F[k]);
+const QMORE = [STAGE, 'g_i_d_ch_v_m_c_ti_u', 'th_i_h_n_thanh_to_n', 'l_do_th_t_b_i'].filter(k => F[k]);
+const qField = k => k === '__createdAt' ? CREATED : k === '__lastact' ? LASTACT : F[k];
+const qIsDate = k => k === '__createdAt' || k === '__lastact' || (F[k] && isDate(F[k]));
+const DATE_P = [['today','Hôm nay','Cả ngày hôm nay'],['yesterday','Hôm qua','Cả ngày hôm qua'],['tomorrow','Ngày mai','Cả ngày mai'],['week','Tuần này','Thứ Hai – Chủ nhật tuần này'],['lastweek','Tuần trước','Thứ Hai – Chủ nhật tuần trước'],['nextweek','Tuần sau','Thứ Hai – Chủ nhật tuần sau'],
+  ['month','Tháng này','Cả tháng này'],['lastmonth','Tháng trước','Cả tháng trước'],['nextmonth','Tháng sau','Cả tháng sau'],['quarter','Quý này','Cả quý này'],['d7','7 ngày qua','7 ngày gần nhất'],['d30','30 ngày qua','30 ngày gần nhất'],['n30','30 ngày tới','30 ngày tiếp theo'],['year','Năm nay','Cả năm nay']];
+function dRange(p){ const T0 = HXC.TODAY, d0 = new Date(T0.getFullYear(), T0.getMonth(), T0.getDate()), day = 864e5, wd = (d0.getDay() + 6) % 7, y = d0.getFullYear(), m = d0.getMonth(), q = Math.floor(m / 3) * 3;
+  return ({ today:[+d0, +d0 + day], yesterday:[+d0 - day, +d0], tomorrow:[+d0 + day, +d0 + 2 * day], week:[+d0 - wd * day, +d0 + (7 - wd) * day], lastweek:[+d0 - (wd + 7) * day, +d0 - wd * day], nextweek:[+d0 + (7 - wd) * day, +d0 + (14 - wd) * day],
+    month:[+new Date(y, m, 1), +new Date(y, m + 1, 1)], lastmonth:[+new Date(y, m - 1, 1), +new Date(y, m, 1)], nextmonth:[+new Date(y, m + 1, 1), +new Date(y, m + 2, 1)], quarter:[+new Date(y, q, 1), +new Date(y, q + 3, 1)],
+    d7:[+d0 - 6 * day, +d0 + day], d30:[+d0 - 29 * day, +d0 + day], n30:[+d0, +d0 + 30 * day], year:[+new Date(y, 0, 1), +new Date(y + 1, 0, 1)] })[p]; }
+function passQ(r){ return Object.entries(st.qf).every(([k, v]) => { if (!v || (Array.isArray(v) && !v.length)) return true; const x = valOf(r, k);
+  if (qIsDate(k)) { if (empty(x)) return false; const R = dRange(v), t = +new Date(String(x).length === 10 ? x + 'T00:00:00+07:00' : x); return t >= R[0] && t < R[1]; }
+  return v.some(o => o === '__none' ? empty(x) : String(x) === o); }); }
 function pass(r, fl){
   const f = fieldOf(fl.key), v = valOf(r, fl.key);
   if (isDate(f)) { if (empty(v)) return fl.op === 'neq'; const a = String(v).slice(0,10), b = String(fl.value).slice(0,10);
@@ -254,7 +315,7 @@ function pass(r, fl){
   } return true;
 }
 function rows(){
-  let list = api.list().filter(r => st.filters.every(fl => pass(r, fl)));
+  let list = api.list().filter(r => st.filters.every(fl => pass(r, fl)) && passQ(r));
   if (st.q) { const q = st.q.toLowerCase(); list = list.filter(r => FIELDS.some(f => String(fmt(r.values[f.key], f)).toLowerCase().includes(q))); }
   const s = st.sort || {key:'__createdAt', dir:'desc'}, d = s.dir === 'asc' ? 1 : -1;
   return [...list].sort((a, b) => { const x = valOf(a, s.key), y = valOf(b, s.key);
@@ -322,7 +383,7 @@ $('#setPop').addEventListener('click', e => {
     confirmBox('Xóa view', `Xóa view “${esc(v.name)}”? Bản ghi không bị ảnh hưởng.`, 'Xóa view', () => { api.saveViews(api.views().filter(x => x.id !== v.id)); st.view = 'all'; renderAll(); toast('Đã xóa view'); }); }
 });
 document.querySelector('.seg').onclick = e => { const b = e.target.closest('[data-mode]'); if (b) { st.mode[st.view] = b.dataset.mode; renderAll(); } };
-$('#colBtn2').onclick = () => { document.body.classList.toggle('fcollapsed'); $('#colIc').textContent = document.body.classList.contains('fcollapsed') ? 'expand_more' : 'expand_less'; };
+$('#colBtn2').onclick = () => { document.body.classList.toggle('fcollapsed'); $('#colIc').textContent = document.body.classList.contains('fcollapsed') ? 'expand_more' : 'expand_less'; renderFilters(); };
 
 /* ── Sắp xếp ── */
 $('#sortBtn').onclick = e => { e.stopPropagation(); const pop = $('#sortPop'); if (pop.classList.contains('open')) { pop.classList.remove('open'); return; } closePops(pop);
@@ -338,15 +399,45 @@ $('#sortPop').addEventListener('click', e => e.stopPropagation());
 
 /* ── Thanh bộ lọc ── */
 function renderFilters(){
+  const quick = st.quick || QUICK0;
+  const on = k => st.qf[k] && (!Array.isArray(st.qf[k]) || st.qf[k].length);
+  const lbl = k => { const f = qField(k), v = st.qf[k]; if (!on(k)) return esc(f.name);
+    if (qIsDate(k)) return `${esc(f.name)}: <b>${DATE_P.find(p => p[0] === v)[1]}</b>`;
+    return `${esc(f.name)}: <b>${esc(v.map(o => o === '__none' ? 'Chưa có' : o === HXC.ME ? 'Tôi' : o).join(', '))}</b>`; };
   const txt = fl => { const f = fieldOf(fl.key), op = opsOf(f).find(o => o[0] === fl.op)[1];
     const vv = ['is_empty','is_not_empty'].includes(fl.op) ? '' : ` “${esc(f.type === 'RELATION' ? fmt(fl.value, f) : isDate(f) ? new Date(fl.value).toLocaleDateString('vi-VN') : fl.value)}”`;
     return `<b>${esc(f.name)}</b> ${op}${vv}`; };
-  $('#fbar').innerHTML = `<span class="lb"><span class="ms sm">filter_list</span>Bộ lọc</span>`
+  const any = quick.some(on) || st.filters.length;
+  $('#fbar').innerHTML = quick.map(k => `<button class="qf ${on(k) ? 'on' : ''}" data-qf="${k}">${lbl(k)}<span class="ms xs">arrow_drop_down</span></button>`).join('')
+    + `<span class="qsep"></span><button class="btn btn--text btn--icon qa" data-qadd title="Thêm bộ lọc nhanh" aria-label="Thêm bộ lọc nhanh"><span class="ms sm">add_circle</span></button>`
+    + `<button class="btn btn--text btn--icon qa" data-qedit title="Chỉnh bộ lọc nhanh" aria-label="Chỉnh bộ lọc nhanh"><span class="ms sm">edit</span></button>`
+    + `<button class="qf" id="fAdd" data-adv><span class="ms xs">filter_list</span>Bộ lọc nâng cao${st.filters.length ? ` (${st.filters.length})` : ''}</button>`
     + st.filters.map((fl, i) => `<span class="fchip">${txt(fl)}<button data-frm="${i}" aria-label="Xóa bộ lọc"><span class="ms xs">close</span></button></span>`).join('')
-    + `<button class="fadd" id="fAdd"><span class="ms xs">add</span>Thêm bộ lọc</button>` + (st.filters.length ? `<button class="fclear" id="fClear">Xoá tất cả</button>` : '');
+    + (any ? `<button class="fclear" id="fClear">Xoá tất cả</button>` : '');
+  $('#filterBtn').setAttribute('aria-pressed', !document.body.classList.contains('fcollapsed'));
+}
+function quickPop(btn, k){
+  const pop = $('#fPop'); closePops(pop); const f = qField(k);
+  if (qIsDate(k)) { place(pop, btn, 260); pop.style.width = '260px';
+    pop.innerHTML = `<div class="qp"><div class="qp-op">là<span class="ms xs">arrow_drop_down</span></div><label class="srch2"><input id="qpQ" placeholder="Tìm"><span class="ms sm">search</span></label><div class="qp-l" id="qpL"></div>${st.qf[k] ? '<button class="fclear" data-qpclr style="margin:6px 8px">Bỏ bộ lọc này</button>' : ''}</div>`;
+    const drawL = q => { $('#qpL', pop).innerHTML = DATE_P.filter(d => !q || d[1].toLowerCase().includes(q)).map(([v, l, d]) => `<button class="qp-d ${st.qf[k] === v ? 'cur' : ''}" data-qpd="${v}"><b>${l}</b><small>${d}</small></button>`).join(''); };
+    drawL(''); $('#qpQ', pop).oninput = e => drawL(e.target.value.trim().toLowerCase());
+    pop.onclick = e => { e.stopPropagation(); const d = e.target.closest('[data-qpd]'); if (d) { st.qf[k] = d.dataset.qpd; st.page = 1; pop.classList.remove('open'); renderAll(); }
+      if (e.target.closest('[data-qpclr]')) { delete st.qf[k]; pop.classList.remove('open'); renderAll(); } };
+    pop.classList.add('open'); $('#qpQ', pop).focus(); return; }
+  const cur = new Set(st.qf[k] || []);
+  const opts = k === OWNER ? [['__none','Chưa có người phụ trách'], [HXC.ME, 'Tôi (' + HXC.ME + ')'], ...HX.USERS.filter(u => u !== HXC.ME).map(u => [u, u])] : [['__none','Không có giá trị'], ...valChoices(f).map(o => [o, o])];
+  place(pop, btn, 280); pop.style.width = '280px';
+  pop.innerHTML = `<div class="qp"><label class="srch2"><input id="qpQ" placeholder="Tìm"><span class="ms sm">search</span></label><div class="qp-l" id="qpL"></div><div class="qp-f"><button class="fclear" data-qpclr>Bỏ chọn</button><button class="btn btn--primary sm" data-qpok>Áp dụng</button></div></div>`;
+  const drawL = q => { $('#qpL', pop).innerHTML = opts.filter(o => !q || o[1].toLowerCase().includes(q)).map(([v, l]) => `<label class="mi"><input type="checkbox" value="${esc(v)}" ${cur.has(v) ? 'checked' : ''}>${esc(l)}</label>`).join(''); };
+  drawL(''); $('#qpQ', pop).oninput = e => drawL(e.target.value.trim().toLowerCase());
+  pop.onchange = e => { if (e.target.type === 'checkbox') e.target.checked ? cur.add(e.target.value) : cur.delete(e.target.value); };
+  pop.onclick = e => { e.stopPropagation(); if (e.target.closest('[data-qpok]')) { st.qf[k] = [...cur]; st.page = 1; pop.classList.remove('open'); renderAll(); }
+    if (e.target.closest('[data-qpclr]')) { delete st.qf[k]; pop.classList.remove('open'); renderAll(); } };
+  pop.classList.add('open'); $('#qpQ', pop).focus();
 }
 function filterBuilder(anchor, presetKey){
-  const pop = $('#fPop'); closePops(pop); place(pop, anchor, 300);
+  const pop = $('#fPop'); closePops(pop); place(pop, anchor, 300); pop.style.width = '300px'; pop.onclick = null; pop.onchange = null;
   pop.innerHTML = `<div class="fbuilder"><select id="fbF" aria-label="Trường">${[CREATED, ...FIELDS].map(f => `<option value="${f.key}" ${f.key === presetKey ? 'selected' : ''}>${esc(f.name)}</option>`).join('')}</select>
     <select id="fbO" aria-label="Điều kiện"></select><span id="fbV"></span>
     <div class="row"><button class="btn btn--secondary sm" id="fbX">Huỷ</button><button class="btn btn--primary sm" id="fbOk">Áp dụng</button></div></div>`;
@@ -367,30 +458,62 @@ function filterBuilder(anchor, presetKey){
 }
 $('#fbar').onclick = e => {
   const rm = e.target.closest('[data-frm]'); if (rm) { st.filters.splice(+rm.dataset.frm, 1); renderAll(); return; }
+  const q = e.target.closest('[data-qf]'); if (q) { e.stopPropagation(); quickPop(q, q.dataset.qf); return; }
+  if (e.target.closest('[data-qadd]')) { e.stopPropagation(); const pop = $('#fPop'); closePops(pop); const quick = st.quick || QUICK0; const more = [...QUICK0, ...QMORE].filter(k => !quick.includes(k));
+    place(pop, e.target.closest('[data-qadd]'), 240); pop.style.width = '240px'; pop.onchange = null;
+    pop.innerHTML = `<div class="hd">Thêm bộ lọc nhanh</div>${more.map(k => `<button class="mi" data-qnew="${k}">${esc(qField(k).name)}</button>`).join('') || '<div class="nil" style="padding:8px">Đã thêm tất cả</div>'}`;
+    pop.onclick = ev => { ev.stopPropagation(); const n = ev.target.closest('[data-qnew]'); if (n) { st.quick = [...quick, n.dataset.qnew]; pop.classList.remove('open'); renderAll(); } }; pop.classList.add('open'); return; }
+  if (e.target.closest('[data-qedit]')) { e.stopPropagation(); const pop = $('#fPop'); closePops(pop); const quick = st.quick || QUICK0;
+    place(pop, e.target.closest('[data-qedit]'), 240); pop.style.width = '240px';
+    pop.innerHTML = `<div class="hd">Bộ lọc nhanh đang hiện</div>${quick.map(k => `<label class="mi"><input type="checkbox" data-qk="${k}" checked>${esc(qField(k).name)}</label>`).join('')}`;
+    pop.onclick = ev => ev.stopPropagation(); pop.onchange = ev => { const k = ev.target.dataset.qk; if (k && !ev.target.checked) { st.quick = (st.quick || QUICK0).filter(x => x !== k); delete st.qf[k]; renderAll(); } }; pop.classList.add('open'); return; }
   if (e.target.closest('#fAdd')) { e.stopPropagation(); filterBuilder(e.target.closest('#fAdd')); return; }
-  if (e.target.closest('#fClear')) { st.filters = []; renderAll(); }
+  if (e.target.closest('#fClear')) { st.filters = []; st.qf = {}; renderAll(); }
 };
+$('#filterBtn').onclick = () => { document.body.classList.toggle('fcollapsed'); $('#colIc').textContent = document.body.classList.contains('fcollapsed') ? 'expand_more' : 'expand_less'; renderFilters(); };
 
 /* ── Bảng ── */
 const DEFW = f => f.primary ? 250 : f.type === 'LONG_TEXT' || f.type === 'MULTI_SELECT' ? 220 : HX.hasChoices(f.type) ? 190 : HX.isNum(f.type) ? 170 : f.type === 'CHECKBOX' ? 120 : 180;
 const W = f => st.widths[f.key] || DEFW(f);
 const visFields = () => FIELDS.filter(f => !st.hidden.includes(f.key));
+const fdate = s => { const d = new Date(s); return `${d.getDate()}/${d.getMonth() + 1}`; };
+function nextLabel(r){ const n = nextAct(r); if (!n) return null; const a = n.a;
+  return a.type === 'TASK' ? { ic:'task_alt', t:`Task · ${a.due ? fdate(a.due) : ''}`, full:`${a.title || a.body} — hạn ${a.due ? HXC.dOnly(a.due) : '—'}` } : { ic:'event', t:`Họp · ${fdate(a.at)}`, full:`${a.title || 'Cuộc họp'} — ${HXC.dt(a.at)}` }; }
+function nextCell(r){ const n = nextLabel(r);
+  return n ? `<a class="na has" href="${DETAIL(r.id)}" title="${esc(n.full)}"><span class="ms">${n.ic}</span>${esc(n.t)}</a>` : `<button class="na" data-sched="${r.id}">Lên lịch<span class="ms">arrow_drop_down</span></button>`; }
+function schedPop(btn, id){ const pop = $('#fPop'); closePops(pop); const br = btn.getBoundingClientRect(), fr = document.querySelector('.frame').getBoundingClientRect();
+  pop.style.width = '220px'; pop.style.left = Math.min(br.left - fr.left, fr.width - 228) + 'px'; pop.style.top = (br.bottom - fr.top + 4) + 'px'; pop.onchange = null;
+  pop.innerHTML = `<button class="mi" data-sc="MEETING"><span class="ms sm">event</span>Lên lịch cuộc họp</button><button class="mi" data-sc="TASK"><span class="ms sm">task_alt</span>Tạo task</button>`;
+  pop.onclick = e => { e.stopPropagation(); const b = e.target.closest('[data-sc]'); if (b) { pop.classList.remove('open'); HXC.composer('deal', id, b.dataset.sc, () => { renderAll(); toast('Đã lưu vào Deal và các bản ghi liên kết'); }); } };
+  pop.classList.add('open'); }
+const XO = [['contact','Contacts'],['company','Companies']];
+function expandRow(r, span){ const t = st.exp[r.id], ol = XO.find(x => x[0] === t)[1], rel = HXC.related('deal', r.id, t);
+  const cols = t === 'company' ? [['Tên công ty', x => `<a class="lnk" style="font-weight:600" href="${HXC.url('company', x.id)}">${esc(x.values.name)}</a>`], ['Domain', x => esc(x.values.domain || '--')], ['Số điện thoại', x => esc(x.values.phone || '--')]]
+    : [['Tên', x => `<a class="lnk" style="font-weight:600" href="${HXC.url('contact', x.id)}">${esc(HXC.fullName(x))}</a>`], ['Email', x => esc(x.values.email || '--')], ['Nhãn liên kết', x => x.label ? `<span class="tag">${esc(x.label)}</span>` : '--']];
+  return `<tr class="xrow"><td colspan="${span}"><div class="xin"><div class="xh"><button class="qf" data-xswitch="${r.id}">${ol} liên kết (${rel.length})<span class="ms xs">arrow_drop_down</span></button><a class="btn btn--text sm" href="${DETAIL(r.id)}">Mở deal<span class="ms xs">open_in_new</span></a></div>
+    ${rel.length ? `<table class="xt"><thead><tr>${cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${rel.map(x => `<tr>${cols.map(c => `<td>${c[1](x)}</td>`).join('')}</tr>`).join('')}</tbody></table>` : `<div class="nil" style="padding:10px 4px">Chưa có ${ol.toLowerCase()} liên kết.</div>`}</div></td></tr>`; }
+function expandPop(btn, id){ const pop = $('#fPop'); closePops(pop); const br = btn.getBoundingClientRect(), fr = document.querySelector('.frame').getBoundingClientRect();
+  pop.style.width = '240px'; pop.style.left = Math.min(br.left - fr.left, fr.width - 248) + 'px'; pop.style.top = (br.bottom - fr.top + 4) + 'px'; pop.onchange = null;
+  pop.innerHTML = `<div class="hd">Hiện đối tượng liên kết</div>${XO.map(([k, l]) => `<button class="mi" data-xo="${k}"><span class="ms sm">${HXC.OBJ[k].icon}</span>${l} (${HXC.related('deal', id, k).length})</button>`).join('')}`;
+  pop.onclick = e => { e.stopPropagation(); const o = e.target.closest('[data-xo]'); if (o) { st.exp[id] = o.dataset.xo; pop.classList.remove('open'); renderTable(); } };
+  pop.classList.add('open'); }
 function renderTable(){
   const all = rows(), pages = Math.max(1, Math.ceil(all.length / PAGE)); st.page = Math.min(Math.max(1, st.page), pages);
   const list = all.slice((st.page - 1) * PAGE, st.page * PAGE), vis = visFields();
   const srt = k => st.sort && st.sort.key === k ? (st.sort.dir === 'asc' ? '▲' : '▼') : '';
-  const total = 44 + vis.reduce((s, f) => s + W(f), 0) + 170 + 52;
-  $('#body').innerHTML = `<div class="tw"><table style="width:${total}px;min-width:100%"><colgroup><col style="width:44px">${vis.map(f => `<col style="width:${W(f)}px">`).join('')}<col style="width:170px"><col style="width:52px"></colgroup>
+  const total = 44 + vis.reduce((s, f) => s + W(f), 0) + 190 + 170 + 52;
+  $('#body').innerHTML = `<div class="tw"><table style="width:${total}px;min-width:100%"><colgroup><col style="width:44px">${vis.map(f => `<col style="width:${W(f)}px">`).join('')}<col style="width:190px"><col style="width:170px"><col style="width:52px"></colgroup>
     <thead><tr><th class="cb"><input type="checkbox" id="all" aria-label="Chọn tất cả" ${list.length && list.every(r => st.sel.has(r.id)) ? 'checked' : ''}></th>
     ${vis.map(f => `<th data-sort="${f.key}" title="Bấm để sắp xếp">${esc(f.name)}<span class="srt">${srt(f.key)}</span><button class="hm" data-hmenu="${f.key}" aria-label="Tuỳ chọn cột ${esc(f.name)}"><span class="ms xs">more_vert</span></button><span class="rz" data-rz="${f.key}" title="Kéo để đổi bề rộng · bấm đúp để về mặc định"></span></th>`).join('')}
+    <th style="cursor:default" title="Task chưa xong / cuộc họp sắp tới gần nhất">Hoạt động tiếp theo</th>
     <th data-sort="__createdAt">Ngày tạo<span class="srt">${srt('__createdAt')}</span></th>
     <th style="cursor:default;text-align:center"><button class="btn btn--text btn--icon" id="colBtn" title="Thêm cột" aria-label="Thêm cột"><span class="ms sm">add</span></button></th></tr></thead>
     <tbody>${list.length ? list.map(r => `<tr data-id="${r.id}" class="${st.sel.has(r.id) ? 'sel' : ''}"><td class="cb"><input type="checkbox" data-sel="${r.id}" ${st.sel.has(r.id) ? 'checked' : ''} aria-label="Chọn ${esc(title(r))}"></td>
       ${vis.map(f => { const v = r.values[f.key];
-        if (f.primary) return `<td class="pk"><span class="pri">${empty(v) ? `<a href="${DETAIL(r.id)}" class="nil">—</a>` : `<a href="${DETAIL(r.id)}">${esc(v)}</a>`}<button class="pvb" data-open="${r.id}" title="Xem trước" aria-label="Xem trước"><span class="ms xs">vertical_split</span></button></span></td>`;
+        if (f.primary) return `<td class="pk"><span class="pri"><button class="xbtn ${st.exp[r.id] ? 'on' : ''}" data-exp="${r.id}" aria-label="Hiện đối tượng liên kết"><span class="ms sm">chevron_right</span></button>${empty(v) ? `<a href="${DETAIL(r.id)}" class="nil">—</a>` : `<a href="${DETAIL(r.id)}">${esc(v)}</a>`}<button class="pvb" data-open="${r.id}" title="Xem trước" aria-label="Xem trước"><span class="ms xs">vertical_split</span></button></span></td>`;
         return `<td data-k="${f.key}" class="${HX.isNum(f.type) ? 'num' : ''}" title="${typeof v === 'string' ? esc(v) : ''}">${display(v, f)}</td>`; }).join('')}
-      <td style="color:var(--on-surface-variant);font-size:13px">${createdFmt(r.createdAt)}</td><td></td></tr>`).join('')
-      : `<tr><td colspan="${vis.length + 3}" class="empty">${st.q ? `Không tìm thấy kết quả cho “${esc(st.q)}”` : 'Chưa có bản ghi nào'}</td></tr>`}</tbody></table></div>
+      <td>${nextCell(r)}</td><td style="color:var(--on-surface-variant);font-size:13px">${createdFmt(r.createdAt)}</td><td></td></tr>${st.exp[r.id] ? expandRow(r, vis.length + 4) : ''}`).join('')
+      : `<tr><td colspan="${vis.length + 4}" class="empty">${st.q ? `Không tìm thấy kết quả cho “${esc(st.q)}”` : 'Chưa có bản ghi nào'}</td></tr>`}</tbody></table></div>
     <div class="pop colpop" id="colPop" style="right:12px;top:44px;width:280px"></div><div class="pop" id="hPop"></div>`;
   $('#pager').style.visibility = ''; $('#pg').textContent = `${st.page} / ${pages}`; $('#prev').disabled = st.page <= 1; $('#next').disabled = st.page >= pages;
   footer(all.length, pages);
@@ -463,6 +586,11 @@ function headMenu(btn, key){
 }
 $('#body').addEventListener('click', e => {
   const op = e.target.closest('[data-open]'); if (op) { e.stopPropagation(); e.preventDefault(); HX.openPanel(op.dataset.open, {dock:true}); return; }
+  const ex = e.target.closest('[data-exp]'); if (ex) { e.stopPropagation(); const id = ex.dataset.exp; if (st.exp[id]) { delete st.exp[id]; renderTable(); } else expandPop(ex, id); return; }
+  const xs = e.target.closest('[data-xswitch]'); if (xs) { e.stopPropagation(); expandPop(xs, xs.dataset.xswitch); return; }
+  const sc = e.target.closest('[data-sched]'); if (sc) { e.stopPropagation(); schedPop(sc, sc.dataset.sched); return; }
+  const kq = e.target.closest('[data-kq]'); if (kq) { e.stopPropagation(); HXC.composer('deal', kq.dataset.id, kq.dataset.kq, () => { renderAll(); toast('Đã lưu hoạt động'); }); return; }
+  if (e.target.closest('.xrow')) return;
   if (e.target.closest('a[href]')) return;
   if (e.target.closest('#colBtn')) { e.stopPropagation(); $('#colPop').classList.contains('open') ? $('#colPop').classList.remove('open') : openColPop(); return; }
   const sh = e.target.closest('[data-show]'); if (sh) { e.stopPropagation(); st.hidden = st.hidden.filter(x => x !== sh.dataset.show); renderTable(); toast('Đã thêm cột'); return; }
@@ -471,7 +599,7 @@ $('#body').addEventListener('click', e => {
   const hm = e.target.closest('[data-hmenu]'); if (hm) { e.stopPropagation(); headMenu(hm, hm.dataset.hmenu); return; }
   const th = e.target.closest('th[data-sort]'); if (th && !e.target.closest('.rz')) { const k = th.dataset.sort;
     st.sort = !st.sort || st.sort.key !== k ? {key:k, dir:'asc'} : st.sort.dir === 'asc' ? {key:k, dir:'desc'} : null; renderTable(); return; }
-  const card = e.target.closest('[data-card]'); if (card && !e.target.closest('.qi')) { HX.openPanel(card.dataset.card, {dock:true}); return; }
+  const card = e.target.closest('[data-card]'); if (card && !e.target.closest('.qi,a')) { HX.openPanel(card.dataset.card, {dock:true}); return; }
   const td = e.target.closest('td[data-k]'); if (td && !td.classList.contains('editing')) {
     const r = api.get(td.parentElement.dataset.id), f = F[td.dataset.k]; td.classList.add('editing');
     td.replaceChildren(editor(f, r.values[f.key], nv => { const err = nv !== r.values[f.key] && HX.check(f, nv, r.id);
@@ -516,19 +644,20 @@ function renderKanban(){
   $('#pager').style.visibility = 'hidden';
   footer(list.length - noVal, 1);
 }
+/* Thẻ board theo HubSpot: tên · ngày tạo · ngày chốt · amount · owner (+ công ty liên kết) · chân thẻ: Ghi chú · Task · hoạt động tiếp theo */
 function card(r){
-  const v = r.values, L = (ic, t) => t ? `<span class="ln"><span class="ms">${ic}</span><span class="t">${t}</span></span>` : '';
+  const v = r.values, L = (ic, t, tip) => t ? `<span class="ln" ${tip ? `title="${tip}"` : ''}><span class="ms">${ic}</span><span class="t">${t}</span></span>` : '';
+  const n = nextLabel(r);
   return `<article class="kc" draggable="true" data-card="${r.id}">
-    <a class="tt" href="${DETAIL(r.id)}">${esc(title(r))}</a>
-    ${L('description', esc(v.t_n_deal || ''))}
-    ${(co => co ? L('domain', `<a class="lk2" href="${HXC.url('company', co.id)}">${esc(co.values.name)}</a>`) : '')(HXC.assoc.companyOfDeal(r.id))}
-    ${L('event', v.ng_y_d_ki_n_ch_t && F.ng_y_d_ki_n_ch_t ? 'Chốt ' + fmt(v.ng_y_d_ki_n_ch_t, F.ng_y_d_ki_n_ch_t) : '')}
-    ${L('payments', empty(v[CASH]) || !F[CASH] ? '' : `<b>${fmt(v[CASH], F[CASH])}</b>`)}
-    ${L('person', esc(v.sale_ph_tr_ch || ''))}
-    ${L('sell', empty(v.g_i_d_ch_v_m_c_ti_u) ? '' : esc(v.g_i_d_ch_v_m_c_ti_u))}
-    <div class="kf"><button class="qi" data-open="${r.id}" title="Xem trước" aria-label="Xem trước"><span class="ms sm">vertical_split</span></button>
-      <a class="qi" href="${DETAIL(r.id)}" title="Mở trang chi tiết" aria-label="Mở trang chi tiết"><span class="ms sm">open_in_new</span></a>
-      ${empty(v[RATE]) ? '' : `<span class="rate" title="Tỷ Lệ Thành Công">${v[RATE]}%</span>`}</div></article>`;
+    <a class="tt" href="${DETAIL(r.id)}">${esc(title(r))}</a>${v.t_n_deal ? `<span class="sub2">${esc(v.t_n_deal)}</span>` : ''}
+    ${(co => co ? L('domain', `<a class="lk2" href="${HXC.url('company', co.id)}">${esc(co.values.name)}</a>`, 'Công ty liên kết') : '')(HXC.assoc.companyOfDeal(r.id))}
+    ${L('event_available', HXC.dOnly(r.createdAt), 'Ngày tạo')}
+    ${L('event', v[CLOSE] && F[CLOSE] ? fmt(v[CLOSE], F[CLOSE]) : '', 'Ngày dự kiến chốt')}
+    ${L('payments', empty(v[CASH]) || !F[CASH] ? '' : `<b>${fmt(v[CASH], F[CASH])}</b>`, 'Amount (Tổng Cash-In Dự Kiến)')}
+    ${L('person', esc(v[OWNER] || ''), 'Sale phụ trách')}
+    <div class="kf"><button class="qi" data-kq="NOTE" data-id="${r.id}" title="Thêm ghi chú" aria-label="Thêm ghi chú"><span class="ms sm">edit_note</span></button>
+      <button class="qi" data-kq="TASK" data-id="${r.id}" title="Tạo task" aria-label="Tạo task"><span class="ms sm">task_alt</span></button>
+      <span class="nx ${n ? 'has' : ''}" title="${n ? esc(n.full) : 'Không có task / cuộc họp sắp tới'}">${n ? `<span class="ms" style="font-size:13px">${n.ic}</span>${esc(n.t)}` : '— | Chưa có lịch'}</span></div></article>`;
 }
 $('#grpBox').addEventListener('change', e => { if (e.target.id === 'grp') { st.groupBy[st.view] = e.target.value; renderKanban(); } });
 $('#body').addEventListener('dragstart', e => { const c = e.target.closest('[data-card]'); if (c) { c.classList.add('dragging'); e.dataTransfer.setData('text/plain', c.dataset.card); } });
@@ -556,8 +685,11 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.pop')) closePops();
 });
 $('#gsBtn').onclick = () => HX.sheetDialog();
-$('#impBtn').onclick = () => HX.importDialog();
-$('#newBtn').onclick = () => HX.openCreate(() => renderAll());
+$('#addBtn').onclick = e => { e.stopPropagation(); closePops($('#addPop')); $('#addPop').classList.toggle('open'); };
+$('#impBtn').onclick = () => { closePops(); HX.importDialog(); };
+$('#newBtn').onclick = () => { closePops(); HX.openCreate(() => renderAll()); };
+$('#resetBtn').onclick = () => { st.qf = {}; st.quick = null; st.filters = []; st.q = ''; $('#q').value = ''; st.sort = {key:'__createdAt', dir:'desc'}; st.exp = {}; delete HIDDEN[st.view]; if (st.view === 'all') HIDDEN.all = FIELDS.filter(f => !f.primary && !['t_n_deal', STAGE, CASH, 'ng_y_d_ki_n_ch_t', 'sale_ph_tr_ch'].includes(f.key)).map(f => f.key); try { localStorage.setItem(HKEY, JSON.stringify(HIDDEN)); } catch {} renderAll(); toast('Đã khôi phục view mặc định'); };
+$('#cloneBtn').onclick = () => toast('Nhân bản view hiện tại thành view mới (dùng “+” ở thanh view để đặt tên)');
 $('#refresh').onclick = () => { renderAll(); toast('Đã làm mới'); };
 $('#exportBtn').onclick = () => toast(`Mockup: xuất ${rows().length} bản ghi ra tệp ${$('#fmt').value}`);
 $('#prev').onclick = () => { st.page--; renderAll(); }; $('#next').onclick = () => { st.page++; renderAll(); };

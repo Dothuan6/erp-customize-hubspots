@@ -241,3 +241,30 @@ Portal HubSpot của dự án chưa có sản phẩm nào; mình chỉ mở form
 | Tổng kết | Subtotal, + discount / fee / tax cấp báo giá, Total, doanh thu định kỳ | Tạm tính · + Chiết khấu / + Phí / + Thuế (% hoặc ₫; thuế tính sau chiết khấu + phí) · Tổng · ARR / MRR | Lưu điều chỉnh cấp Deal |
 | Amount của Deal | Tuỳ chọn dùng tổng line item làm Amount | Ô "Dùng tổng line item làm Amount" (mặc định bật) → cập nhật Tổng Cash-In Dự Kiến, ghi vào timeline | Không |
 | Card trên Deal | Danh sách line item + tổng | Như HubSpot + dòng điều chỉnh và ARR khi có hàng định kỳ | Không |
+
+## 16. Phần 6 — Báo cáo: CRM Data Overview & Pipeline Overview (29/09/2026)
+
+Khảo sát 2 dashboard trên portal HubSpot của dự án (chỉ xem, không sửa).
+
+| Khu vực | HubSpot | Prototype sau chỉnh | Cần BE ERP? |
+|---|---|---|---|
+| Header | ☆ · tên dashboard ▾ · Explore reports · Create dashboard · Actions ▾ · Share ▾ · Add content ▾ · ⚙ | Như HubSpot. ☆ lưu yêu thích; Thao tác: đổi tên, xuất CSV cả dashboard, khôi phục bố cục…; Chia sẻ: sao chép liên kết; Thêm nội dung: thêm lại báo cáo đã gỡ | Lưu cấu hình dashboard theo user |
+| Bộ chọn dashboard | Tab All / Recently viewed / Favorites / My dashboards + tìm | Như HubSpot | — |
+| Bộ lọc | ✎ Quick filters · Owners ▾ (CRM) / Date range ▾ + Deal owner ▾ (Pipeline) · Advanced filters · làm mới | Như HubSpot, đúng thứ tự từng dashboard. Khoảng thời gian: 14 preset + tuỳ chọn từ–đến; Owner chọn nhiều; nâng cao: Lifecycle (contact), Gói dịch vụ (deal) | Query theo khoảng ngày / owner |
+| Mặc định | CRM: "This entire month"; Pipeline: "This entire quarter" | Như HubSpot | — |
+| Thẻ báo cáo | Tiêu đề (link) ⓘ; chip khoảng thời gian (rê chuột xem ngày cụ thể), "Compared to", "Filters (n)"; rê chuột: kéo · làm mới · bộ lọc · ⋮; góc đổi kích thước | Như HubSpot. ⋮: Đi tới Contacts/Deals, Xem bản ghi, Đổi tên, **Xuất dữ liệu chi tiết (CSV)**, Gỡ khỏi dashboard… Kéo tay cầm để sắp xếp, nút góc đổi 1 → 2 → 3 cột (nhớ theo trình duyệt) | — |
+| CRM Data Overview | New contacts (KPI + so sánh), Contact sources (cột), Contacts added over time (đường), Deals created over time (đường), Deals by stage (tròn), Activity type breakdown, Team activity summary, 2 thẻ Tickets | Đủ, cùng kiểu biểu đồ (Deals theo giai đoạn đổi sang biểu đồ tròn); bỏ 2 thẻ Tickets (ngoài phạm vi). Biểu đồ theo thời gian lấy đúng các tháng trong khoảng lọc | Báo cáo tổng hợp ở BE |
+| Pipeline Overview | Deals created, Deals closed, Deals by status, Deal owner performance by closed amount, Deal progression through funnel stages, Average time to close | Đủ, cùng kiểu biểu đồ | Rollup / group-by ở BE |
+| Drill-down | Bấm số / cột → danh sách bản ghi | Như HubSpot + nút Xuất CSV | — |
+
+## 17. Phần 7 — Bảng Sales · Sơ đồ quan hệ · Trường bổ sung (29/09/2026)
+
+| Khu vực | Tham chiếu HubSpot | Prototype | Cần BE ERP? |
+|---|---|---|---|
+| **Sales — danh sách** (`crm-sales-hubspot.html`) | Trang danh sách + Sales leaderboard / Forecast | View tabs: Tất cả · Của tôi · theo Team; tìm kiếm; kỳ Tháng / Quý / Năm. Dải KPI: doanh số thắng, % đạt chỉ tiêu, pipeline đang mở + dự báo (giá trị × tỷ lệ thành công), hoạt động 30 ngày, task quá hạn. Bảng xếp hạng theo doanh số: Team, Vai trò, số Contacts / Companies / Deal mở, Pipeline, Dự báo, Doanh số thắng, Chỉ tiêu, **% đạt (thanh tiến độ)**, Tỷ lệ thắng, Hoạt động, Task quá hạn. Bấm tiêu đề để sắp xếp, Export CSV, "Thêm sale" | Collection NhanVien (đã có) + cột Team, Vai trò, Chỉ tiêu tháng, Trạng thái; API tổng hợp KPI theo kỳ |
+| **Sales — chi tiết** (`?id=`) | Bố cục record page | Trái: định danh + Email / Gọi + "Thông tin sale" sửa trực tiếp (đổi tên → cập nhật owner ở mọi bản ghi). Giữa: 6 thẻ KPI theo kỳ, Pipeline theo giai đoạn, Việc cần làm (task chưa xong, họp sắp tới, cờ quá hạn), Hoạt động gần đây (link về bản ghi). Phải: Deals / Companies / Contacts sở hữu. Thao tác: **Chuyển giao bản ghi** cho sale khác (như khi deactivate user HubSpot), Đánh dấu đã nghỉ | Cập nhật owner hàng loạt |
+| Liên kết dữ liệu | Owner là user | Sale ↔ Contact owner / Company owner / "Sale phụ trách" (Deal) theo tên; sale mới hiện ngay trong mọi ô chọn owner | Nên chuyển sang lưu sale_id |
+| **Sơ đồ quan hệ** (`crm-quan-he-hubspot.html`) | Settings › Data model overview | Lưu đồ SVG: Sale, Company, Contact, Deal, Hoạt động, Line item, Sản phẩm; đường tím = sở hữu, liền = liên kết, đứt = hoạt động; nhãn bản số 1:N / N:N + số liên kết thực tế. Rê chuột làm nổi liên kết của 1 đối tượng; bấm thẻ → panel (mô tả, liên kết, thuộc tính, mở danh sách); bấm nhãn → nơi lưu (gợi ý BE), màn hình dùng, hành vi khi xoá. Luồng 4 bước bán hàng + bảng chi tiết quan hệ; tải SVG | Không (tài liệu cho BE) |
+| **Trường bổ sung** (trang chi tiết Contact / Company / Deal) | Card thuộc tính tuỳ chỉnh ở sidebar record + "Create property" | Card "Trường bổ sung (n)" dưới "Thông tin chính": trường mới tạo **tự hiện ở đây** (nhãn "Mới"), bấm để sửa giá trị tại chỗ. **+ Thêm**: tạo trường (tên, 11 loại, lựa chọn, mô tả, hiện ở vùng này) rồi mở luôn ô nhập. ⚙: chọn trường có sẵn để ghim thêm (áp dụng cho mọi bản ghi cùng loại), thu gọn được | Contact/Company: thêm trường vào collection; Deal: dùng Quản lý trường ERP (addField) |
+| Trường mới ở danh sách | Property dùng được ở cột & bộ lọc | Trường tự tạo của Contact / Company có trong "+ Thêm cột" và "Thêm bộ lọc nhanh"; trường mới của Deal có ở bảng Deals / Quản lý trường | — |
+| Điều hướng | — | Sidebar thêm **Sales** và **Sơ đồ quan hệ**; trang chủ thêm 2 thẻ | — |

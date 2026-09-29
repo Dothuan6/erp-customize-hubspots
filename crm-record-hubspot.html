@@ -93,6 +93,25 @@ html[data-theme="dark"] .ai{background:#311B92;color:#D1C4E9}
 .mi .soonb{margin-left:auto;white-space:nowrap;padding-left:8px;font-size:10.5px;font-weight:700;color:var(--on-surface-variant)}
 .hist{display:flex;flex-direction:column;gap:0}
 .hist .ri{padding:10px 0}
+/* Phần 7: vùng "Trường bổ sung" (HubSpot: card thuộc tính tuỳ chỉnh ở sidebar trái) */
+.ch .cnt{font-weight:500;color:var(--on-surface-variant);margin-left:4px}
+.newb{display:inline-flex;align-items:center;height:16px;padding:0 6px;margin-left:6px;border-radius:var(--radius-pill);font-size:10px;font-weight:700;letter-spacing:.02em;background:#E3F2FD;color:#0B5CAD;vertical-align:1px}
+html[data-theme="dark"] .newb{background:#0D3A66;color:#BBDEFB}
+.xf-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font-size:13px;color:var(--on-surface-variant);padding:6px 4px 4px}
+.xf-empty .ms{font-size:28px;max-width:none}
+.xf-l{display:flex;flex-direction:column;max-height:300px;overflow-y:auto}
+.xf-l label{display:flex;align-items:center;gap:8px;min-height:32px;padding:0 8px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer}
+.xf-l label:hover{background:var(--surface-2)}
+.xf-l input{accent-color:var(--primary)}
+.xf-l small{margin-left:auto;font-size:11px;color:var(--on-surface-variant);white-space:nowrap}
+.xf-g{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--on-surface-variant);padding:8px 8px 4px}
+.nf{display:flex;flex-direction:column;gap:12px}
+.nf label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600}
+.nf .in{height:36px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 10px;background:var(--surface);font-weight:400;color:var(--on-surface)}
+.nf textarea.in{height:auto;min-height:84px;padding:8px 10px;resize:vertical;font:inherit;font-weight:400}
+.nf .chk{flex-direction:row;align-items:center;gap:8px;font-weight:500}
+.nf .hint{font-size:12px;font-weight:400;color:var(--on-surface-variant)}
+.nf .err{color:var(--error);font-size:12px;min-height:14px}
 </style>
 </head>
 <body>
@@ -106,6 +125,9 @@ html[data-theme="dark"] .ai{background:#311B92;color:#D1C4E9}
         <span class="r"><button class="btn btn--text sm" data-keymenu>Thao tác<span class="ms xs">arrow_drop_down</span></button><button class="btn btn--text btn--icon" id="propCfg" title="Chọn thuộc tính hiển thị" aria-label="Chọn thuộc tính hiển thị"><span class="ms sm">settings</span></button></span></div>
         <div class="cb" id="keyBody"><div class="props" id="props"></div><button class="btn btn--text sm" data-allprops style="margin-top:6px">Xem tất cả thuộc tính</button></div>
         <div class="meta" id="meta"></div></section>
+      <section class="card" id="xfCard"><div class="ch"><button class="tg" id="xfTg" aria-expanded="true"><span class="ms sm" id="xfIc">expand_more</span>Trường bổ sung<span class="cnt" id="xfN"></span></button>
+        <span class="r"><button class="btn btn--text sm" data-xfadd title="Tạo trường mới"><span class="ms xs">add</span>Thêm</button><button class="btn btn--text btn--icon" data-xfcfg title="Chọn trường hiển thị" aria-label="Chọn trường hiển thị trong Trường bổ sung"><span class="ms sm">settings</span></button></span></div>
+        <div class="cb" id="xfBody"><div class="props" id="xf"></div></div></section>
     </div>
     <div class="col">
       <section class="card"><div class="tabs" role="tablist" id="tabs"></div>
@@ -187,6 +209,57 @@ else {
     $('#meta').textContent = `Ngày tạo: ${HXC.dt(r.createdAt)}`;
   }
 
+  /* ── Phần 7: vùng "Trường bổ sung" — trường mới tạo tự hiện ở đây, sửa trực tiếp; ⚙ chọn trường có sẵn để ghim thêm ── */
+  const keyShown = () => T === 'deal' ? DEAL_KEYS : KEYS[T];
+  function drawExtra() {
+    const keys = HXC.extraKeys(T).filter(k => !keyShown().includes(k));
+    $('#xfN').textContent = `(${keys.length})`;
+    if (!keys.length) { $('#xf').onclick = null; $('#xf').innerHTML = `<div class="xf-empty"><span class="ms">playlist_add</span>Chưa có trường bổ sung. Tạo trường mới để lưu thêm thông tin cho mọi ${O.label}, hoặc bấm ⚙ để ghim trường có sẵn.<button class="btn btn--secondary sm" data-xfadd><span class="ms xs">add</span>Tạo trường mới</button></div>`; return; }
+    if (T === 'deal') HX.propList($('#xf'), r, 'page', keys); else HXC.props($('#xf'), T, r, keys, () => refreshAll());
+    badgeNew();
+  }
+  // Gắn nhãn "Mới" cho trường tự tạo — chạy lại mỗi khi danh sách vẽ lại sau khi sửa giá trị
+  function badgeNew() { $('#xf').querySelectorAll('.prop').forEach(p => { const f = O.fields.find(x => x.key === p.dataset.k), l = p.querySelector('label');
+    if (f && HXC.isNewField(T, f) && l && !l.querySelector('.newb')) l.insertAdjacentHTML('beforeend', `<span class="newb" title="${esc(f.desc || 'Trường mới tạo')}">Mới</span>`); }); }
+  new MutationObserver(badgeNew).observe($('#xf'), { childList:true });
+  function extraCfg(anchor) {
+    const cur = HXC.extraKeys(T), pool = O.fields.filter(f => !keyShown().includes(f.key) && !(T === 'deal' && ['m_deal','t_n_deal','giai_o_n_pipeline','ng_y_d_ki_n_ch_t','t_ng_cash_in_d_ki_n'].includes(f.key)) && !(T === 'contact' && ['email','firstname','lastname'].includes(f.key)) && !(T === 'company' && f.key === 'name'));
+    const nw = pool.filter(f => HXC.isNewField(T, f)), old = pool.filter(f => !HXC.isNewField(T, f));
+    const row = f => `<label><input type="checkbox" data-xk="${f.key}" ${cur.includes(f.key) ? 'checked' : ''}>${esc(f.name)}<small>${HX.TYPE[f.type] ? HX.TYPE[f.type].name : f.type}</small></label>`;
+    const p = openFp(anchor, `<label class="srch2"><input id="xfQ" placeholder="Tìm thuộc tính"><span class="ms sm">search</span></label>
+      <div class="xf-l" id="xfL"><div class="xf-g">Trường mới / tuỳ chỉnh (${nw.length})</div>${nw.map(row).join('') || '<div class="nil" style="padding:4px 8px;font-size:12.5px">Chưa có</div>'}<div class="xf-g">Trường có sẵn (${old.length})</div>${old.map(row).join('')}</div>
+      <div class="sep"></div><button class="mi" data-xfadd><span class="ms sm">add</span>Tạo trường mới</button>${T === 'deal' ? '<a class="mi" href="crm-quan-ly-truong-hubspot.html"><span class="ms sm">tune</span>Quản lý trường dữ liệu (ERP)</a>' : ''}`, 300, true);
+    fp.dataset.src = 'xf';
+    $('#xfQ', p).oninput = e => p.querySelectorAll('#xfL label').forEach(l => l.hidden = !l.textContent.toLowerCase().includes(e.target.value.trim().toLowerCase()));
+    $('#xfL', p).onchange = e => { const k = e.target.dataset.xk; if (!k) return; const keys = HXC.extraKeys(T); HXC.setExtra(T, e.target.checked ? [...keys, k] : keys.filter(x => x !== k)); drawExtra(); };
+  }
+  function newFieldDlg() {
+    closeFp();
+    const types = ['TEXT','LONG_TEXT','NUMBER','CURRENCY','DATE','DATETIME','SELECT','MULTI_SELECT','CHECKBOX','USER','URL'];
+    HX.modal(`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="nfH" style="max-width:480px"><div class="mh" id="nfH">Tạo trường mới cho ${O.label}</div>
+      <div class="mb nf"><label><span>Tên trường <span class="req">*</span></span><input class="in" id="nfN" maxlength="60" placeholder="VD: ${T === 'company' ? 'Mã số thuế' : T === 'deal' ? 'Đối thủ cạnh tranh' : 'Kênh liên hệ ưa thích'}"></label>
+        <label>Loại trường<select class="in" id="nfT">${types.map(c => `<option value="${c}">${HX.TYPE[c].name}</option>`).join('')}</select></label>
+        <label id="nfCw" hidden>Các lựa chọn <span class="hint">Mỗi dòng một lựa chọn</span><textarea class="in" id="nfC" placeholder="Lựa chọn 1&#10;Lựa chọn 2"></textarea></label>
+        <label>Mô tả <span class="hint">Không bắt buộc — hiện khi rê chuột vào tên trường</span><input class="in" id="nfD"></label>
+        <label class="chk"><input type="checkbox" id="nfS" checked>Hiện ở vùng “Trường bổ sung” trên mọi ${O.label}</label>
+        <div class="hint">${T === 'deal' ? 'Trường được thêm vào collection Deals_Pipeline của ERP (giống Quản lý trường) — dùng được ở bảng, bộ lọc và báo cáo.' : `Trường áp dụng cho mọi ${O.label}; dùng được làm cột và bộ lọc ở danh sách ${O.plural}.`}</div>
+        <div class="err" id="nfE" role="alert"></div></div>
+      <div class="mf"><button class="btn btn--secondary" data-close>Huỷ</button><button class="btn btn--primary" id="nfOk">Tạo trường</button></div></div>`, (bg, close) => {
+      const n = $('#nfN', bg); n.focus();
+      $('#nfT', bg).onchange = e => { $('#nfCw', bg).hidden = !HX.hasChoices(e.target.value); };
+      $('#nfOk', bg).onclick = () => {
+        const name = n.value.trim(), type = $('#nfT', bg).value, choices = $('#nfC', bg).value.split('\n').map(x => x.trim()).filter(Boolean);
+        if (!name) { $('#nfE', bg).textContent = 'Nhập tên trường'; n.focus(); return; }
+        if (O.fields.some(f => f.name.toLowerCase() === name.toLowerCase())) { $('#nfE', bg).textContent = `Đã có trường “${name}” trên ${O.label}`; n.focus(); return; }
+        if (HX.hasChoices(type) && !choices.length) { $('#nfE', bg).textContent = 'Nhập ít nhất 1 lựa chọn'; $('#nfC', bg).focus(); return; }
+        const f = HXC.addCustomField(T, { name, type, choices, desc: $('#nfD', bg).value.trim(), show: $('#nfS', bg).checked });
+        close(); toast(`Đã tạo trường “${name}” — nhập giá trị ngay trong “Trường bổ sung”`); drawExtra();
+        const pr = $('#xf').querySelector(`[data-k="${f.key}"]`); if (pr) { $('#xfBody').hidden = false; pr.scrollIntoView({ block:'nearest' }); pr.click(); }
+      };
+      n.onkeydown = e => { if (e.key === 'Enter') $('#nfOk', bg).click(); };
+    });
+  }
+
   /* ── Cột phải ── */
   function drawRight() {
     const cards = T === 'contact' ? ['company','deal'] : T === 'company' ? ['contact','deal'] : ['contact','company','lineitems'];
@@ -242,10 +315,10 @@ else {
     document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 'pane-' + def));
   }
   const goTab = k => { $('#tabs').querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x.dataset.pane === k)); document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 'pane-' + k)); };
-  function refreshAll() { drawId(); drawProps(); drawRight(); drawCatchup(); tl && tl.draw(); }
+  function refreshAll() { drawId(); drawProps(); drawExtra(); drawRight(); drawCatchup(); tl && tl.draw(); }
   HX.onChange = refreshAll;
 
-  drawTabs(); drawId(); drawProps(); drawRight(); drawCatchup();
+  drawTabs(); drawId(); drawProps(); drawExtra(); drawRight(); drawCatchup();
   tl = HXC.timeline($('#tl'), T, ID, refreshAll);
 
   /* ── Menu ── */
@@ -322,6 +395,9 @@ else {
       const v = { ...r.values }; if (T === 'contact') { v.firstname = (v.firstname || '') + ' (bản sao)'; v.email = ''; } else { v.name = v.name + ' (bản sao)'; }
       const n = HXC.create(T, v, T === 'contact' && HXC.assoc.companyOfContact(ID) ? [['company', HXC.assoc.companyOfContact(ID).id]] : []);
       toast('Đã nhân bản — đang mở bản sao'); setTimeout(() => location.href = HXC.url(T, n.id), 500); return; }
+    if (e.target.closest('[data-xfadd]')) { newFieldDlg(); return; }
+    const xc = e.target.closest('[data-xfcfg]'); if (xc) { e.stopPropagation(); fp.classList.contains('open') && fp.dataset.src === 'xf' ? closeFp() : extraCfg(xc); return; }
+    if (e.target.closest('#xfTg')) { const b = $('#xfBody'), open = b.hidden; b.hidden = !open; $('#xfIc').textContent = open ? 'expand_more' : 'chevron_right'; $('#xfTg').setAttribute('aria-expanded', open); return; }
     if (e.target.closest('#propCfg')) { toast('Chọn thuộc tính hiển thị trong “' + KEY_T[T] + '” (mockup)'); return; }
     if (e.target.closest('#keyTg')) { const b = $('#keyBody'), open = b.hidden; b.hidden = !open; $('#meta').hidden = !open; $('#keyIc').textContent = open ? 'expand_more' : 'chevron_right'; $('#keyTg').setAttribute('aria-expanded', open); return; }
     if (e.target.closest('[data-wf]')) { closeFp(); HX.workflowDialog(r); return; }

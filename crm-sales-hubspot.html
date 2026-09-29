@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi" data-brand="crm">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales — HarnexAI CRM (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link rel="stylesheet" href="crm-shared.css">
+<style>
+/* ═══ Phần 7 · Bảng dành cho Sale (nhân viên kinh doanh) ═══
+   Danh sách = kiểu trang danh sách HubSpot (tiêu đề · view tabs · search · kỳ · bảng sắp xếp được) + dải KPI như "Sales workspace / Leaderboard".
+   Chi tiết (?id=) = bố cục record page 3 cột: định danh + thông tin | KPI · pipeline theo giai đoạn · việc cần làm · hoạt động | Deals · Companies · Contacts sở hữu.
+   Dữ liệu: db.sales (HXC) — liên kết với Contact owner / Company owner / "Sale phụ trách" của Deal theo tên. */
+.frame{position:relative}
+.ph{display:flex;align-items:center;gap:8px;padding:16px 16px 0;flex-wrap:wrap}
+.ttl{font-size:24px;font-weight:600}
+.ph .count{font-size:13px;color:var(--on-surface-variant)}
+.ph-act{margin-left:auto;display:flex;gap:8px;align-items:center}
+.vtabs{display:flex;align-items:flex-end;gap:2px;padding:8px 16px 0;border-bottom:1px solid var(--outline-variant);overflow-x:auto}
+.vtab{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;font-weight:600;font-size:13px;color:var(--on-surface-variant);white-space:nowrap;border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
+.vtab:hover{background:var(--surface-variant)}
+.vtab[aria-selected="true"]{color:var(--on-surface);border-bottom-color:var(--on-surface);background:var(--surface-2)}
+.tools{display:flex;align-items:center;gap:8px;padding:12px 16px;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;width:220px;max-width:100%;border:1px solid var(--outline);border-radius:var(--btn-radius);color:var(--on-surface-variant)}
+.search input{border:none;outline:none;background:none;flex:1;min-width:0;color:var(--on-surface);font-size:13px}
+.segtxt{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden}
+.segtxt button{height:30px;padding:0 12px;font-size:12.5px;font-weight:600;color:var(--on-surface-variant)}
+.segtxt button[aria-pressed="true"]{background:var(--primary-container);color:var(--on-primary-container)}
+.tools .rg{font-size:12px;color:var(--on-surface-variant)}
+/* Dải KPI */
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 16px 12px}
+@media(min-width:760px){.kpis{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.kpi{border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:10px 12px;min-width:0}
+.kpi .l{font-size:12px;color:var(--on-surface-variant);display:flex;align-items:center;gap:4px}
+.kpi .v{font-size:20px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .s{font-size:11.5px;color:var(--on-surface-variant);margin-top:2px}
+.kpi.warn .v{color:var(--error)}
+/* Bảng */
+.body{flex:1;min-height:0;overflow:auto;border-top:1px solid var(--outline-variant)}
+table.lt{border-collapse:separate;border-spacing:0;min-width:100%}
+.lt th,.lt td{border-bottom:1px solid var(--outline-variant);text-align:left;white-space:nowrap;padding:0 12px;height:52px}
+.lt th{position:sticky;top:0;z-index:2;background:var(--surface);font-weight:500;font-size:13px;color:var(--on-surface-variant);cursor:pointer;user-select:none;height:40px}
+.lt th:hover{color:var(--on-surface);background:var(--surface-variant)}
+.lt th.num,.lt td.num{text-align:right}
+.lt th .srt{vertical-align:-2px;margin-left:2px}
+.lt td{font-size:13.5px}
+.lt>tbody>tr{cursor:pointer}
+.lt>tbody>tr:hover>td{background:var(--surface-2)}
+.lt .nmcol{min-width:240px;position:sticky;left:0;z-index:1;background:var(--surface);border-right:1px solid var(--outline-variant)}
+.lt th.nmcol{z-index:3}
+.rk{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700;background:var(--surface-2);color:var(--on-surface-variant);flex:none}
+.rk.g1{background:#FFE08A;color:#6B4E00}
+.pri{display:flex;align-items:center;gap:10px;min-width:0}
+.pri a{font-weight:600;color:var(--link)}
+.pri a:hover{text-decoration:underline}
+.pri small{display:block;font-size:12px;color:var(--on-surface-variant)}
+.bar{display:flex;align-items:center;gap:8px;min-width:150px}
+.bar .t{flex:1;height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:99px;background:var(--c1)}
+.bar .t i.ok{background:#00A884} .bar .t i.mid{background:#F5A623} .bar .t i.low{background:var(--c1)}
+.bar b{font-size:12.5px;min-width:38px;text-align:right}
+.od{color:var(--error);font-weight:600}
+.st-off{opacity:.55}
+.foot{display:flex;align-items:center;gap:6px;padding:8px 16px;border-top:1px solid var(--outline-variant);flex:none;font-size:12px;color:var(--on-surface-variant)}
+.foot .pillc{font-weight:600;padding:3px 10px;border-radius:var(--radius-pill);background:var(--surface-2);color:var(--on-surface)}
+.empty{padding:48px 16px;text-align:center;color:var(--on-surface-variant)}
+@media(max-width:760px){ .frame:not(.rec){overflow:auto} .frame:not(.rec)>*{flex:none} .body{overflow-x:auto;overflow-y:visible} .foot span:not(.pillc){display:none} .lt .nmcol{min-width:200px} }
+/* Chi tiết */
+.frame.rec{overflow:auto;background:var(--page-bg)}
+.grid{display:grid;grid-template-columns:1fr;gap:12px;padding:12px;align-items:start}
+@media(min-width:905px){ .grid{grid-template-columns:320px 1fr} .col-r{grid-column:1/-1} }
+@media(min-width:1240px){ .grid{grid-template-columns:320px minmax(0,1fr) 320px} .col-r{grid-column:auto} }
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-lg)}
+.ch{display:flex;align-items:center;gap:6px;padding:12px 14px;font-weight:600}
+.ch .r{margin-left:auto;display:flex;gap:2px;align-items:center}
+.cb{padding:0 14px 14px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:10px 10px 0 8px}
+.back{display:inline-flex;align-items:center;font-size:14px;font-weight:600}
+.back:hover{color:var(--link)}
+.idt{display:flex;gap:12px;align-items:center;padding:12px 14px 4px}
+.idt .ic{width:48px;height:48px;border-radius:50%;background:var(--primary-container);color:var(--on-primary-container);display:grid;place-items:center;flex:none;font-weight:700;font-size:16px}
+.idt h1{font-size:20px;font-weight:700;line-height:1.3}
+.sub{padding:0 14px 6px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.sub a{color:var(--link);font-weight:600}
+.qa{display:flex;justify-content:space-around;gap:4px;padding:10px 14px 14px}
+.qa a,.qa button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;color:var(--on-surface)}
+.qa .o{width:36px;height:36px;border-radius:50%;border:1px solid var(--outline);display:grid;place-items:center}
+.qa a:hover .o,.qa button:hover .o{background:var(--surface-2)}
+.meta{font-size:12px;color:var(--on-surface-variant);padding:0 14px 14px}
+.dk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:720px){.dk{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.stg{display:flex;flex-direction:column;gap:8px}
+.stg .row{display:grid;grid-template-columns:150px 1fr 110px;gap:10px;align-items:center;font-size:13px}
+.stg .row .t{height:14px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.stg .row .t i{display:block;height:100%;background:var(--c1);border-radius:4px}
+.stg .row .n{text-align:right;font-weight:600;white-space:nowrap}
+.ri{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--outline-variant);font-size:13px}
+.ri:first-child{border-top:none}
+.ri .ms{color:var(--on-surface-variant);margin-top:1px}
+.ri a{color:var(--link);font-weight:600}
+.ri .x{flex:1;min-width:0}
+.ri .nil{font-size:12px}
+.ai-l{display:flex;flex-direction:column}
+.ai-l a.it{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:8px 0;border-top:1px solid var(--outline-variant);font-size:13px;min-width:0}
+.ai-l a.it:first-child{border-top:none}
+.ai-l a.it .nm{font-weight:600;color:var(--link);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.kpi .bar{min-width:0;margin-top:4px}
+.perf-rg{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ai-l a.it:hover .nm{text-decoration:underline}
+.ai-l a.it small{color:var(--on-surface-variant);white-space:nowrap}
+.ac-empty{padding:4px 0 6px}
+.pop-form{display:flex;flex-direction:column;gap:10px}
+.fpop{position:fixed;z-index:80;max-height:min(420px,70vh);overflow-y:auto}
+.tgl{display:inline-flex;align-items:center;gap:4px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar" id="topbar"></header>
+  <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
+  <main class="main"><div class="frame" id="frame"></div></main>
+</div>
+<div class="pop fpop" id="fpop" role="menu"></div>
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel"></aside>
+<div class="modal-bg" id="modal"></div>
+<div class="demo" id="demo" role="group" aria-label="Điều khiển mockup"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="crm-shared.js"></script>
+<script src="crm-objects.js"></script>
+<script>
+const { esc, display, toast, confirmBox, $ } = HX;
+HX.shell('sales');
+const qs = new URLSearchParams(location.search);
+const NOW = HXC.TODAY, F = HX.F;
+const short = n => { n = Number(n) || 0; return (n >= 1e9 ? (n / 1e9).toFixed(1).replace('.', ',') + ' tỷ' : n >= 1e6 ? (Math.round(n / 1e5) / 10).toString().replace('.', ',') + ' tr' : n.toLocaleString('vi-VN')) + ' ₫'; };
+const RANGES = [['month','Tháng này'],['quarter','Quý này'],['year','Năm nay']];
+function range(k) { const y = NOW.getFullYear(), m = NOW.getMonth();
+  return k === 'month' ? [new Date(y, m, 1), new Date(y, m + 1, 1)] : k === 'quarter' ? [new Date(y, m - m % 3, 1), new Date(y, m - m % 3 + 3, 1)] : [new Date(y, 0, 1), new Date(y + 1, 0, 1)]; }
+const rgLabel = k => { const [a, b] = range(k); const e = new Date(+b - 864e5); return `${a.getDate()}/${a.getMonth() + 1} – ${e.getDate()}/${e.getMonth() + 1}/${e.getFullYear()}`; };
+const barCls = p => p == null ? '' : p >= 100 ? 'ok' : p >= 50 ? 'mid' : 'low';
+const bar = p => p == null ? '<span class="nil">Chưa đặt chỉ tiêu</span>' : `<span class="bar"><span class="t"><i class="${barCls(p)}" style="width:${Math.min(100, p)}%"></i></span><b>${p}%</b></span>`;
+const st = (() => { try { return { rg:'month', view:'all', q:'', sort:{ k:'wonSum', dir:'desc' }, ...JSON.parse(localStorage.getItem('hx-crm-sales-ui') || '{}'), q:'' }; } catch { return { rg:'month', view:'all', q:'', sort:{ k:'wonSum', dir:'desc' } }; } })();
+const saveSt = () => { try { localStorage.setItem('hx-crm-sales-ui', JSON.stringify({ rg:st.rg, view:st.view, sort:st.sort })); } catch {} };
+const fp = $('#fpop');
+function openFp(anchor, html, w = 260) { const a = anchor.getBoundingClientRect(); fp.style.width = w + 'px'; fp.innerHTML = html; fp.style.left = Math.max(8, Math.min(a.right - w, innerWidth - w - 8)) + 'px'; fp.classList.add('open'); const h = fp.offsetHeight; fp.style.top = (a.bottom + 4 + h > innerHeight - 8 ? Math.max(8, a.top - h - 4) : a.bottom + 4) + 'px'; return fp; }
+const closeFp = () => fp.classList.remove('open');
+const rgSeg = () => `<span class="segtxt" role="group" aria-label="Kỳ">${RANGES.map(([k, l]) => `<button data-rg="${k}" aria-pressed="${st.rg === k}">${l}</button>`).join('')}</span><span class="rg">${rgLabel(st.rg)}</span>`;
+
+/* ── Panel Thêm sale ── */
+function salePanel() {
+  const p = $('#panel');
+  const inp = f => f.type === 'SELECT' ? `<select class="in" id="sf_${f.key}">${f.choices.map((c, i) => `<option ${i === 0 ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>`
+    : `<input class="in" id="sf_${f.key}" type="${f.type === 'NUMBER' ? 'number' : f.type === 'DATE' ? 'date' : f.key === 'email' ? 'email' : 'text'}" ${f.key === 'joined' ? `value="${NOW.toISOString().slice(0, 10)}"` : ''} ${f.key === 'quota' ? 'placeholder="VD: 100000000"' : ''}>`;
+  p.innerHTML = `<div class="pn-h"><h2>Thêm sale</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
+    <form class="pn-b field-form" id="sf">${HXC.SALE_FIELDS.map(f => `<label for="sf_${f.key}">${esc(f.name)}${['name','email'].includes(f.key) ? ' <span class="req">*</span>' : ''}${inp(f)}</label>`).join('')}
+      <p class="nil" style="font-size:12px">Sale mới xuất hiện ngay trong danh sách chọn Contact owner / Company owner và có thể được gán làm “Sale phụ trách” Deal.</p><p class="err" id="sfErr" role="alert"></p></form>
+    <div class="pn-f"><button class="btn btn--primary" id="sfSave">Tạo</button><button class="btn btn--text" data-pclose>Huỷ</button></div>`;
+  p.onclick = e => { if (e.target.closest('[data-pclose]')) HX.closePanel();
+    if (e.target.closest('#sfSave')) { const v = {}; HXC.SALE_FIELDS.forEach(f => { const x = $('#sf_' + f.key, p).value.trim(); v[f.key] = x === '' ? null : f.type === 'NUMBER' ? Number(x) : x; });
+      if (!v.name || !v.email) { $('#sfErr', p).textContent = 'Nhập họ tên và email của sale'; return; }
+      if (HXC.saleByName(v.name)) { $('#sfErr', p).textContent = `Đã có sale tên “${v.name}”`; return; }
+      const s = HXC.createSale(v); HX.closePanel(); toast(`Đã thêm sale “${v.name}”`); draw(); } };
+  p.classList.add('open'); document.body.classList.add('panel-open'); document.body.classList.remove('dock'); $('#sf_name', p).focus();
+}
+
+/* ═══ DANH SÁCH ═══ */
+const COLS = [
+  ['team','Team'],['role','Vai trò'],['contacts','Contacts','n'],['companies','Companies','n'],['open','Deal đang mở','n'],['pipeline','Giá trị pipeline','n'],['forecast','Dự báo (theo tỷ lệ)','n'],
+  ['wonSum','Doanh số thắng','n'],['quota','Chỉ tiêu','n'],['pct','% đạt chỉ tiêu'],['winRate','Tỷ lệ thắng','n'],['acts30','Hoạt động 30 ngày','n'],['overdue','Task quá hạn','n']];
+function rows() {
+  const [a, b] = range(st.rg);
+  return HXC.sales().map(s => { const x = HXC.saleStats(s.values.name, a, b);
+    return { s, x, team:s.values.team, role:s.values.role, contacts:x.contacts.length, companies:x.companies.length, open:x.open.length, pipeline:x.pipeline, forecast:x.forecast, wonSum:x.wonSum, quota:x.quota, pct:x.pct ?? -1, winRate:x.winRate ?? -1, acts30:x.acts30, overdue:x.overdue.length, name:s.values.name }; });
+}
+function drawList() {
+  document.title = 'Sales — HarnexAI CRM (mockup)';
+  const teams = [...new Set(HXC.sales().map(s => s.values.team).filter(Boolean))];
+  const all = rows(), ranked = [...all].sort((a, b) => b.wonSum - a.wonSum || b.pipeline - a.pipeline);
+  const rank = new Map(ranked.map((r, i) => [r.s.id, i + 1]));
+  let list = all.filter(r => st.view === 'all' || (st.view === 'me' ? r.name === HXC.ME : r.team === st.view)).filter(r => !st.q || [r.name, r.s.values.email, r.team, r.role].join(' ').toLowerCase().includes(st.q));
+  const { k, dir } = st.sort; list.sort((a, b) => { const va = a[k], vb = b[k]; const c = typeof va === 'number' ? va - vb : String(va || '').localeCompare(String(vb || ''), 'vi'); return dir === 'asc' ? c : -c; });
+  const sum = f => list.reduce((s, r) => s + (Number(r[f]) || 0), 0);
+  const tq = sum('quota'), tw = sum('wonSum'), tp = tq ? Math.round(tw / tq * 100) : null;
+  $('#frame').className = 'frame';
+  $('#frame').innerHTML = `
+    <div class="ph"><h1 class="ttl">Sales</h1><span class="count">${HXC.sales().length} sale</span>
+      <div class="ph-act"><button class="btn btn--secondary" id="csvBtn"><span class="ms sm">ios_share</span>Export</button><button class="btn btn--primary" id="addSale"><span class="ms sm">person_add</span>Thêm sale</button></div></div>
+    <div class="vtabs" role="tablist">${[['all','Tất cả sales'],['me','Của tôi'], ...teams.map(t => [t, t])].map(([k, l]) => `<button class="vtab" role="tab" aria-selected="${st.view === k}" data-view="${esc(k)}">${esc(l)}</button>`).join('')}</div>
+    <div class="tools"><label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm tên, email, team" value="${esc(st.q)}" aria-label="Tìm sale"></label>${rgSeg()}</div>
+    <div class="kpis">
+      <div class="kpi"><div class="l"><span class="ms xs">emoji_events</span>Doanh số thắng</div><div class="v">${short(tw)}</div><div class="s">Deal Closed Won có ngày chốt trong kỳ</div></div>
+      <div class="kpi"><div class="l"><span class="ms xs">flag</span>Đạt chỉ tiêu</div><div class="v">${tp == null ? '—' : tp + '%'}</div><div class="s">Chỉ tiêu kỳ: ${short(tq)}</div></div>
+      <div class="kpi"><div class="l"><span class="ms xs">filter_alt</span>Pipeline đang mở</div><div class="v">${short(sum('pipeline'))}</div><div class="s">${sum('open')} deal · dự báo ${short(sum('forecast'))}</div></div>
+      <div class="kpi"><div class="l"><span class="ms xs">forum</span>Hoạt động 30 ngày</div><div class="v">${sum('acts30')}</div><div class="s">Ghi chú · cuộc gọi · cuộc họp</div></div>
+      <div class="kpi ${sum('overdue') ? 'warn' : ''}"><div class="l"><span class="ms xs">assignment_late</span>Task quá hạn</div><div class="v">${sum('overdue')}</div><div class="s">Chưa hoàn thành, quá ngày hạn</div></div></div>
+    <div class="body"><table class="lt"><thead><tr><th class="nmcol" data-sort="name">Sale${srt('name')}</th>${COLS.map(([k, l, n]) => `<th class="${n ? 'num' : ''}" data-sort="${k}">${l}${srt(k)}</th>`).join('')}</tr></thead>
+      <tbody>${list.map(r => `<tr data-id="${r.s.id}" class="${r.s.values.status && r.s.values.status !== 'Đang làm việc' ? 'st-off' : ''}"><td class="nmcol"><div class="pri"><span class="rk ${rank.get(r.s.id) === 1 && r.wonSum ? 'g1' : ''}" title="Hạng theo doanh số thắng">${rank.get(r.s.id)}</span><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.s.values.email || '')}</small></div></div></td>
+        <td>${esc(r.team || '—')}</td><td>${esc(r.role || '—')}</td><td class="num">${r.contacts}</td><td class="num">${r.companies}</td><td class="num">${r.open}</td><td class="num">${short(r.pipeline)}</td><td class="num">${short(r.forecast)}</td>
+        <td class="num"><b>${short(r.wonSum)}</b></td><td class="num">${r.quota ? short(r.quota) : '—'}</td><td>${bar(r.x.pct)}</td><td class="num">${r.x.winRate == null ? '—' : r.x.winRate + '%'}</td><td class="num">${r.acts30}</td><td class="num">${r.overdue ? `<span class="od">${r.overdue}</span>` : 0}</td></tr>`).join('')
+        || `<tr><td colspan="${COLS.length + 1}" class="empty">Không có sale phù hợp.</td></tr>`}</tbody></table></div>
+    <div class="foot"><span class="pillc">${list.length} sale</span><span>Chỉ tiêu kỳ = chỉ tiêu tháng × số tháng của kỳ. Bấm tên cột để sắp xếp, bấm dòng để xem chi tiết.</span></div>`;
+}
+const srt = k => st.sort.k === k ? `<span class="ms xs srt">${st.sort.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>` : '';
+function exportCsv() {
+  const list = rows(), head = ['Sale','Email', ...COLS.map(c => c[1])];
+  const csv = [head, ...list.map(r => [r.name, r.s.values.email, r.team, r.role, r.contacts, r.companies, r.open, r.pipeline, Math.round(r.forecast), r.wonSum, r.quota, r.x.pct ?? '', r.x.winRate ?? '', r.acts30, r.overdue])].map(a => a.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type:'text/csv' })); a.download = `sales-${st.rg}.csv`; a.click(); toast('Đã xuất CSV');
+}
+
+/* ═══ CHI TIẾT ═══ */
+const IC = { NOTE:'edit_note', CALL:'call', MEETING:'event', TASK:'task_alt', EMAIL:'mail' }, TN = { NOTE:'Ghi chú', CALL:'Cuộc gọi', MEETING:'Cuộc họp', TASK:'Task', EMAIL:'Email' };
+function refOf(a) { const t = a.deals && a.deals[0] ? ['deal', a.deals[0]] : a.contacts && a.contacts[0] ? ['contact', a.contacts[0]] : a.companies && a.companies[0] ? ['company', a.companies[0]] : null;
+  if (!t) return ''; const r = HXC.get(t[0], t[1]); return r ? ` · <a href="${HXC.url(t[0], t[1])}">${esc(HXC.titleOf(t[0], r))}</a>` : ''; }
+function drawDetail(s) {
+  const name = s.values.name; document.title = `${name} — Sales`;
+  const [a, b] = range(st.rg), x = HXC.saleStats(name, a, b), today = NOW.toISOString().slice(0, 10);
+  const byStage = HX.STAGES.map(sg => { const ds = x.deals.filter(d => d.values[HXC.STAGE] === sg); return [sg, ds.length, ds.reduce((t, d) => t + (Number(d.values[HXC.CASH]) || 0), 0)]; });
+  const maxV = Math.max(1, ...byStage.map(r => r[2]));
+  const todo = [...x.overdue, ...x.upcoming.filter(t => !x.overdue.includes(t))].slice(0, 8);
+  $('#frame').className = 'frame rec';
+  $('#frame').innerHTML = `<div class="grid">
+    <div class="col">
+      <section class="card"><div class="top"><a class="back" href="crm-sales-hubspot.html"><span class="ms sm">chevron_left</span>Sales</a><button class="btn btn--text sm" id="actBtn" aria-haspopup="menu">Thao tác<span class="ms xs">arrow_drop_down</span></button></div>
+        <div class="idt"><span class="ic">${esc(HXC.initials(name))}</span><div style="min-width:0"><h1>${esc(name)}</h1><div class="nil" style="font-size:13px">${esc([s.values.role, s.values.team].filter(Boolean).join(' · '))}</div></div></div>
+        <div class="sub">${s.values.email ? `<a href="mailto:${esc(s.values.email)}">${esc(s.values.email)}</a>` : ''}${s.values.phone ? `<span>${esc(s.values.phone)}</span>` : ''}</div>
+        <div class="qa">${s.values.email ? `<a href="mailto:${esc(s.values.email)}"><span class="o"><span class="ms sm">mail</span></span>Email</a>` : ''}${s.values.phone ? `<a href="tel:${esc(s.values.phone.replace(/\s/g, ''))}"><span class="o"><span class="ms sm">call</span></span>Gọi</a>` : ''}
+          <a href="crm-giao-dich-hubspot.html"><span class="o"><span class="ms sm">handshake</span></span>Deals</a><a href="crm-bao-cao-hubspot.html"><span class="o"><span class="ms sm">bar_chart</span></span>Báo cáo</a></div></section>
+      <section class="card"><div class="ch">Thông tin sale</div><div class="cb"><div class="props" id="sp"></div></div><div class="meta">Ngày tạo: ${HXC.dt(s.createdAt)}</div></section>
+    </div>
+    <div class="col">
+      <section class="card"><div class="ch">Hiệu suất</div><div class="cb"><div class="perf-rg">${rgSeg()}</div>
+        <div class="dk">
+          <div class="kpi"><div class="l">Doanh số thắng</div><div class="v">${short(x.wonSum)}</div><div class="s">${x.won.length} deal Closed Won</div></div>
+          <div class="kpi"><div class="l">Chỉ tiêu kỳ</div><div class="v">${x.quota ? short(x.quota) : '—'}</div><div class="s">${bar(x.pct)}</div></div>
+          <div class="kpi"><div class="l">Pipeline đang mở</div><div class="v">${short(x.pipeline)}</div><div class="s">${x.open.length} deal · dự báo ${short(x.forecast)}</div></div>
+          <div class="kpi"><div class="l">Tỷ lệ thắng</div><div class="v">${x.winRate == null ? '—' : x.winRate + '%'}</div><div class="s">${x.won.length} thắng · ${x.lost.length} thua trong kỳ</div></div>
+          <div class="kpi"><div class="l">Hoạt động 30 ngày</div><div class="v">${x.acts30}</div><div class="s">Ghi chú · cuộc gọi · cuộc họp</div></div>
+          <div class="kpi ${x.overdue.length ? 'warn' : ''}"><div class="l">Task quá hạn</div><div class="v">${x.overdue.length}</div><div class="s">${x.tasks.length} task chưa xong</div></div>
+        </div></div></section>
+      <section class="card"><div class="ch">Pipeline theo giai đoạn<span class="r"><a class="btn btn--text sm" href="crm-giao-dich-hubspot.html">Mở Deals<span class="ms xs">open_in_new</span></a></span></div><div class="cb stg">
+        ${byStage.map(([sg, n, v]) => `<div class="row"><span>${display(sg, F[HXC.STAGE])}</span><span class="t"><i style="width:${v / maxV * 100}%"></i></span><span class="n">${n} · ${short(v)}</span></div>`).join('')}</div></section>
+      <section class="card"><div class="ch">Việc cần làm (${todo.length})</div><div class="cb">${todo.length ? todo.map(t => `<div class="ri"><span class="ms sm">${IC[t.type]}</span><div class="x"><b>${esc(t.title || t.body)}</b>${refOf(t)}
+          <div class="nil">${t.type === 'TASK' ? `Hạn ${t.due ? HXC.dOnly(t.due) : '—'}${t.due && t.due < today ? ' · <span class="od">Quá hạn</span>' : t.due === today ? ' · <b>Hôm nay</b>' : ''} · Ưu tiên ${esc(t.prio || 'Không')}` : HXC.dt(t.at)}</div></div></div>`).join('') : '<div class="ac-empty nil">Không có task hay cuộc họp sắp tới.</div>'}</div></section>
+      <section class="card"><div class="ch">Hoạt động gần đây</div><div class="cb">${x.recent.slice(0, 6).map(t => `<div class="ri"><span class="ms sm">${IC[t.type] || 'bolt'}</span><div class="x"><b>${TN[t.type] || 'Hoạt động'}${t.title ? ': ' + esc(t.title) : ''}</b>${refOf(t)}<div class="nil">${HXC.dt(t.at)}${t.body && t.body !== t.title ? ' · ' + esc(t.body.replace(/<[^>]+>/g, '').slice(0, 90)) : ''}</div></div></div>`).join('') || '<div class="ac-empty nil">Chưa có hoạt động.</div>'}</div></section>
+    </div>
+    <div class="col col-r">
+      ${card('deal', 'Deals', x.deals, d => [HX.title(d) + (d.values.t_n_deal ? ' — ' + d.values.t_n_deal : ''), `${short(d.values[HXC.CASH])} · ${String(d.values[HXC.STAGE] || '').replace(/^\d\.\s*/, '')}`])}
+      ${card('company', 'Companies', x.companies, c => [c.values.name, c.values.lifecycle || ''])}
+      ${card('contact', 'Contacts', x.contacts, c => [HXC.fullName(c), c.values.jobtitle || c.values.lifecycle || ''])}
+    </div></div>`;
+  drawSaleProps(s);
+}
+function card(t, label, arr, fn) {
+  const shown = arr.slice(0, 6);
+  return `<section class="card"><div class="ch"><span class="ms sm">${HXC.OBJ[t].icon}</span>${label} (${arr.length})<span class="r"><a class="btn btn--text sm" href="${HXC.OBJ[t].list}">Xem tất cả</a></span></div><div class="cb ai-l">
+    ${shown.map(r => { const [n, m] = fn(r); return `<a class="it" href="${HXC.url(t, r.id)}"><span class="nm">${esc(n)}</span><small>${esc(m)}</small></a>`; }).join('') || `<div class="ac-empty nil" style="font-size:13px">Chưa sở hữu ${label.toLowerCase()} nào.</div>`}
+    ${arr.length > shown.length ? `<div class="nil" style="font-size:12px;padding-top:6px">+${arr.length - shown.length} bản ghi khác</div>` : ''}</div></section>`;
+}
+function drawSaleProps(s) {
+  const box = $('#sp');
+  box.innerHTML = HXC.SALE_FIELDS.map(f => `<div class="prop" data-k="${f.key}"><label>${esc(f.name)}</label><div class="v">${f.key === 'quota' && s.values.quota ? esc(HXC.money(s.values.quota)) : display(s.values[f.key], f)}</div></div>`).join('');
+  box.onclick = e => { const pr = e.target.closest('.prop'); if (!pr || pr.querySelector('.ed,.selcell')) return;
+    const f = HXC.SALE_FIELDS.find(x => x.key === pr.dataset.k);
+    pr.querySelector('.v').replaceChildren(HX.editor(f, s.values[f.key], nv => {
+      if (f.key === 'name' && (!nv || (nv !== s.values.name && HXC.saleByName(nv)))) { toast(nv ? `Đã có sale tên “${nv}”` : 'Tên không được để trống'); drawSaleProps(s); return; }
+      if (nv !== s.values[f.key]) { const renamed = f.key === 'name'; HXC.updateSale(s.id, f.key, nv); toast(renamed ? 'Đã đổi tên — cập nhật owner ở mọi Contact, Company, Deal liên quan' : `Đã lưu “${f.name}”`); drawDetail(s); return; }
+      drawSaleProps(s); }, () => drawSaleProps(s), 'page')); };
+}
+function reassign(s, anchor) {
+  const others = HXC.sales().filter(o => o.id !== s.id);
+  const [a, b] = range(st.rg), x = HXC.saleStats(s.values.name, a, b);
+  const p = openFp(anchor, `<div class="pop-form" style="padding:8px"><b>Chuyển giao bản ghi</b><div class="nil" style="font-size:12px">${x.contacts.length} contact · ${x.companies.length} company · ${x.open.length} deal đang mở của ${esc(s.values.name)} sẽ chuyển cho:</div>
+    <select class="in" id="raTo" style="height:34px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 8px;background:var(--surface)">${others.map(o => `<option>${esc(o.values.name)}</option>`).join('')}</select>
+    <div style="display:flex;justify-content:flex-end;gap:6px"><button class="btn btn--secondary sm" data-fx>Huỷ</button><button class="btn btn--primary sm" id="raOk">Chuyển giao</button></div></div>`, 300);
+  $('#raOk', p).onclick = () => { const to = $('#raTo', p).value;
+    x.contacts.forEach(c => HXC.update('contact', c.id, 'owner', to)); x.companies.forEach(c => HXC.update('company', c.id, 'owner', to)); x.open.forEach(d => HX.api.update(d.id, HXC.SALE, to));
+    closeFp(); toast(`Đã chuyển ${x.contacts.length + x.companies.length + x.open.length} bản ghi cho ${to}`); drawDetail(s); };
+}
+
+/* ── Điều phối ── */
+function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : drawList(); }
+draw();
+HX.onChange = draw;
+document.addEventListener('click', e => {
+  const rg = e.target.closest('[data-rg]'); if (rg) { st.rg = rg.dataset.rg; saveSt(); draw(); return; }
+  const vt = e.target.closest('[data-view]'); if (vt) { st.view = vt.dataset.view; saveSt(); draw(); return; }
+  const th = e.target.closest('th[data-sort]'); if (th) { const k = th.dataset.sort; st.sort = { k, dir: st.sort.k === k && st.sort.dir === 'desc' ? 'asc' : 'desc' }; saveSt(); draw(); return; }
+  if (e.target.closest('#addSale')) { salePanel(); return; }
+  if (e.target.closest('#csvBtn')) { exportCsv(); return; }
+  const tr = e.target.closest('tbody tr[data-id]'); if (tr && !e.target.closest('a')) { location.href = '?id=' + tr.dataset.id; return; }
+  if (e.target.closest('[data-fx]')) { closeFp(); return; }
+  const ab = e.target.closest('#actBtn'); if (ab) { e.stopPropagation(); const s = HXC.saleById(qs.get('id'));
+    openFp(ab, `<button class="mi" data-ra><span class="ms sm">swap_horiz</span>Chuyển giao bản ghi cho sale khác</button><a class="mi" href="crm-quan-he-hubspot.html"><span class="ms sm">schema</span>Xem sơ đồ quan hệ dữ liệu</a><div class="sep"></div>
+      <button class="mi" data-off><span class="ms sm">${s.values.status === 'Đang làm việc' ? 'person_off' : 'person_check'}</span>${s.values.status === 'Đang làm việc' ? 'Đánh dấu đã nghỉ' : 'Đánh dấu đang làm việc'}</button>`, 280); fp.dataset.src = 'act'; return; }
+  if (e.target.closest('[data-ra]')) { e.stopPropagation(); reassign(HXC.saleById(qs.get('id')), $('#actBtn')); return; }
+  if (e.target.closest('[data-off]')) { const s = HXC.saleById(qs.get('id')); const on = s.values.status === 'Đang làm việc'; closeFp();
+    if (on) confirmBox('Đánh dấu đã nghỉ', `${esc(s.values.name)} vẫn giữ các bản ghi đang sở hữu. Nên dùng “Chuyển giao bản ghi” trước khi đánh dấu nghỉ.`, 'Đánh dấu nghỉ', () => { HXC.updateSale(s.id, 'status', 'Đã nghỉ'); toast('Đã cập nhật trạng thái'); draw(); });
+    else { HXC.updateSale(s.id, 'status', 'Đang làm việc'); toast('Đã cập nhật trạng thái'); draw(); } return; }
+  if (!e.target.closest('#fpop')) closeFp();
+});
+document.addEventListener('input', e => { if (e.target.id === 'q') { st.q = e.target.value.trim().toLowerCase(); const pos = e.target.selectionStart; draw(); const q = $('#q'); q.focus(); q.setSelectionRange(pos, pos); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFp(); });
+</script>
+</body>
+</html>

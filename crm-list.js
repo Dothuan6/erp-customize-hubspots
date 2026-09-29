@@ -26,6 +26,8 @@ function HXList(T) {
     cols:['owner','_created','phone','_lastact','city','country','industry'], colsMore:['domain','lifecycle','leadstatus','employees','_contacts','_deals'],
     expand:[['contact','Contacts'],['deal','Deals']], board:'lifecycle',
   };
+  // Phần 7: trường tự tạo (vùng "Trường bổ sung") dùng được làm cột & bộ lọc nhanh
+  O.fields.filter(f => f.custom).forEach(f => { if (!CFG.colsMore.includes(f.key)) CFG.colsMore.push(f.key); if (!['LONG_TEXT','URL'].includes(f.type) && !CFG.quickMore.includes(f.key)) CFG.quickMore.push(f.key); });
   const DATE_P = [['today','Hôm nay','Cả ngày hôm nay'],['yesterday','Hôm qua','24 giờ của ngày trước'],['week','Tuần này','Từ thứ Hai tuần này'],['lastweek','Tuần trước','Thứ Hai – Chủ nhật tuần trước'],
     ['month','Tháng này','Từ ngày 1 tháng này'],['lastmonth','Tháng trước','Cả tháng trước'],['d7','7 ngày qua','7 ngày gần nhất'],['d30','30 ngày qua','30 ngày gần nhất'],['d90','90 ngày qua','90 ngày gần nhất'],['quarter','Quý này','Từ đầu quý'],['year','Năm nay','Từ ngày 1/1']];
   const st = { view:'all', q:'', f:{}, adv:[], sort:{ key:'_created', dir:'desc' }, sel:new Set(), mode:'TABLE', quick:[...CFG.quick], cols:[...CFG.cols], exp:{}, fcollapsed:false, compact:false };

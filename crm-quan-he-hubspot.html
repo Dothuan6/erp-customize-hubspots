@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi" data-brand="crm">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sơ đồ quan hệ dữ liệu — HarnexAI CRM (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link rel="stylesheet" href="crm-shared.css">
+<style>
+/* ═══ Phần 7 · Lưu đồ quan hệ Company – Contact – Deal – Sale ═══
+   Clone ý tưởng "Data model overview" của HubSpot (Settings › Data management › Data model): mỗi đối tượng là 1 thẻ (số bản ghi, số thuộc tính),
+   đường nối = liên kết (association) kèm bản số 1:N / N:N. Rê chuột để làm nổi liên kết của 1 đối tượng, bấm thẻ để xem chi tiết. Số liệu tính trực tiếp từ dữ liệu mẫu. */
+.frame{overflow:auto}
+.frame>*{flex:none}
+.ph{display:flex;align-items:center;gap:8px;padding:16px 16px 4px;flex-wrap:wrap}
+.ph h1{font-size:24px;font-weight:600}
+.ph .r{margin-left:auto;display:flex;gap:8px}
+.lead{padding:0 16px 8px;font-size:13px;color:var(--on-surface-variant);max-width:900px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;padding:4px 16px 8px;font-size:12px;color:var(--on-surface-variant)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:28px;height:0;border-top:2px solid var(--on-surface-variant)}
+.legend i.own{border-color:#7C4DFF}
+.legend i.act{border-top-style:dashed}
+.cv{margin:0 16px 16px;border:1px solid var(--outline-variant);border-radius:var(--radius-lg);background:
+  radial-gradient(circle,var(--outline-variant) 1px,transparent 1.2px) 0 0/18px 18px,var(--page-bg);overflow-x:auto}
+.cv svg{display:block;width:100%;min-width:760px;height:auto}
+/* Thẻ đối tượng */
+.nd{cursor:pointer}
+.nd rect.bx{fill:var(--surface);stroke:var(--outline-variant);stroke-width:1.2;transition:stroke .15s}
+.nd:hover rect.bx,.nd.sel rect.bx,.nd:focus rect.bx{stroke:var(--primary);stroke-width:2}
+.nd:focus{outline:none}
+.nd .tp{font:700 15px 'Be Vietnam Pro',Inter,sans-serif;fill:var(--on-surface)}
+.nd .sb{font:500 12px Inter,sans-serif;fill:var(--on-surface-variant)}
+.nd .ic{font-family:'Material Symbols Outlined';font-size:20px;fill:#fff}
+/* Đường liên kết */
+.eg path{fill:none;stroke:var(--on-surface-variant);stroke-width:1.6;transition:opacity .15s,stroke-width .15s}
+.eg.own path{stroke:#7C4DFF}
+.eg.act path{stroke-dasharray:6 5}
+.eg .ch rect{fill:var(--surface);stroke:var(--outline-variant)}
+.eg.own .ch rect{stroke:#B39DDB}
+.eg .ch text{font:600 11.5px Inter,sans-serif;fill:var(--on-surface)}
+.eg .ch text .c{font-weight:700;fill:var(--primary)}
+.eg .ch{cursor:pointer}
+svg.hl .eg,svg.hl .nd{opacity:.18}
+svg.hl .eg.on,svg.hl .nd.on{opacity:1}
+svg.hl .eg.on path{stroke-width:2.6}
+/* Bảng quan hệ */
+.sec{padding:0 16px 20px}
+.sec h2{font-size:16px;font-weight:600;margin:6px 0 10px}
+.tw{overflow-x:auto;border:1px solid var(--outline-variant);border-radius:var(--radius-md)}
+table.rt{border-collapse:collapse;width:100%;min-width:880px}
+.rt th,.rt td{padding:10px 12px;border-bottom:1px solid var(--outline-variant);text-align:left;font-size:13px;vertical-align:top}
+.rt th{font-weight:600;font-size:12px;color:var(--on-surface-variant);background:var(--surface-2)}
+.rt tr:last-child td{border-bottom:none}
+.rt tbody tr{cursor:pointer}
+.rt tbody tr:hover td{background:var(--surface-2)}
+.rt code{font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.card-n{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:var(--radius-pill);font-size:11.5px;font-weight:700;background:var(--primary-container);color:var(--on-primary-container);white-space:nowrap}
+.flow{display:grid;gap:10px;grid-template-columns:1fr}
+@media(min-width:900px){.flow{grid-template-columns:repeat(4,1fr)}}
+.fs{border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:12px;font-size:13px;position:relative}
+.fs b{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.fs .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--primary);color:var(--on-primary);font-size:12px;font-weight:700}
+.fs p{color:var(--on-surface-variant)}
+/* Panel chi tiết */
+.pd h3{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--on-surface-variant);margin:16px 0 6px}
+.pd .al{display:flex;flex-direction:column}
+.pd .al div{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--outline-variant);font-size:13px}
+.pd .al div:first-child{border-top:none}
+.pd .al .n{margin-left:auto;font-weight:700}
+.pd .fl{display:flex;flex-wrap:wrap;gap:6px}
+.pd p{font-size:13px;line-height:1.55}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar" id="topbar"></header>
+  <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
+  <main class="main"><div class="frame" id="frame">
+    <div class="ph"><h1>Sơ đồ quan hệ dữ liệu</h1><span class="tag">Company · Contact · Deal · Sale</span>
+      <div class="r"><a class="btn btn--secondary" href="crm-sales-hubspot.html"><span class="ms sm">badge</span>Sales</a><button class="btn btn--secondary" id="pngBtn"><span class="ms sm">download</span>Tải SVG</button></div></div>
+    <p class="lead">Mỗi thẻ là một đối tượng CRM (collection trên ERP). Đường tím = quyền sở hữu (Sale là owner), đường liền = liên kết lưu trên bản ghi, đường đứt = hoạt động gắn với nhiều bản ghi. Rê chuột vào thẻ để làm nổi các liên kết của nó; bấm thẻ hoặc nhãn để xem chi tiết và số liên kết thực tế.</p>
+    <div class="legend"><span><i class="own"></i>Sở hữu (owner)</span><span><i></i>Liên kết (association)</span><span><i class="act"></i>Hoạt động gắn bản ghi</span><span><b style="color:var(--primary)">1:N</b> một – nhiều</span><span><b style="color:var(--primary)">N:N</b> nhiều – nhiều</span></div>
+    <div class="cv"><svg id="dg" viewBox="0 0 1120 720" role="img" aria-label="Sơ đồ quan hệ giữa Sale, Company, Contact, Deal, Hoạt động, Line item và Sản phẩm"></svg></div>
+    <div class="sec"><h2>Luồng dữ liệu bán hàng</h2><div class="flow" id="flow"></div></div>
+    <div class="sec"><h2>Chi tiết các quan hệ</h2><div class="tw"><table class="rt"><thead><tr><th>Quan hệ</th><th>Bản số</th><th>Lưu ở đâu (gợi ý BE)</th><th>Hiển thị / thao tác ở màn hình</th><th>Khi xoá</th><th style="text-align:right">Liên kết hiện có</th></tr></thead><tbody id="rt"></tbody></table></div></div>
+  </div></main>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel"></aside>
+<div class="modal-bg" id="modal"></div>
+<div class="demo" id="demo" role="group" aria-label="Điều khiển mockup"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="crm-shared.js"></script>
+<script src="crm-objects.js"></script>
+<script>
+const { esc, toast, $ } = HX;
+HX.shell('schema');
+const db = HXC.db(), deals = HX.api.list(), links = db.dealLinks;
+const saleNames = HXC.sales().map(s => s.values.name);
+const W = 200, H = 88;
+/* ── Đối tượng ── */
+const N = {
+  contact: { x:460, y:40,  name:'Contact', icon:'person', color:'#FF7A59', href:'crm-contacts-hubspot.html', n: db.contacts.length, props: HXC.CONTACT_FIELDS.length,
+    desc:'Người liên hệ tại khách hàng. Mỗi contact có tối đa 1 công ty chính, có thể tham gia nhiều Deal với nhãn vai trò (Người quyết định, Người ảnh hưởng…).', keys:['email','firstname','lastname','owner','lifecycle','leadstatus'] },
+  sale: { x:460, y:200, name:'Sale', icon:'badge', color:'#7C4DFF', href:'crm-sales-hubspot.html', n: HXC.sales().length, props: HXC.SALE_FIELDS.length,
+    desc:'Nhân viên kinh doanh (collection NhanVien của ERP). Là owner của Contact, Company và “Sale phụ trách” của Deal; là người tạo / được giao hoạt động. KPI trên trang Sales được tính từ các liên kết này.', keys:['name','email','team','role','quota','status'] },
+  company: { x:80, y:320, name:'Company', icon:'domain', color:'#0091AE', href:'crm-companies-hubspot.html', n: db.companies.length, props: HXC.COMPANY_FIELDS.length,
+    desc:'Doanh nghiệp khách hàng. Gom nhiều contact và nhiều deal; lifecycle stage của company phản ánh deal tốt nhất.', keys:['name','domain','industry','owner','lifecycle','leadstatus'] },
+  deal: { x:840, y:320, name:'Deal', icon:'handshake', color:'#00A884', href:'crm-giao-dich-hubspot.html', n: deals.length, props: HX.FIELDS.length,
+    desc:'Cơ hội bán hàng (collection Deals_Pipeline của ERP). Thuộc 1 company, có nhiều contact, 1 sale phụ trách, nhiều line item; giá trị Deal có thể lấy từ tổng line item.', keys:['m_deal','t_n_deal','giai_o_n_pipeline','t_ng_cash_in_d_ki_n','ng_y_d_ki_n_ch_t','sale_ph_tr_ch'] },
+  activity: { x:460, y:500, name:'Hoạt động', icon:'forum', color:'#516F90', href:null, n: db.activities.length, props: 8,
+    desc:'Ghi chú, cuộc gọi, cuộc họp, task (collection Sales_Activities). Một hoạt động gắn cùng lúc với nhiều contact / company / deal nên hiện trên timeline của tất cả bản ghi đó.', keys:[] },
+  lineitem: { x:840, y:500, name:'Line item', icon:'receipt_long', color:'#F5A623', href:null, n: db.lineItems.length, props: 8 + db.liFields.length,
+    desc:'Dòng sản phẩm trong Deal: số lượng, đơn giá, chiết khấu, tần suất thanh toán, kỳ hạn. Sao chép giá từ sản phẩm lúc thêm, sửa riêng không ảnh hưởng thư viện.', keys:[] },
+  product: { x:840, y:630, name:'Sản phẩm', icon:'inventory_2', color:'#99AFC4', href:null, n: db.products.length, props: 6,
+    desc:'Thư viện sản phẩm / gói dịch vụ dùng chung. Một sản phẩm được dùng ở nhiều line item của nhiều deal.', keys:[] },
+};
+/* ── Liên kết: điểm vẽ, bản số, nơi lưu, số liên kết thực tế ── */
+const cnt = {
+  saleContact: db.contacts.filter(c => saleNames.includes(c.values.owner)).length,
+  saleCompany: db.companies.filter(c => saleNames.includes(c.values.owner)).length,
+  saleDeal: deals.filter(d => saleNames.includes(d.values[HXC.SALE])).length,
+  coCt: db.contacts.filter(c => c.company).length,
+  coDeal: Object.values(links).filter(l => l.company).length,
+  ctDeal: Object.values(links).reduce((s, l) => s + l.contacts.length, 0),
+  actCt: db.activities.reduce((s, a) => s + (a.contacts || []).length, 0),
+  actCo: db.activities.reduce((s, a) => s + (a.companies || []).length, 0),
+  actDeal: db.activities.reduce((s, a) => s + (a.deals || []).length, 0),
+  dealLi: db.lineItems.length, prodLi: db.lineItems.filter(li => li.product).length,
+};
+const E = [
+  { a:'sale', b:'contact', k:'own', pts:[[560,200],[560,128]], lab:[560,164], card:'1:N', name:'Contact owner', lb:'owner', field:'contact.owner = sale.name (BE nên lưu sale_id)', ui:'Cột & bộ lọc “Contact owner” ở danh sách; “Thông tin chính” trên record; trang Sales › Contacts', del:'Sale nghỉ → “Chuyển giao bản ghi” cho sale khác', n:cnt.saleContact },
+  { a:'sale', b:'company', k:'own', pts:[[460,250],[280,336]], lab:[370,293], card:'1:N', name:'Company owner', lb:'owner', field:'company.owner = sale.name', ui:'Danh sách Companies; record Company; trang Sales › Companies', del:'Như trên', n:cnt.saleCompany },
+  { a:'sale', b:'deal', k:'own', pts:[[660,250],[840,336]], lab:[750,293], card:'1:N', name:'Sale phụ trách', lb:'Sale phụ trách', field:'deal.sale_ph_tr_ch (trường có sẵn trên Deals_Pipeline)', ui:'Bảng / board Deals, “Về Deal này”, Báo cáo theo owner, trang Sales › Deals', del:'Như trên', n:cnt.saleDeal },
+  { a:'company', b:'contact', k:'', pts:[[220,320],[460,108]], lab:[330,222], card:'1:N', name:'Công ty chính', lb:'Công ty chính', field:'contact.company_id', ui:'Card “Companies” trên record Contact, card “Contacts” trên record Company, cột “Công ty chính”', del:'Xoá company → contact mất công ty chính (không xoá contact)', n:cnt.coCt },
+  { a:'contact', b:'deal', k:'', pts:[[660,108],[900,320]], lab:[790,222], card:'N:N', name:'Contact của Deal + nhãn vai trò', lb:'có nhãn vai trò', field:'bảng nối deal_contacts(deal_id, contact_id, label)', ui:'Card “Contacts” trên Deal (nhãn Người quyết định…), card “Deals” trên Contact, form tạo Deal', del:'Xoá 1 bên → xoá dòng nối', n:cnt.ctDeal },
+  { a:'company', b:'deal', k:'', pts:[[280,384],[840,384]], lab:[560,384], card:'1:N', name:'Công ty của Deal', lb:'Công ty của Deal', field:'deal.company_id', ui:'Card “Companies” trên Deal, card “Deals” trên Company, mở rộng dòng ở danh sách', del:'Xoá company → deal mất công ty (giữ deal)', n:cnt.coDeal },
+  { a:'activity', b:'company', k:'act', pts:[[460,548],[180,408]], lab:[330,483], card:'N:N', name:'Hoạt động của Company', lb:'gắn hoạt động', field:'activity_links(activity_id, object, record_id)', ui:'Timeline tab “Hoạt động”, Catch-up “Tương tác gần đây”', del:'Xoá hoạt động → gỡ khỏi mọi timeline', n:cnt.actCo },
+  { a:'activity', b:'deal', k:'act', pts:[[660,548],[890,408]], lab:[770,483], card:'N:N', name:'Hoạt động của Deal', lb:'gắn hoạt động', field:'activity_links', ui:'Timeline Deal; cột “Hoạt động tiếp theo” ở bảng Deals', del:'Như trên', n:cnt.actDeal },
+  { a:'activity', b:'contact', k:'act', pts:[[520,588],[520,690],[30,690],[30,70],[460,70]], lab:[245,70], card:'N:N', name:'Hoạt động của Contact', lb:'gắn hoạt động', field:'activity_links', ui:'Timeline Contact; “Liên hệ gần nhất” tự tính từ cuộc gọi / họp', del:'Như trên', n:cnt.actCt },
+  { a:'deal', b:'lineitem', k:'', pts:[[990,408],[990,500]], lab:[990,454], card:'1:N', name:'Line item của Deal', lb:'Line items', field:'line_item.deal_id', ui:'Card “Line items” + trình sửa toàn màn hình trên Deal', del:'Xoá deal → xoá line item', n:cnt.dealLi },
+  { a:'product', b:'lineitem', k:'', pts:[[940,630],[940,588]], lab:[940,609], card:'1:N', name:'Sản phẩm của Line item', lb:'Sản phẩm', field:'line_item.product_id (sao chép tên, giá)', ui:'Thư viện sản phẩm trong trình sửa line item', del:'Xoá sản phẩm → line item giữ bản sao', n:cnt.prodLi },
+];
+/* ── Vẽ ── */
+const svg = $('#dg');
+const path = pts => 'M' + pts.map(p => p.join(',')).join(' L');
+const chipW = e => 26 + (e.card + e.lb + e.n).length * 6.4;
+svg.innerHTML = `<defs><marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7"><circle cx="5" cy="5" r="4" fill="currentColor"/></marker></defs>`
+  + E.map((e, i) => `<g class="eg ${e.k}" data-a="${e.a}" data-b="${e.b}" data-e="${i}"><path d="${path(e.pts)}"/>
+      <g class="ch" tabindex="0" role="button" aria-label="${esc(N[e.a].name + ' – ' + N[e.b].name + ': ' + e.card)}"><title>${esc(e.name)} · ${esc(e.card)} · ${e.n} liên kết</title>
+        <rect x="${e.lab[0] - chipW(e) / 2}" y="${e.lab[1] - 11}" width="${chipW(e)}" height="22" rx="11"/><text x="${e.lab[0]}" y="${e.lab[1] + 4}" text-anchor="middle"><tspan class="c">${e.card}</tspan> ${esc(e.lb)} · ${e.n}</text></g></g>`).join('')
+  + Object.entries(N).map(([k, o]) => `<g class="nd" data-n="${k}" tabindex="0" role="button" aria-label="${esc(o.name)}: ${o.n} bản ghi"><title>${esc(o.name)} — bấm để xem chi tiết</title>
+      <rect class="bx" x="${o.x}" y="${o.y}" width="${W}" height="${H}" rx="10"/><rect x="${o.x}" y="${o.y}" width="${W}" height="5" rx="2" fill="${o.color}"/>
+      <circle cx="${o.x + 30}" cy="${o.y + 42}" r="17" fill="${o.color}"/><text class="ic" x="${o.x + 30}" y="${o.y + 52}" text-anchor="middle">${o.icon}</text>
+      <text class="tp" x="${o.x + 58}" y="${o.y + 40}">${esc(o.name)}</text><text class="sb" x="${o.x + 58}" y="${o.y + 60}">${o.n} bản ghi · ${o.props} thuộc tính</text></g>`).join('');
+/* Làm nổi liên kết khi rê chuột */
+function hl(k) { if (!k) { svg.classList.remove('hl'); svg.querySelectorAll('.on').forEach(x => x.classList.remove('on')); return; }
+  svg.classList.add('hl'); svg.querySelectorAll('.eg').forEach(g => { const on = g.dataset.a === k || g.dataset.b === k; g.classList.toggle('on', on); if (on) { svg.querySelector(`.nd[data-n="${g.dataset.a}"]`).classList.add('on'); svg.querySelector(`.nd[data-n="${g.dataset.b}"]`).classList.add('on'); } });
+  svg.querySelector(`.nd[data-n="${k}"]`).classList.add('on'); }
+svg.addEventListener('mouseover', e => { const n = e.target.closest('.nd'); const g = e.target.closest('.eg'); if (n) hl(n.dataset.n); else if (g) { hl(null); svg.classList.add('hl'); g.classList.add('on'); svg.querySelector(`.nd[data-n="${g.dataset.a}"]`).classList.add('on'); svg.querySelector(`.nd[data-n="${g.dataset.b}"]`).classList.add('on'); } });
+svg.addEventListener('mouseleave', () => hl(null));
+
+/* ── Panel chi tiết ── */
+function openP(html) { const p = $('#panel'); p.innerHTML = html; p.onclick = e => { if (e.target.closest('[data-pclose]')) HX.closePanel(); const x = e.target.closest('[data-go]'); if (x) nodePanel(x.dataset.go); };
+  p.classList.add('open'); document.body.classList.add('panel-open'); document.body.classList.remove('dock'); }
+function nodePanel(k) {
+  const o = N[k], es = E.filter(e => e.a === k || e.b === k);
+  const flds = k === 'sale' ? HXC.SALE_FIELDS : k === 'contact' ? HXC.CONTACT_FIELDS : k === 'company' ? HXC.COMPANY_FIELDS : k === 'deal' ? HX.FIELDS : [];
+  openP(`<div class="pn-h"><h2>${esc(o.name)}</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
+    <div class="pn-b pd"><p>${esc(o.desc)}</p>
+      <h3>Liên kết (${es.length})</h3><div class="al">${es.map(e => { const other = e.a === k ? e.b : e.a; return `<div><span class="ms sm" style="color:${N[other].color}">${N[other].icon}</span><button class="lk" data-go="${other}" style="color:var(--link);font-weight:600">${esc(N[other].name)}</button><span class="card-n">${e.card}</span><span class="nil" style="font-size:12px">${esc(e.name)}</span><span class="n">${e.n}</span></div>`; }).join('')}</div>
+      ${flds.length ? `<h3>Thuộc tính (${flds.length})</h3><div class="fl">${flds.map(f => `<span class="tag" title="${esc(HX.TYPE[f.type] ? HX.TYPE[f.type].name : f.type)}">${esc(f.name)}${f.custom || (k === 'deal' && !HXC.DEAL_BASE.includes(f.key)) ? ' · Mới' : ''}</span>`).join('')}</div>` : ''}
+      ${o.href ? `<div style="margin-top:18px"><a class="btn btn--primary" href="${o.href}">Mở ${esc(o.name)}<span class="ms sm">open_in_new</span></a></div>` : ''}</div>`);
+}
+function edgePanel(i) { const e = E[i];
+  openP(`<div class="pn-h"><h2>${esc(N[e.a].name)} ↔ ${esc(N[e.b].name)}</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
+    <div class="pn-b pd"><p><span class="card-n">${e.card}</span> <b>${esc(e.name)}</b></p>
+      <h3>Lưu ở đâu</h3><p><code>${esc(e.field)}</code></p><h3>Màn hình</h3><p>${esc(e.ui)}</p><h3>Khi xoá</h3><p>${esc(e.del)}</p>
+      <h3>Hiện có</h3><p><b>${e.n}</b> liên kết trong dữ liệu mẫu.</p>
+      <div style="margin-top:14px;display:flex;gap:8px"><button class="btn btn--secondary" data-go="${e.a}">${esc(N[e.a].name)}</button><button class="btn btn--secondary" data-go="${e.b}">${esc(N[e.b].name)}</button></div></div>`);
+}
+svg.addEventListener('click', e => { const g = e.target.closest('.ch'); if (g) { edgePanel(+g.closest('.eg').dataset.e); return; } const n = e.target.closest('.nd'); if (n) nodePanel(n.dataset.n); });
+svg.addEventListener('keydown', e => { if (e.key !== 'Enter' && e.key !== ' ') return; e.preventDefault(); const g = e.target.closest('.ch'); if (g) edgePanel(+g.closest('.eg').dataset.e); else if (e.target.closest('.nd')) nodePanel(e.target.closest('.nd').dataset.n); });
+svg.addEventListener('focusin', e => { const n = e.target.closest('.nd'); if (n) hl(n.dataset.n); });
+svg.addEventListener('focusout', () => hl(null));
+
+/* ── Luồng & bảng ── */
+$('#flow').innerHTML = [
+  ['Sale nhận lead', 'Sale tạo / được giao Contact (owner) và gắn Company chính. Company có owner riêng (thường là cùng sale).'],
+  ['Mở cơ hội', 'Tạo Deal từ Contact / Company: Deal tự liên kết Company + Contact (nhãn “Người quyết định”), Sale phụ trách = owner.'],
+  ['Chăm sóc & báo giá', 'Ghi hoạt động (gọi, họp, task) — mỗi hoạt động gắn cùng lúc Contact, Company, Deal. Thêm line item từ thư viện sản phẩm.'],
+  ['Chốt & đo lường', 'Deal Closed Won → Contact/Company thành Customer. Doanh số, pipeline, % chỉ tiêu của Sale tính từ các Deal này (trang Sales, Báo cáo).'],
+].map(([t, d], i) => `<div class="fs"><b><span class="n">${i + 1}</span>${t}</b><p>${d}</p></div>`).join('');
+$('#rt').innerHTML = E.map((e, i) => `<tr data-e="${i}"><td><b>${esc(N[e.a].name)} ↔ ${esc(N[e.b].name)}</b><div class="nil" style="font-size:12px">${esc(e.name)}</div></td><td><span class="card-n">${e.card}</span></td><td><code>${esc(e.field)}</code></td><td>${esc(e.ui)}</td><td>${esc(e.del)}</td><td style="text-align:right;font-weight:700">${e.n}</td></tr>`).join('');
+$('#rt').onclick = e => { const tr = e.target.closest('tr[data-e]'); if (tr) edgePanel(+tr.dataset.e); };
+$('#pngBtn').onclick = () => { const clone = svg.cloneNode(true); clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  const css = [...document.styleSheets].map(s => { try { return [...s.cssRules].map(r => r.cssText).filter(t => /\.(eg|nd|ch)\b/.test(t)).join('\n'); } catch { return ''; } }).join('\n');
+  clone.insertAdjacentHTML('afterbegin', `<style>:root{--surface:#fff;--outline-variant:#DFE3EB;--on-surface:#213343;--on-surface-variant:#516F90;--primary:#0B5CAD;--page-bg:#F5F8FA}${css}</style><rect width="1120" height="720" fill="#F5F8FA"/>`);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([clone.outerHTML], { type:'image/svg+xml' })); a.download = 'so-do-quan-he-crm.svg'; a.click(); toast('Đã tải sơ đồ (SVG)'); };
+</script>
+</body>
+</html>

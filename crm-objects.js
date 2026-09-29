@@ -170,6 +170,50 @@ const HXC = (() => {
   db.companies.forEach(c => { if (!('country' in c.values)) c.values.country = 'Việt Nam'; if (!('leadstatus' in c.values)) c.values.leadstatus = c.values.lifecycle === 'Customer' ? null : c.values.lifecycle === 'Opportunity' ? 'Có deal' : 'Mới'; });
   if (!load()) persist();
 
+  /* ── Phần 7: Sales (nhân viên kinh doanh = owner của Contact / Company / Deal) ── */
+  // BE: collection "NhanVien" của ERP (đã có) + thêm cột Team, Vai trò, Chỉ tiêu tháng. Tên sale = giá trị của Contact owner / Company owner / "Sale phụ trách".
+  const TEAMS = ['Sales HCM','Sales HN','Key Account'];
+  const ROLES = ['Sales Executive','Trưởng nhóm','Sales Manager','Account Manager'];
+  const SALE_FIELDS = [
+    {key:'name', name:'Họ và tên', type:'TEXT'},
+    {key:'email', name:'Email', type:'TEXT'},
+    {key:'phone', name:'Số điện thoại', type:'TEXT'},
+    {key:'team', name:'Team', type:'SELECT', choices:TEAMS},
+    {key:'role', name:'Vai trò', type:'SELECT', choices:ROLES},
+    {key:'quota', name:'Chỉ tiêu tháng (₫)', type:'NUMBER'},
+    {key:'status', name:'Trạng thái', type:'SELECT', choices:['Đang làm việc','Tạm nghỉ','Đã nghỉ']},
+    {key:'joined', name:'Ngày vào làm', type:'DATE'},
+  ];
+  if (!db.sales) {
+    db.sales = [
+      { id:'s1', createdAt: iso('2024-03-01'), values:{ name:'Minh Trần', email:'minh.tran@harnex.ai', phone:'0901 234 567', team:'Sales HCM', role:'Trưởng nhóm', quota:150000000, status:'Đang làm việc', joined:'2024-03-01' } },
+      { id:'s2', createdAt: iso('2025-01-06'), values:{ name:'Lan Lê', email:'lan.le@harnex.ai', phone:'0912 345 678', team:'Sales HCM', role:'Sales Executive', quota:80000000, status:'Đang làm việc', joined:'2025-01-06' } },
+      { id:'s3', createdAt: iso('2023-08-14'), values:{ name:'Phương Nguyễn', email:'phuong.nguyen@harnex.ai', phone:'0987 654 321', team:'Sales HN', role:'Sales Manager', quota:100000000, status:'Đang làm việc', joined:'2023-08-14' } },
+    ];
+    persist();
+  }
+  db.sales.forEach(s => { if (!USERS.includes(s.values.name)) USERS.push(s.values.name); });
+
+  /* ── Phần 7: Trường bổ sung (thuộc tính tuỳ chỉnh) ── */
+  // db.cf = trường tự tạo của Contact / Company (Deal dùng Quản lý trường ERP: HX.api.addField). db.extra = key hiển thị trong vùng "Trường bổ sung".
+  const DEAL_BASE = ['m_deal','t_n_deal','lead_id','g_i_d_ch_v_m_c_ti_u','th_i_h_n_thanh_to_n','giai_o_n_pipeline','ph_thu_tr_tr_c','ph_kh_i_t_o_setup','t_ng_cash_in_d_ki_n','s_ti_n_gi_m_gi','l_do_gi_m','t_l_th_nh_c_ng','ng_y_d_ki_n_ch_t','sale_ph_tr_ch','l_do_th_t_b_i','ng_y_c_p_nh_t_g_n_nh_t','test'];
+  if (!db.cf) {
+    db.cf = {
+      contact:[{ key:'cf_kenh_lien_he', name:'Kênh liên hệ ưa thích', type:'SELECT', choices:['Zalo','Điện thoại','Email','Gặp trực tiếp'], custom:true, createdAt:iso('2026-09-27') },
+               { key:'cf_ngay_sinh', name:'Ngày sinh', type:'DATE', custom:true, createdAt:iso('2026-09-27') }],
+      company:[{ key:'cf_mst', name:'Mã số thuế', type:'TEXT', custom:true, createdAt:iso('2026-09-27') },
+               { key:'cf_hang_kh', name:'Hạng khách hàng', type:'SELECT', choices:['A – Chiến lược','B – Tiềm năng','C – Thường'], custom:true, createdAt:iso('2026-09-27') }],
+    };
+    db.extra = { contact:['cf_kenh_lien_he','cf_ngay_sinh','jobtitle','source'], company:['cf_mst','cf_hang_kh','domain','employees'], deal:['ph_thu_tr_tr_c','ph_kh_i_t_o_setup','s_ti_n_gi_m_gi','lead_id'] };
+    const v = (t, id, k, x) => { const r = (t === 'contact' ? db.contacts : db.companies).find(c => c.id === id); if (r) r.values[k] = x; };
+    v('contact','ct01','cf_kenh_lien_he','Zalo'); v('contact','ct03','cf_kenh_lien_he','Điện thoại'); v('contact','ct05','cf_kenh_lien_he','Email');
+    v('company','co01','cf_mst','0312 456 789'); v('company','co01','cf_hang_kh','A – Chiến lược'); v('company','co02','cf_hang_kh','B – Tiềm năng');
+    persist();
+  }
+  db.extra = db.extra || { contact:[], company:[], deal:[] };
+  const FIELDS_OF = { contact:CONTACT_FIELDS, company:COMPANY_FIELDS };
+  ['contact','company'].forEach(t => db.cf[t].forEach(f => { if (!FIELDS_OF[t].some(x => x.key === f.key)) FIELDS_OF[t].push(f); }));
+
   /* ── Truy vấn & liên kết ── */
   const coll = t => t === 'contact' ? db.contacts : t === 'company' ? db.companies : null;
   const get = (t, id) => t === 'deal' ? deals.get(id) : (coll(t) || []).find(r => r.id === id);
@@ -811,6 +855,71 @@ const HXC = (() => {
     }
   }
 
+  /* ── Phần 7: API Trường bổ sung ── */
+  const fieldsOf = t => OBJ[t].fields;
+  const isNewField = (t, f) => t === 'deal' ? !DEAL_BASE.includes(f.key) : !!f.custom;
+  function extraKeys(t) {
+    const all = fieldsOf(t), has = k => all.some(f => f.key === k), off = (db.extraOff || {})[t] || [];
+    const auto = all.filter(f => isNewField(t, f) && !db.extra[t].includes(f.key) && !off.includes(f.key)).map(f => f.key);
+    return [...db.extra[t].filter(has), ...auto];
+  }
+  function setExtra(t, keys) {
+    db.extra[t] = [...keys]; db.extraOff = db.extraOff || {};
+    db.extraOff[t] = fieldsOf(t).filter(f => isNewField(t, f) && !keys.includes(f.key)).map(f => f.key); persist();
+  }
+  function addCustomField(t, def) {
+    const clean = { name: def.name.trim(), type: def.type, ...(def.choices && def.choices.length ? { choices: def.choices } : {}), ...(def.desc ? { desc: def.desc } : {}) };
+    let f;
+    if (t === 'deal') f = deals.addField(clean);
+    else { const base = 'cf_' + (HX.slug(clean.name) || 'truong'); let key = base, n = 2; while (fieldsOf(t).some(x => x.key === key)) key = base + '_' + n++;
+      f = { ...clean, key, custom:true, createdAt:new Date().toISOString() }; db.cf[t].push(f); FIELDS_OF[t].push(f); }
+    if (def.show !== false && !db.extra[t].includes(f.key)) db.extra[t].push(f.key);
+    persist(); return f;
+  }
+
+  /* ── Phần 7: API Sales ── */
+  const sales = () => db.sales;
+  const saleById = id => db.sales.find(s => s.id === id);
+  const saleByName = n => db.sales.find(s => s.values.name === n);
+  const saleUrl = n => { const s = saleByName(n); return s ? `crm-sales-hubspot.html?id=${s.id}` : null; };
+  function createSale(values) {
+    const s = { id:'s' + Date.now().toString(36), createdAt:new Date().toISOString(), values:{ status:'Đang làm việc', ...values } };
+    db.sales.push(s); if (!USERS.includes(s.values.name)) USERS.push(s.values.name); persist(); return s;
+  }
+  function updateSale(id, key, value) {
+    const s = saleById(id); if (!s) return; const old = s.values[key]; s.values[key] = value;
+    if (key === 'name' && old && value && old !== value) { // đổi tên → đổi theo ở mọi bản ghi đang sở hữu
+      db.contacts.concat(db.companies).forEach(r => { if (r.values.owner === old) r.values.owner = value; });
+      deals.list().forEach(d => { if (d.values[SALE] === old) deals.update(d.id, SALE, value); });
+      const i = USERS.indexOf(old); if (i >= 0) USERS[i] = value; else USERS.push(value);
+    }
+    persist();
+  }
+  // KPI của 1 sale trong khoảng [from, to) (Date / ms)
+  function saleStats(name, from, to) {
+    const inR = d => { const x = +new Date(d); return x >= +from && x < +to; };
+    const ds = deals.list().filter(d => d.values[SALE] === name);
+    const open = ds.filter(d => ![WON, LOST].includes(d.values[STAGE])), won = ds.filter(d => d.values[STAGE] === WON && d.values[CLOSE] && inR(d.values[CLOSE])), lost = ds.filter(d => d.values[STAGE] === LOST && d.values[CLOSE] && inR(d.values[CLOSE]));
+    const cash = d => Number(d.values[CASH]) || 0;
+    const acts = [...db.activities].filter(a => a.by === name || a.assignee === name);
+    const today = TODAY.toISOString().slice(0, 10);
+    const tasks = db.activities.filter(a => a.type === 'TASK' && (a.assignee || a.by) === name && !a.done);
+    const q = Number((saleByName(name) || { values:{} }).values.quota) || 0;
+    const months = Math.max(1, Math.round((+to - +from) / (30.44 * 864e5)));
+    const wonSum = won.reduce((s, d) => s + cash(d), 0);
+    return {
+      contacts: db.contacts.filter(c => c.values.owner === name), companies: db.companies.filter(c => c.values.owner === name),
+      deals: ds, open, won, lost, pipeline: open.reduce((s, d) => s + cash(d), 0),
+      forecast: open.reduce((s, d) => s + cash(d) * (Number(d.values.t_l_th_nh_c_ng) || 0) / 100, 0),
+      wonSum, quota: q * months, pct: q ? Math.round(wonSum / (q * months) * 100) : null,
+      winRate: won.length + lost.length ? Math.round(won.length / (won.length + lost.length) * 100) : null,
+      acts30: acts.filter(a => a.type !== 'TASK' && +new Date(a.at) > +TODAY - 30 * 864e5 && a.at <= TODAY.toISOString()).length,
+      tasks, overdue: tasks.filter(a => a.due && a.due < today), dueToday: tasks.filter(a => a.due === today),
+      upcoming: [...tasks.filter(a => !a.due || a.due >= today), ...db.activities.filter(a => a.type === 'MEETING' && a.by === name && a.at > TODAY.toISOString())].sort((a, b) => String(a.due || a.at).localeCompare(String(b.due || b.at))),
+      recent: acts.filter(a => a.at <= TODAY.toISOString() && a.type !== 'TASK').sort((a, b) => b.at.localeCompare(a.at)),
+    };
+  }
+
   /* ── Liên kết trong form "Tạo bản ghi" của Deals (HX.openCreate) ── */
   const dealAssocForm = () => `<div class="assoc-sec"><b>Liên kết Deal với</b><label>Company<select class="in" id="cf__company"><option value="">— Không —</option>${db.companies.map(c => `<option value="${c.id}">${esc(c.values.name)}</option>`).join('')}</select></label>
     <label>Contact<select class="in" id="cf__contact"><option value="">— Không —</option>${db.contacts.map(c => `<option value="${c.id}">${esc(fullName(c))}${c.company ? ' · ' + esc((get('company', c.company) || {values:{}}).values.name || '') : ''}</option>`).join('')}</select></label></div>`;
@@ -820,6 +929,7 @@ const HXC = (() => {
 
   return { ME, TODAY, LIFECYCLE, LEAD_STATUS, SOURCES, INDUSTRIES, ASSOC_LABELS, CONTACT_FIELDS, COMPANY_FIELDS, OBJ, STAGE, CASH, CLOSE, SALE, WON, LOST,
     db: () => db, get, list, related, assoc, associate, dissociate, update, create, remove, activitiesOf, addActivity, lastContacted, itemsOf, liTotal, liNet, totalsOf, dealTotals, saveItems, money,
+    SALE_FIELDS, TEAMS, ROLES, sales, saleById, saleByName, saleUrl, createSale, updateSale, saleStats, DEAL_BASE, isNewField, extraKeys, setExtra, addCustomField,
     titleOf, fullName, initials, url, dt, dOnly, props, createPanel, addAssocPanel, assocCard, timeline, composer, lineItemsCard, lineItemEditor, dealAssocForm, saveDealAssoc,
     reset() { try { localStorage.removeItem(KEY); } catch {} } };
 })();

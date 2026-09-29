@@ -14,9 +14,9 @@
    Thẻ báo cáo lấy đúng danh sách trên portal HubSpot của khách (28/09/2026), bỏ thẻ Tickets (ngoài phạm vi).
    Số liệu tính trực tiếp từ dữ liệu mẫu Contacts / Deals / Activities; bấm số hoặc cột để xem danh sách bản ghi.
    Màu biểu đồ: bảng categorical đã kiểm (dataviz), 1 series = 1 màu; trạng thái Open/Won/Lost = 3 slot đầu + nhãn trực tiếp. */
-.viz{--series-1:#2a78d6;--st-open:#2a78d6;--st-won:#1baf7a;--st-lost:#eb6834;--grid:#e6e6e3;--axis:#8a8984;--ink:var(--on-surface);--ink-2:var(--on-surface-variant)}
-@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .viz{--series-1:#3987e5;--st-open:#3987e5;--st-won:#199e70;--st-lost:#d95926;--grid:#3a3a38;--axis:#8f8e88}}
-:root[data-theme="dark"] .viz{--series-1:#3987e5;--st-open:#3987e5;--st-won:#199e70;--st-lost:#d95926;--grid:#3a3a38;--axis:#8f8e88}
+.viz{--c1:#2a78d6;--c2:#eb6834;--c3:#1baf7a;--c4:#eda100;--c5:#e87ba4;--c6:#008300;--series-1:#2a78d6;--st-open:#2a78d6;--st-won:#1baf7a;--st-lost:#eb6834;--grid:#e6e6e3;--axis:#8a8984;--ink:var(--on-surface);--ink-2:var(--on-surface-variant)}
+@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .viz{--c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#008300;--series-1:#3987e5;--st-open:#3987e5;--st-won:#199e70;--st-lost:#d95926;--grid:#3a3a38;--axis:#8f8e88}}
+:root[data-theme="dark"] .viz{--c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#008300;--series-1:#3987e5;--st-open:#3987e5;--st-won:#199e70;--st-lost:#d95926;--grid:#3a3a38;--axis:#8f8e88}
 .frame{overflow:auto}
 .dh{display:flex;align-items:center;gap:10px;padding:18px 20px 14px;border-bottom:1px solid var(--outline-variant);flex-wrap:wrap}
 .dh h1{font-size:24px;font-weight:600}
@@ -65,6 +65,48 @@
 .drl a{display:flex;justify-content:space-between;gap:12px;padding:9px 4px;border-bottom:1px solid var(--outline-variant);font-size:13.5px}
 .drl a b{color:var(--link);font-weight:600}
 .drl a:hover{background:var(--surface-variant)}
+
+/* Phần 6 — clone dashboard HubSpot (khảo sát 29/09/2026): bộ chọn dashboard có tab + tìm, bộ lọc nhanh dạng popover,
+   thẻ báo cáo có thanh công cụ khi rê chuột (kéo để sắp xếp · làm mới · bộ lọc · ⋮), đổi kích thước, gỡ / thêm lại báo cáo. */
+.dg{grid-auto-flow:row dense}
+@media(min-width:1240px){.rc.s2{grid-column:span 2}.rc.s3{grid-column:span 3}}
+@media(min-width:760px) and (max-width:1239px){.rc.s2,.rc.s3{grid-column:span 2}}
+.rc{position:relative}
+.rc h2 a{color:var(--link)}
+.rc h2 a:hover{text-decoration:underline}
+.rc-tb{position:absolute;top:10px;right:10px;display:flex;gap:2px;opacity:0;transition:opacity .12s;background:var(--surface);border-radius:var(--radius-md)}
+.rc:hover .rc-tb,.rc:focus-within .rc-tb{opacity:1}
+.rc-tb button{width:28px;height:28px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant)}
+.rc-tb button:hover{background:var(--surface-2);color:var(--on-surface)}
+.rc .grip{position:absolute;top:12px;left:4px;cursor:grab;color:var(--on-surface-variant);opacity:0;font-size:16px}
+.rc:hover .grip{opacity:1}
+.rc.dragging{opacity:.45}
+.rc.dropt{outline:2px dashed var(--primary);outline-offset:2px}
+.rc .rsz{position:absolute;right:4px;bottom:4px;width:22px;height:22px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant);opacity:0}
+.rc:hover .rsz{opacity:1}
+.rc .rsz:hover{background:var(--surface-2)}
+.chips span[title]{cursor:help}
+.qf2{display:inline-flex;align-items:center;gap:2px;height:30px;padding:0 8px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--on-surface)}
+.qf2:hover{background:var(--surface-2)}
+.qf2.on{background:var(--primary-container);color:var(--on-primary-container)}
+.qf2 .ms{font-size:16px}
+#pop{position:absolute;z-index:70;max-height:min(480px,70vh);overflow-y:auto}
+.frame{position:relative}
+.dtabs{display:flex;gap:2px;border-bottom:1px solid var(--outline-variant);margin:-6px -6px 8px;padding:0 6px}
+.dtabs button{height:40px;padding:0 10px;font-size:13px;font-weight:600;color:var(--on-surface-variant);border-bottom:2px solid transparent;white-space:nowrap}
+.dtabs button[aria-selected="true"]{color:var(--on-surface);border-bottom-color:var(--on-surface)}
+.qp-d{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 10px;border-radius:var(--radius-sm);text-align:left;width:100%}
+.qp-d:hover{background:var(--surface-2)} .qp-d.cur{background:var(--primary-container);color:var(--on-primary-container)}
+.qp-d b{font-weight:600;font-size:13px} .qp-d small{font-size:11.5px;color:var(--on-surface-variant)}
+.qp-c{display:flex;gap:6px;align-items:center;padding:8px 10px;border-top:1px solid var(--outline-variant);flex-wrap:wrap}
+.qp-c input{height:30px;border:1px solid var(--outline);border-radius:var(--radius-sm);padding:0 6px;background:var(--surface);color:var(--on-surface)}
+.af{display:flex;flex-direction:column;gap:14px}
+.af fieldset{border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px 14px}
+.af legend{font-size:12px;font-weight:700;color:var(--on-surface-variant);padding:0 4px}
+.af label{display:flex;align-items:center;gap:6px;font-size:13px}
+.star.on .ms{font-variation-settings:'FILL' 1;color:#eda100}
+.rc-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:6px;color:var(--on-surface-variant);font-size:13px;padding:20px 0}
+.rc-empty .ms{font-size:30px;max-width:none}
 </style>
 </head>
 <body>
@@ -73,20 +115,19 @@
   <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
   <main class="main"><div class="frame">
     <div class="dh">
-      <button class="btn btn--text btn--icon" data-toast="Đã đánh dấu dashboard yêu thích" aria-label="Yêu thích"><span class="ms">star</span></button>
-      <div style="position:relative"><button class="dsel" id="dBtn" aria-haspopup="menu"><h1 id="dName"></h1><span class="ms">arrow_drop_down</span></button><div class="pop" id="dPop" role="menu" style="top:44px;left:0;width:280px"></div></div>
-      <div class="r"><button class="btn btn--text sm" data-toast="Explore reports: thư viện báo cáo mẫu (ngoài phạm vi)">Khám phá báo cáo</button>
-        <button class="btn btn--secondary" data-toast="Tạo dashboard mới (ngoài phạm vi giai đoạn 2)">Tạo dashboard</button>
-        <button class="btn btn--secondary" data-toast="Thao tác: đổi tên, sao chép, xoá dashboard">Thao tác<span class="ms xs">arrow_drop_down</span></button>
-        <button class="btn btn--secondary" data-toast="Chia sẻ dashboard với nhóm">Chia sẻ<span class="ms xs">arrow_drop_down</span></button>
-        <button class="btn btn--primary" data-toast="Thêm báo cáo vào dashboard (ngoài phạm vi)">Thêm nội dung<span class="ms xs">arrow_drop_down</span></button></div>
+      <button class="btn btn--text btn--icon star" id="favBtn" aria-label="Yêu thích" aria-pressed="false"><span class="ms">star</span></button>
+      <div><button class="dsel" id="dBtn" aria-haspopup="menu"><h1 id="dName"></h1><span class="ms">arrow_drop_down</span></button></div>
+      <div class="r"><button class="btn btn--text sm" data-toast="Khám phá báo cáo: thư viện báo cáo mẫu của HubSpot (ngoài phạm vi)">Khám phá báo cáo</button>
+        <button class="btn btn--secondary" data-toast="Tạo dashboard mới từ mẫu hoặc trống (ngoài phạm vi giai đoạn 2)">Tạo dashboard</button>
+        <button class="btn btn--secondary" id="actBtn">Thao tác<span class="ms xs">arrow_drop_down</span></button>
+        <button class="btn btn--secondary" id="shareBtn">Chia sẻ<span class="ms xs">arrow_drop_down</span></button>
+        <button class="btn btn--primary" id="addBtn">Thêm nội dung<span class="ms xs">arrow_drop_down</span></button>
+        <button class="btn btn--secondary btn--icon" data-toast="Cài đặt dashboard: quyền truy cập, múi giờ hiển thị" aria-label="Cài đặt dashboard"><span class="ms sm">settings</span></button></div>
     </div>
-    <div class="fl"><span class="ms sm" style="color:var(--on-surface-variant)">bolt</span>
-      <select class="qfs" id="fRange" aria-label="Khoảng thời gian"><option value="month">Tháng này</option><option value="quarter" selected>Quý này</option><option value="30">30 ngày qua</option><option value="year">Năm nay</option><option value="all">Mọi thời gian</option></select>
-      <select class="qfs" id="fOwner" aria-label="Owner"><option value="">Tất cả owner</option></select>
-      <span class="sepv"></span><button class="btn btn--text sm" data-toast="Bộ lọc nâng cao theo mọi thuộc tính (như màn danh sách)"><span class="ms xs">tune</span>Bộ lọc nâng cao</button>
-      <button class="btn btn--text btn--icon" id="refresh" aria-label="Làm mới" style="margin-left:auto"><span class="ms sm">refresh</span></button></div>
+    <div class="fl" id="fl"></div>
     <div class="dg viz" id="grid"></div>
+    <div class="pop" id="pop"></div>
+    <p class="nil" style="text-align:right;font-size:12px;padding:0 20px 18px">Theo giờ Việt Nam (UTC+07:00)</p>
   </div></main>
 </div>
 <div class="tip" id="tip" role="tooltip"></div>
@@ -102,33 +143,49 @@ const {esc, toast, $} = HX;
 HX.shell('reports');
 const TODAY = HXC.TODAY, STAGE = HXC.STAGE, CASH = HXC.CASH, CLOSE = HXC.CLOSE, SALE = HXC.SALE;
 const DASH = { crm:'CRM Data Overview', pipe:'Pipeline Overview' };
-const st = { dash: new URLSearchParams(location.search).get('d') === 'pipe' ? 'pipe' : 'crm', range:'quarter', owner:'' };
-$('#fOwner').innerHTML += HX.USERS.map(u => `<option>${u}</option>`).join('');
-$('#dPop').innerHTML = Object.entries(DASH).map(([k, n]) => `<button class="mi" data-dash="${k}"><span class="ms sm">dashboard</span>${n}</button>`).join('');
+/* Trạng thái lưu theo trình duyệt: yêu thích, thứ tự / kích thước / tên / báo cáo đã gỡ của từng dashboard */
+const SK = 'hx-crm-dash-v1';
+let S = {}; try { S = JSON.parse(localStorage.getItem(SK) || '{}'); } catch {}
+S.fav = S.fav || {}; S.recent = S.recent || [];
+const save = () => { try { localStorage.setItem(SK, JSON.stringify(S)); } catch {} };
+const D0 = k => (S[k] = S[k] || { order:null, size:{}, names:{}, hidden:[] });
+const st = { dash: new URLSearchParams(location.search).get('d') === 'pipe' ? 'pipe' : 'crm',
+  f:{ crm:{ range:'month', owners:[], quick:['owner','range'] }, pipe:{ range:'quarter', owners:[], quick:['range','owner'] } }, adv:{ lifecycle:[], goi:[] } };
+const F = () => st.f[st.dash];
 
-/* ── Khoảng thời gian ── */
-function range(key = st.range) {
-  const y = TODAY.getFullYear(), m = TODAY.getMonth();
-  if (key === 'month') return [new Date(y, m, 1), new Date(y, m + 1, 1), 'Tháng này'];
-  if (key === 'quarter') { const q = Math.floor(m / 3) * 3; return [new Date(y, q, 1), new Date(y, q + 3, 1), 'Quý này']; }
-  if (key === '30') return [new Date(TODAY.getTime() - 30 * 864e5), new Date(TODAY.getTime() + 864e5), '30 ngày qua'];
-  if (key === 'year') return [new Date(y, 0, 1), new Date(y + 1, 0, 1), 'Năm nay'];
-  return [new Date(2000, 0, 1), new Date(2100, 0, 1), 'Mọi thời gian'];
+/* ── Khoảng thời gian (preset như HubSpot) ── */
+const DATE_P = [['today','Hôm nay'],['yesterday','Hôm qua'],['week','Tuần này'],['lastweek','Tuần trước'],['month','Cả tháng này'],['lastmonth','Tháng trước'],['quarter','Cả quý này'],['lastquarter','Quý trước'],['year','Cả năm nay'],['lastyear','Năm trước'],['d7','7 ngày qua'],['d30','30 ngày qua'],['d90','90 ngày qua'],['all','Mọi thời gian']];
+const fmtD = d => `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+function range(key = F().range) {
+  const y = TODAY.getFullYear(), m = TODAY.getMonth(), d0 = new Date(y, m, TODAY.getDate()), day = 864e5, wd = (d0.getDay() + 6) % 7, q = Math.floor(m / 3) * 3;
+  if (typeof key === 'object') return [new Date(key.from + 'T00:00:00'), new Date(new Date(key.to + 'T00:00:00').getTime() + day), `${fmtD(new Date(key.from))} – ${fmtD(new Date(key.to))}`];
+  const R = { today:[d0, new Date(+d0 + day)], yesterday:[new Date(+d0 - day), d0], week:[new Date(+d0 - wd * day), new Date(+d0 + (7 - wd) * day)], lastweek:[new Date(+d0 - (wd + 7) * day), new Date(+d0 - wd * day)],
+    month:[new Date(y, m, 1), new Date(y, m + 1, 1)], lastmonth:[new Date(y, m - 1, 1), new Date(y, m, 1)], quarter:[new Date(y, q, 1), new Date(y, q + 3, 1)], lastquarter:[new Date(y, q - 3, 1), new Date(y, q, 1)],
+    year:[new Date(y, 0, 1), new Date(y + 1, 0, 1)], lastyear:[new Date(y - 1, 0, 1), new Date(y, 0, 1)], d7:[new Date(+d0 - 6 * day), new Date(+d0 + day)], d30:[new Date(+d0 - 29 * day), new Date(+d0 + day)], d90:[new Date(+d0 - 89 * day), new Date(+d0 + day)],
+    all:[new Date(2026, 0, 1), new Date(2100, 0, 1)] }[key];
+  return [...R, DATE_P.find(p => p[0] === key)[1]];
 }
 function prevRange() { const [a, b] = range(); const len = b - a; return [new Date(a.getTime() - len), a]; }
+const rangeTip = () => { const [a, b] = range(); return F().range === 'all' ? 'Mọi thời gian' : `Khoảng thời gian: ${fmtD(a)} – ${fmtD(new Date(b - 864e5))}`; };
 const inR = (iso, [a, b]) => iso && new Date(iso) >= a && new Date(iso) < b;
-const ownerOK = v => !st.owner || v === st.owner;
-const months = () => { const out = []; for (let i = 3; i >= 0; i--) { const d = new Date(TODAY.getFullYear(), TODAY.getMonth() - i, 1); out.push([d, new Date(d.getFullYear(), d.getMonth() + 1, 1), `T${d.getMonth() + 1}/${d.getFullYear() % 100}`]); } return out; };
+const ownerOK = v => !F().owners.length || F().owners.includes(v);
+// Các tháng nằm trong khoảng lọc (biểu đồ "theo thời gian", tần suất tháng như HubSpot)
+function monthsIn() { let [a, b] = range(); if (F().range === 'all') { a = new Date(2026, 6, 1); b = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 1); }
+  const out = []; let d = new Date(a.getFullYear(), a.getMonth(), 1);
+  while (d < b && out.length < 12) { const n = new Date(d.getFullYear(), d.getMonth() + 1, 1); out.push([new Date(Math.max(d, a)), new Date(Math.min(n, b)), `T${d.getMonth() + 1}/${d.getFullYear()}`]); d = n; }
+  return out; }
 
-/* ── Dữ liệu cho drill-down ── */
+/* ── Dữ liệu cho drill-down / xuất CSV ── */
 const DRILL = {}; let dn = 0;
 const drill = (title, rows) => { const k = 'd' + (++dn); DRILL[k] = { title, rows }; return k; };
-const rowC = c => ({ href: HXC.url('contact', c.id), name: HXC.fullName(c), sub: HXC.dOnly(c.createdAt) });
-const rowD = d => ({ href: HXC.url('deal', d.id), name: `${HX.title(d)} · ${d.values.t_n_deal || ''}`, sub: HX.F[CASH] ? (HX.fmt(d.values[CASH], HX.F[CASH]) || '—') : '' });
+const rowC = c => ({ href: HXC.url('contact', c.id), name: HXC.fullName(c), sub: HXC.dOnly(c.createdAt), cols:{ 'Tên': HXC.fullName(c), 'Email': c.values.email || '', 'Owner': c.values.owner || '', 'Nguồn': c.values.source || '', 'Lifecycle': c.values.lifecycle || '', 'Ngày tạo': HXC.dOnly(c.createdAt) } });
+const rowD = d => ({ href: HXC.url('deal', d.id), name: `${HX.title(d)} · ${d.values.t_n_deal || ''}`, sub: HX.F[CASH] ? (HX.fmt(d.values[CASH], HX.F[CASH]) || '—') : '',
+  cols:{ 'Mã Deal': HX.title(d), 'Tên Deal': d.values.t_n_deal || '', 'Giai đoạn': d.values[STAGE] || '', 'Amount': d.values[CASH] ?? '', 'Ngày chốt': d.values[CLOSE] || '', 'Sale phụ trách': d.values[SALE] || '', 'Ngày tạo': HXC.dOnly(d.createdAt) } });
 const rowA = a => { const t = a.deals && a.deals[0] ? ['deal', a.deals[0]] : a.contacts && a.contacts[0] ? ['contact', a.contacts[0]] : ['company', (a.companies || [])[0]];
-  return { href: HXC.url(t[0], t[1]), name: `${a.title || a.body || ''}`.slice(0, 70), sub: `${a.by} · ${HXC.dOnly(a.at)}` }; };
+  return { href: HXC.url(t[0], t[1]), name: `${a.title || a.body || ''}`.slice(0, 70), sub: `${a.by} · ${HXC.dOnly(a.at)}`, cols:{ 'Loại': a.type, 'Nội dung': a.title || a.body || '', 'Người thực hiện': a.by, 'Thời điểm': HXC.dt(a.at) } }; };
 
-/* ── Biểu đồ SVG (mark mảnh, đầu bo 4px, lưới nhạt, 1 series 1 màu) ── */
+/* ── Biểu đồ (mark mảnh, đầu bo 4px, lưới nhạt; 1 series = 1 màu; nhiều hạng mục = bảng categorical đã kiểm + nhãn trực tiếp) ── */
+const CAT = ['var(--c1)','var(--c2)','var(--c3)','var(--c4)','var(--c5)','var(--c6)'];
 const nf = v => Number(v).toLocaleString('vi-VN');
 const money = v => { v = Number(v) || 0; return v >= 1e9 ? (v / 1e9).toLocaleString('vi-VN', {maximumFractionDigits:2}) + ' tỷ' : v >= 1e6 ? (v / 1e6).toLocaleString('vi-VN', {maximumFractionDigits:1}) + ' tr' : nf(v); };
 const nice = m => { if (m <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(m))); const n = m / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p; };
@@ -141,110 +198,228 @@ const CH = {}; let cn = 0;
 const vcol = (rows, opts = {}) => { const k = 'c' + (++cn); CH[k] = [rows, opts]; return `<div class="ch-host" data-chart="${k}" style="min-height:204px"></div>`; };
 function drawCharts() { document.querySelectorAll('.ch-host').forEach(h => { const [rows, o] = CH[h.dataset.chart]; h.innerHTML = vcolSvg(rows, o, Math.max(260, h.clientWidth)); }); }
 function vcolSvg(rows, { fmt = nf, title, line = false } = {}, W = 480) {
-  const H = 200, l = 36, b = 170, t = 14, pw = W - l - 10, mx = nice(Math.max(1, ...rows.map(r => r.value))), step = pw / rows.length;
+  const H = 200, l = 44, b = 170, t = 14, pw = W - l - 10, mx = nice(Math.max(1, ...rows.map(r => r.value))), step = pw / Math.max(1, rows.length);
   const ticks = [0, .5, 1].map(f => f * mx), Y = v => b - v / mx * (b - t);
   const grid = ticks.map(v => `<line x1="${l}" x2="${W - 10}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${l - 6}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="var(--ink-2)">${esc(fmt(v))}</text>`).join('');
   const labels = rows.map((r, i) => `<text x="${l + step * i + step / 2}" y="${b + 18}" text-anchor="middle" font-size="11.5" fill="var(--ink-2)">${esc(r.label)}</text>`).join('');
   if (line) { const pts = rows.map((r, i) => [l + step * i + step / 2, Y(r.value)]);
-    return `<svg viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="${esc(title || '')}">${grid}${labels}<path d="${pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join('')}" fill="none" stroke="var(--series-1)" stroke-width="2"/>
+    return `<svg viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="${esc(title || '')}">${grid}${labels}${pts.length > 1 ? `<path d="${pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join('')}" fill="none" stroke="var(--series-1)" stroke-width="2"/>` : ''}
       ${rows.map((r, i) => `<g data-tip="${esc(r.label)}: ${esc(fmt(r.value))}" ${r.drill ? `data-drill="${r.drill}"` : ''}><rect x="${pts[i][0] - step / 2}" y="${t}" width="${step}" height="${b - t}" fill="transparent"/><circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="4.5" fill="var(--series-1)" stroke="var(--surface)" stroke-width="2"/><text x="${pts[i][0]}" y="${pts[i][1] - 10}" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--ink)">${esc(fmt(r.value))}</text></g>`).join('')}</svg>`; }
   const bw = Math.min(44, step * .55);
   return `<svg viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="${esc(title || '')}">${grid}${labels}${rows.map((r, i) => { const x = l + step * i + step / 2 - bw / 2, h = b - Y(r.value);
     return `<g data-tip="${esc(r.label)}: ${esc(fmt(r.value))}" ${r.drill ? `data-drill="${r.drill}"` : ''}><rect x="${x - 6}" y="${t}" width="${bw + 12}" height="${b - t}" fill="transparent"/>${h > 0 ? `<path d="M${x} ${b}v-${Math.max(0, h - 4)}a4 4 0 0 1 4 -4h${bw - 8}a4 4 0 0 1 4 4v${Math.max(0, h - 4)}z" fill="var(--series-1)"/>` : ''}
       <text x="${x + bw / 2}" y="${Y(r.value) - 6}" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--ink)">${esc(fmt(r.value))}</text></g>`; }).join('')}</svg>`;
 }
-function donut(parts, title) {
-  const tot = parts.reduce((s, p) => s + p.value, 0) || 1, R = 70, r = 44, cx = 90, cy = 90; let a0 = -Math.PI / 2;
-  const arcs = parts.filter(p => p.value).map(p => { const a1 = a0 + p.value / tot * Math.PI * 2 - (parts.filter(q => q.value).length > 1 ? .03 : 0);
+function donut(parts, title, unit = 'deal') {
+  const tot = parts.reduce((s, p) => s + p.value, 0);
+  if (!tot) return `<div class="rc-empty"><span class="ms">donut_large</span>Không có dữ liệu trong khoảng thời gian này</div>`;
+  const R = 70, r = 44, cx = 90, cy = 90; let a0 = -Math.PI / 2; const nz = parts.filter(q => q.value);
+  const arcs = nz.map(p => { const a1 = a0 + p.value / tot * Math.PI * 2 - (nz.length > 1 ? .03 : 0);
     const P = (a, rr) => [cx + rr * Math.cos(a), cy + rr * Math.sin(a)], lg = a1 - a0 > Math.PI ? 1 : 0;
-    const d = parts.filter(q => q.value).length === 1 ? `M${cx} ${cy - R}a${R} ${R} 0 1 1 -.01 0zM${cx} ${cy - r}a${r} ${r} 0 1 0 .01 0z`
-      : `M${P(a0, R)}A${R} ${R} 0 ${lg} 1 ${P(a1, R)}L${P(a1, r)}A${r} ${r} 0 ${lg} 0 ${P(a0, r)}z`;
+    const d = nz.length === 1 ? `M${cx} ${cy - R}a${R} ${R} 0 1 1 -.01 0zM${cx} ${cy - r}a${r} ${r} 0 1 0 .01 0z` : `M${P(a0, R)}A${R} ${R} 0 ${lg} 1 ${P(a1, R)}L${P(a1, r)}A${r} ${r} 0 ${lg} 0 ${P(a0, r)}z`;
     const out = `<path d="${d}" fill="${p.color}" fill-rule="evenodd" data-tip="${esc(p.label)}: ${p.value} (${Math.round(p.value / tot * 100)}%)" ${p.drill ? `data-drill="${p.drill}"` : ''}/>`; a0 = a1 + .03; return out; }).join('');
-  return `<svg viewBox="0 0 180 180" style="max-width:190px;margin:0 auto" role="img" aria-label="${esc(title)}">${arcs}<text x="90" y="88" text-anchor="middle" font-size="22" font-weight="700" fill="var(--ink)">${parts.reduce((s, p) => s + p.value, 0)}</text><text x="90" y="106" text-anchor="middle" font-size="11" fill="var(--ink-2)">deal</text></svg>
-    <div class="lg">${parts.map(p => `<span><i style="background:${p.color}"></i>${esc(p.label)} · <b>${p.value}</b> (${Math.round(p.value / tot * 100)}%)</span>`).join('')}</div>`;
+  return `<svg viewBox="0 0 180 180" style="max-width:190px;margin:0 auto" role="img" aria-label="${esc(title)}">${arcs}<text x="90" y="88" text-anchor="middle" font-size="22" font-weight="700" fill="var(--ink)">${tot}</text><text x="90" y="106" text-anchor="middle" font-size="11" fill="var(--ink-2)">${unit}</text></svg>
+    <div class="lg">${parts.map(p => `<span ${p.drill ? `data-drill="${p.drill}" style="cursor:pointer"` : ''}><i style="background:${p.color}"></i>${esc(p.label)} · <b>${p.value}</b> (${Math.round(p.value / tot * 100)}%)</span>`).join('')}</div>`;
 }
-const card = (title, info, chips, body, cls = '') => `<section class="rc ${cls}"><h2>${esc(title)}<span class="ms" title="${esc(info)}">info</span></h2><div class="chips">${chips.map(c => `<span>${esc(c)}</span>`).join('')}</div>${body}</section>`;
 const kpi = (label, v, prevV, k) => { const d = prevV ? Math.round((v - prevV) / prevV * 100) : null;
-  return `<div class="kpi"><small>${label}</small><button data-drill="${k}" aria-label="Xem danh sách">${nf(v)}</button>${st.range === 'all' ? '' : `<span class="dl">${d === null ? 'Kỳ trước: 0' : `${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% so với kỳ trước (${prevV})`}</span>`}</div>`; };
+  return `<div class="kpi"><small>${label}</small><button data-drill="${k}" aria-label="Xem danh sách">${nf(v)}</button>${F().range === 'all' ? '' : `<span class="dl">${d === null ? 'Kỳ trước: 0' : `${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% so với kỳ trước (${prevV})`}</span>`}</div>`; };
 
-/* ── CRM Data Overview ── */
-function crm() {
-  const R = range(), P = prevRange(), rl = R[2], M = months();
-  const C = HXC.list('contact').filter(c => ownerOK(c.values.owner)), D = HX.api.list().filter(d => ownerOK(d.values[SALE]));
+/* ── Danh mục báo cáo của từng dashboard (đúng danh sách trên portal HubSpot; bỏ 2 thẻ Tickets — ngoài phạm vi) ── */
+function data() {
+  const C = HXC.list('contact').filter(c => ownerOK(c.values.owner) && (!st.adv.lifecycle.length || st.adv.lifecycle.includes(c.values.lifecycle)));
+  const D = HX.api.list().filter(d => ownerOK(d.values[SALE]) && (!st.adv.goi.length || st.adv.goi.includes(d.values.g_i_d_ch_v_m_c_ti_u)));
   const A = [...HXC.db().activities].filter(a => ownerOK(a.by));
-  const newC = C.filter(c => inR(c.createdAt, R)), prevC = C.filter(c => inR(c.createdAt, P));
-  const src = HXC.SOURCES.map(s => ({ label:s, value: newC.filter(c => c.values.source === s).length })).map(r => ({ ...r, drill: drill(`Contacts nguồn ${r.label} · ${rl}`, newC.filter(c => c.values.source === r.label).map(rowC)) }));
-  const cOver = M.map(([a, b, l]) => { const x = C.filter(c => inR(c.createdAt, [a, b])); return { label:l, value:x.length, drill: drill(`Contacts tạo ${l}`, x.map(rowC)) }; });
-  const dOver = M.map(([a, b, l]) => { const x = D.filter(d => inR(d.createdAt, [a, b])); return { label:l, value:x.length, drill: drill(`Deals tạo ${l}`, x.map(rowD)) }; });
-  const dR = D.filter(d => inR(d.createdAt, R));
-  const byStage = HX.STAGES.map(s => { const x = dR.filter(d => d.values[STAGE] === s); return { label:s, value:x.length, drill: drill(`Deals ở ${s} · ${rl}`, x.map(rowD)) }; });
-  const aR = A.filter(a => inR(a.at, R));
-  const TY = [['NOTE','Ghi chú'],['TASK','Task'],['MEETING','Cuộc họp'],['CALL','Cuộc gọi']];
-  const byType = TY.map(([k, l]) => { const x = aR.filter(a => a.type === k); return { label:l, value:x.length, drill: drill(`${l} · ${rl}`, x.map(rowA)) }; });
-  const team = HX.USERS.filter(u => ownerOK(u)).map(u => ({ u, cells: TY.map(([k, l]) => { const x = aR.filter(a => a.by === u && a.type === k); return { v:x.length, drill: drill(`${l} của ${u} · ${rl}`, x.map(rowA)) }; }) }));
-  return [
-    card('Contacts mới tạo', 'Số contact được tạo trong khoảng thời gian, so với kỳ liền trước', [rl, 'So với kỳ trước'], kpi('(SỐ LƯỢNG) CONTACTS', newC.length, prevC.length, drill(`Contacts tạo · ${rl}`, newC.map(rowC)))),
-    card('Nguồn contact', 'Contacts mới theo thuộc tính Nguồn', [rl], vcol(src, { title:'Nguồn contact' }), 'w2'),
-    card('Contacts thêm theo thời gian', 'Số contact tạo mới theo tháng', ['4 tháng gần nhất', 'Theo tháng'], vcol(cOver, { title:'Contacts theo tháng', line:true })),
-    card('Deals tạo theo thời gian', 'Số deal tạo mới theo tháng', ['4 tháng gần nhất', 'Theo tháng'], vcol(dOver, { title:'Deals theo tháng' })),
-    card('Deals theo giai đoạn', 'Deals tạo trong kỳ, nhóm theo Giai Đoạn Pipeline', [rl], hbar(byStage, { title:'Deals theo giai đoạn' })),
-    card('Phân loại hoạt động', 'Số hoạt động ghi nhận theo loại', [rl], hbar(byType, { title:'Hoạt động theo loại' })),
-    card('Tổng hợp hoạt động theo nhóm', 'Số hoạt động của từng người theo loại', [rl], `<table class="tt"><thead><tr><th>Người thực hiện</th>${TY.map(([, l]) => `<th>${l}</th>`).join('')}<th>Tổng</th></tr></thead>
-      <tbody>${team.map(t => `<tr><td>${esc(t.u)}</td>${t.cells.map(c => `<td>${c.v ? `<button data-drill="${c.drill}">${c.v}</button>` : '0'}</td>`).join('')}<td><b>${t.cells.reduce((s, c) => s + c.v, 0)}</b></td></tr>`).join('')}</tbody></table>`, 'w2'),
-  ].join('');
+  return { C, D, A, R: range(), P: prevRange(), M: monthsIn() };
 }
+const REPORTS = {
+  crm: [
+    { id:'newc', title:'Contacts mới tạo', info:'Số contact được tạo trong khoảng thời gian, so với kỳ liền trước', size:1, list:'crm-contacts-hubspot.html', cmp:true,
+      run: ({ C, R, P }) => { const x = C.filter(c => inR(c.createdAt, R)), p = C.filter(c => inR(c.createdAt, P)); const k = drill('Contacts mới tạo', x.map(rowC)); return { body: kpi('(SỐ LƯỢNG) CONTACTS', x.length, p.length, k), k }; } },
+    { id:'src', title:'Nguồn contact', info:'Contacts mới theo thuộc tính Nguồn (HubSpot: Record source)', size:2, list:'crm-contacts-hubspot.html',
+      run: ({ C, R }) => { const x = C.filter(c => inR(c.createdAt, R)); const rows = HXC.SOURCES.map(s => ({ label:s, value: x.filter(c => c.values.source === s).length })).map(r => ({ ...r, drill: drill(`Contacts nguồn ${r.label}`, x.filter(c => c.values.source === r.label).map(rowC)) }));
+        return { body: vcol(rows, { title:'Nguồn contact' }), k: drill('Nguồn contact', x.map(rowC)) }; } },
+    { id:'cover', title:'Contacts thêm theo thời gian', info:'Số contact tạo mới theo tháng', size:1, list:'crm-contacts-hubspot.html', freq:true,
+      run: ({ C, M }) => { const rows = M.map(([a, b, l]) => { const x = C.filter(c => inR(c.createdAt, [a, b])); return { label:l, value:x.length, drill: drill(`Contacts tạo ${l}`, x.map(rowC)) }; });
+        return { body: vcol(rows, { title:'Contacts theo tháng', line:true }), k: drill('Contacts theo tháng', M.flatMap(([a, b]) => C.filter(c => inR(c.createdAt, [a, b])).map(rowC))) }; } },
+    { id:'dover', title:'Deals tạo theo thời gian', info:'Số deal tạo mới theo tháng', size:2, list:'crm-giao-dich-hubspot.html', freq:true,
+      run: ({ D, M }) => { const rows = M.map(([a, b, l]) => { const x = D.filter(d => inR(d.createdAt, [a, b])); return { label:l, value:x.length, drill: drill(`Deals tạo ${l}`, x.map(rowD)) }; });
+        return { body: vcol(rows, { title:'Deals theo tháng', line:true }), k: drill('Deals theo tháng', M.flatMap(([a, b]) => D.filter(d => inR(d.createdAt, [a, b])).map(rowD))) }; } },
+    { id:'stage', title:'Deals theo giai đoạn', info:'Deals tạo trong kỳ, nhóm theo Giai Đoạn Pipeline', size:1, list:'crm-giao-dich-hubspot.html',
+      run: ({ D, R }) => { const x = D.filter(d => inR(d.createdAt, R)); const parts = HX.STAGES.map((s, i) => { const y = x.filter(d => d.values[STAGE] === s); return { label:s, value:y.length, color: CAT[i % 6], drill: drill(`Deals ở ${s}`, y.map(rowD)) }; });
+        return { body: donut(parts, 'Deals theo giai đoạn'), k: drill('Deals theo giai đoạn', x.map(rowD)) }; } },
+    { id:'atype', title:'Phân loại hoạt động', info:'Số hoạt động ghi nhận theo loại', size:1, list:null,
+      run: ({ A, R }) => { const x = A.filter(a => inR(a.at, R)); const rows = [['NOTE','Ghi chú'],['TASK','Task'],['MEETING','Cuộc họp'],['CALL','Cuộc gọi']].map(([k, l]) => { const y = x.filter(a => a.type === k); return { label:l, value:y.length, drill: drill(`${l}`, y.map(rowA)) }; });
+        return { body: hbar(rows, { title:'Hoạt động theo loại' }), k: drill('Hoạt động', x.map(rowA)) }; } },
+    { id:'team', title:'Tổng hợp hoạt động theo nhóm', info:'Số hoạt động của từng người theo loại', size:2, list:null,
+      run: ({ A, R }) => { const TY = [['NOTE','Ghi chú'],['TASK','Task'],['MEETING','Cuộc họp'],['CALL','Cuộc gọi']], x = A.filter(a => inR(a.at, R));
+        const team = HX.USERS.filter(u => ownerOK(u)).map(u => ({ u, cells: TY.map(([k, l]) => { const y = x.filter(a => a.by === u && a.type === k); return { v:y.length, drill: drill(`${l} của ${u}`, y.map(rowA)) }; }) }));
+        return { body: `<table class="tt"><thead><tr><th>Người thực hiện</th>${TY.map(([, l]) => `<th>${l}</th>`).join('')}<th>Tổng</th></tr></thead><tbody>${team.map(t => `<tr><td>${esc(t.u)}</td>${t.cells.map(c => `<td>${c.v ? `<button data-drill="${c.drill}">${c.v}</button>` : '0'}</td>`).join('')}<td><b>${t.cells.reduce((s, c) => s + c.v, 0)}</b></td></tr>`).join('')}</tbody></table>`, k: drill('Hoạt động của nhóm', x.map(rowA)) }; } },
+  ],
+  pipe: [
+    { id:'dcr', title:'Deals đã tạo', info:'Số deal tạo trong kỳ', size:1, list:'crm-giao-dich-hubspot.html', cmp:true,
+      run: ({ D, R, P }) => { const x = D.filter(d => inR(d.createdAt, R)), p = D.filter(d => inR(d.createdAt, P)); const k = drill('Deals đã tạo', x.map(rowD)); return { body: kpi('(SỐ LƯỢNG) DEALS', x.length, p.length, k), k }; } },
+    { id:'dcl', title:'Deals đã đóng', info:'Deal ở Closed Won hoặc Closed Lost, ngày chốt trong kỳ', size:1, list:'crm-giao-dich-hubspot.html', filt:1, cmp:true,
+      run: ({ D, R, P }) => { const cl = d => [HXC.WON, HXC.LOST].includes(d.values[STAGE]); const x = D.filter(d => cl(d) && inR(d.values[CLOSE], R)), p = D.filter(d => cl(d) && inR(d.values[CLOSE], P)); const k = drill('Deals đã đóng', x.map(rowD)); return { body: kpi('(SỐ LƯỢNG) DEALS', x.length, p.length, k), k }; } },
+    { id:'dst', title:'Deals theo trạng thái', info:'Deals tạo trong kỳ: đang mở, thắng, thua', size:1, list:'crm-giao-dich-hubspot.html',
+      run: ({ D, R }) => { const x = D.filter(d => inR(d.createdAt, R)), cl = d => [HXC.WON, HXC.LOST].includes(d.values[STAGE]);
+        const open = x.filter(d => !cl(d)), won = x.filter(d => d.values[STAGE] === HXC.WON), lost = x.filter(d => d.values[STAGE] === HXC.LOST);
+        return { body: donut([{ label:'Đang mở', value:open.length, color:'var(--st-open)', drill: drill('Deals đang mở', open.map(rowD)) }, { label:'Thắng', value:won.length, color:'var(--st-won)', drill: drill('Deals thắng', won.map(rowD)) }, { label:'Thua', value:lost.length, color:'var(--st-lost)', drill: drill('Deals thua', lost.map(rowD)) }], 'Deals theo trạng thái'), k: drill('Deals theo trạng thái', x.map(rowD)) }; } },
+    { id:'perf', title:'Hiệu quả sale theo giá trị chốt', info:'Tổng Cash-In của deal Closed Won theo Sale phụ trách', size:2, list:'crm-giao-dich-hubspot.html', filt:1,
+      run: ({ D, R }) => { const won = D.filter(d => d.values[STAGE] === HXC.WON && inR(d.values[CLOSE], R));
+        const rows = HX.USERS.filter(u => ownerOK(u)).map(u => { const x = won.filter(d => d.values[SALE] === u); return { label:u, value:x.reduce((s, d) => s + (Number(d.values[CASH]) || 0), 0), drill: drill(`Deals thắng của ${u}`, x.map(rowD)) }; });
+        return { body: hbar(rows, { fmt: v => money(v) + ' ₫', title:'Giá trị chốt theo sale' }), k: drill('Deals thắng', won.map(rowD)) }; } },
+    { id:'fun', title:'Tiến trình deal qua các giai đoạn', info:'Số deal đã tới hoặc vượt qua từng giai đoạn (không tính Closed Lost)', size:2, list:'crm-giao-dich-hubspot.html',
+      run: ({ D, R }) => { const x = D.filter(d => inR(d.createdAt, R)), SS = HX.STAGES.slice(0, 5);
+        const rows = SS.map((s, i) => { const y = x.filter(d => { const k = HX.STAGES.indexOf(d.values[STAGE]); return k >= i && k <= 4; }); return { label:s, value:y.length, drill: drill(`Deals đã tới ${s}`, y.map(rowD)) }; });
+        return { body: hbar(rows, { title:'Phễu giai đoạn' }) + `<div class="nil" style="font-size:12px">Tỷ lệ chuyển từ giai đoạn 1 sang Won: ${rows[0].value ? Math.round(rows[4].value / rows[0].value * 100) : 0}%</div>`, k: drill('Deals trong phễu', x.map(rowD)) }; } },
+    { id:'ttc', title:'Thời gian chốt trung bình', info:'Số ngày trung bình từ lúc tạo đến Ngày Dự Kiến Chốt của deal Closed Won, theo tháng chốt', size:1, list:'crm-giao-dich-hubspot.html', freq:true,
+      run: ({ D, M }) => { const rows = M.map(([a, b, l]) => { const x = D.filter(d => d.values[STAGE] === HXC.WON && inR(d.values[CLOSE], [a, b]));
+          const avg = x.length ? Math.round(x.reduce((s, d) => s + (new Date(d.values[CLOSE]) - new Date(d.createdAt)) / 864e5, 0) / x.length) : 0; return { label:l, value:Math.max(0, avg), drill: drill(`Deals thắng chốt ${l}`, x.map(rowD)) }; });
+        return { body: vcol(rows, { fmt: v => v + ' ngày', title:'Thời gian chốt trung bình', line:true }), k: drill('Deals thắng', D.filter(d => d.values[STAGE] === HXC.WON).map(rowD)) }; } },
+  ],
+};
+const reportsOf = k => { const d = D0(k), all = REPORTS[k]; const ord = d.order || all.map(r => r.id); return ord.map(id => all.find(r => r.id === id)).filter(Boolean).concat(all.filter(r => !ord.includes(r.id))).filter(r => !d.hidden.includes(r.id)); };
 
-/* ── Pipeline Overview ── */
-function pipe() {
-  const R = range(), P = prevRange(), rl = R[2], M = months();
-  const D = HX.api.list().filter(d => ownerOK(d.values[SALE]));
-  const closed = d => [HXC.WON, HXC.LOST].includes(d.values[STAGE]);
-  const created = D.filter(d => inR(d.createdAt, R)), createdP = D.filter(d => inR(d.createdAt, P));
-  const closedR = D.filter(d => closed(d) && inR(d.values[CLOSE], R)), closedP = D.filter(d => closed(d) && inR(d.values[CLOSE], P));
-  const open = created.filter(d => !closed(d)), won = created.filter(d => d.values[STAGE] === HXC.WON), lost = created.filter(d => d.values[STAGE] === HXC.LOST);
-  const wonR = D.filter(d => d.values[STAGE] === HXC.WON && inR(d.values[CLOSE], R));
-  const perf = HX.USERS.filter(u => ownerOK(u)).map(u => { const x = wonR.filter(d => d.values[SALE] === u); return { label:u, value:x.reduce((s, d) => s + (Number(d.values[CASH]) || 0), 0), drill: drill(`Deals thắng của ${u} · ${rl}`, x.map(rowD)) }; });
-  const S = HX.STAGES.slice(0, 5);
-  const funnel = S.map((s, i) => { const x = created.filter(d => { const k = HX.STAGES.indexOf(d.values[STAGE]); return k >= i && k <= 4; }); return { label:s, value:x.length, drill: drill(`Deals đã tới ${s} · ${rl}`, x.map(rowD)) }; });
-  const ttc = M.map(([a, b, l]) => { const x = D.filter(d => d.values[STAGE] === HXC.WON && inR(d.values[CLOSE], [a, b]));
-    const avg = x.length ? Math.round(x.reduce((s, d) => s + (new Date(d.values[CLOSE]) - new Date(d.createdAt)) / 864e5, 0) / x.length) : 0; return { label:l, value:Math.max(0, avg), drill: drill(`Deals thắng chốt ${l}`, x.map(rowD)) }; });
-  return [
-    card('Deals đã tạo', 'Số deal tạo trong kỳ', [rl], kpi('(SỐ LƯỢNG) DEALS', created.length, createdP.length, drill(`Deals tạo · ${rl}`, created.map(rowD)))),
-    card('Deals đã đóng', 'Deal ở Closed Won hoặc Closed Lost, ngày chốt trong kỳ', [rl, 'Bộ lọc (1)'], kpi('(SỐ LƯỢNG) DEALS', closedR.length, closedP.length, drill(`Deals đóng · ${rl}`, closedR.map(rowD)))),
-    card('Deals theo trạng thái', 'Deals tạo trong kỳ: đang mở, thắng, thua', [rl], donut([
-      { label:'Đang mở', value:open.length, color:'var(--st-open)', drill: drill('Deals đang mở', open.map(rowD)) },
-      { label:'Thắng', value:won.length, color:'var(--st-won)', drill: drill('Deals thắng', won.map(rowD)) },
-      { label:'Thua', value:lost.length, color:'var(--st-lost)', drill: drill('Deals thua', lost.map(rowD)) }], 'Deals theo trạng thái')),
-    card('Hiệu quả sale theo giá trị chốt', 'Tổng Cash-In của deal Closed Won theo Sale phụ trách', [rl, 'Bộ lọc (1)'], hbar(perf, { fmt: v => money(v) + ' ₫', title:'Giá trị chốt theo sale' }), 'w2'),
-    card('Tiến trình deal qua các giai đoạn', 'Số deal đã tới hoặc vượt qua từng giai đoạn (không tính Closed Lost)', [rl], hbar(funnel, { title:'Phễu giai đoạn' }) + `<div class="nil" style="font-size:12px">Tỷ lệ chuyển từ giai đoạn 1 sang Won: ${funnel[0].value ? Math.round(funnel[4].value / funnel[0].value * 100) : 0}%</div>`),
-    card('Thời gian chốt trung bình', 'Số ngày trung bình từ lúc tạo đến Ngày Dự Kiến Chốt của deal Closed Won, theo tháng chốt', ['4 tháng gần nhất', 'Theo tháng'], vcol(ttc, { fmt: v => v + ' ngày', title:'Thời gian chốt trung bình', line:true }), 'w2'),
-  ].join('');
+/* ── Vẽ ── */
+function renderFilters() {
+  const f = F(), on = { owner: f.owners.length > 0, range: true };
+  const lbl = { owner: f.owners.length ? `${st.dash === 'pipe' ? 'Deal owner' : 'Owners'}: ${f.owners.map(u => u === HXC.ME ? 'Tôi' : u).join(', ')}` : (st.dash === 'pipe' ? 'Deal owner' : 'Owners'), range: `Khoảng thời gian: ${range()[2]}` };
+  const advN = st.adv.lifecycle.length + st.adv.goi.length;
+  $('#fl').innerHTML = `<button class="qf2" id="qEdit"><span class="ms">edit</span>Bộ lọc nhanh</button>`
+    + f.quick.map(k => `<button class="qf2 ${k === 'owner' && on.owner ? 'on' : ''}" data-q="${k}"><span class="ms">bolt</span>${esc(lbl[k])}<span class="ms">arrow_drop_down</span></button>`).join('')
+    + `<span class="sepv"></span><button class="qf2 ${advN ? 'on' : ''}" id="advBtn"><span class="ms">tune</span>Bộ lọc nâng cao${advN ? ` (${advN})` : ''}</button>`
+    + (f.owners.length || advN || f.range !== (st.dash === 'pipe' ? 'quarter' : 'month') ? `<button class="fclear" id="fClr" style="font-size:12px;font-weight:600;color:var(--link)">Đặt lại</button>` : '')
+    + `<button class="btn btn--text btn--icon" id="refresh" aria-label="Làm mới" title="Làm mới" style="margin-left:auto"><span class="ms sm">refresh</span></button>`;
 }
-
 function render() {
   dn = 0; cn = 0; Object.keys(DRILL).forEach(k => delete DRILL[k]); Object.keys(CH).forEach(k => delete CH[k]);
-  $('#dName').textContent = DASH[st.dash]; document.title = `${DASH[st.dash]} — Báo cáo`;
-  $('#grid').innerHTML = st.dash === 'crm' ? crm() : pipe();
+  const d = D0(st.dash); $('#dName').textContent = DASH[st.dash]; document.title = `${DASH[st.dash]} — Báo cáo`;
+  $('#favBtn').classList.toggle('on', !!S.fav[st.dash]); $('#favBtn').setAttribute('aria-pressed', !!S.fav[st.dash]);
+  S.recent = [st.dash, ...S.recent.filter(x => x !== st.dash)]; save();
+  renderFilters();
+  const ctx = data(), rl = range()[2];
+  const list = reportsOf(st.dash);
+  $('#grid').innerHTML = list.length ? list.map(r => { const out = r.run(ctx); r._k = out.k; const size = d.size[r.id] || r.size;
+    const chips = [`<span title="${esc(rangeTip())}">${esc(rl)}${r.freq ? ' | Theo tháng' : ''}</span>`, ...(r.cmp && F().range !== 'all' ? ['<span>So với | Kỳ trước</span>'] : []), ...(r.filt ? [`<span title="${r.id === 'dcl' ? 'Giai đoạn là Closed Won hoặc Closed Lost' : 'Giai đoạn là Closed Won'}">Bộ lọc (${r.filt})</span>`] : [])];
+    return `<section class="rc s${size}" draggable="false" data-rid="${r.id}"><span class="ms grip" data-grip title="Kéo để sắp xếp" aria-hidden="true">drag_indicator</span>
+      <h2>${r.list ? `<a href="${r.list}" title="Mở danh sách">${esc(d.names[r.id] || r.title)}</a>` : esc(d.names[r.id] || r.title)}<span class="ms" title="${esc(r.info)}">info</span></h2>
+      <div class="rc-tb"><button data-rrf="${r.id}" title="Làm mới" aria-label="Làm mới báo cáo"><span class="ms sm">refresh</span></button><button data-rfl="${r.id}" title="Bộ lọc của báo cáo" aria-label="Bộ lọc báo cáo"><span class="ms sm">tune</span></button><button data-rm="${r.id}" title="Thao tác" aria-label="Thao tác báo cáo"><span class="ms sm">more_vert</span></button></div>
+      <div class="chips">${chips.join('')}</div>${out.body}<button class="rsz" data-rsz="${r.id}" title="Đổi kích thước (1 → 2 → 3 cột)" aria-label="Đổi kích thước"><span class="ms xs">open_in_full</span></button></section>`; }).join('')
+    : `<div class="rc s3"><div class="rc-empty"><span class="ms">add_chart</span>Dashboard trống. Bấm “Thêm nội dung” để thêm lại báo cáo đã gỡ.</div></div>`;
   drawCharts();
 }
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawCharts, 150); });
-function openDrill(k) {
+
+/* ── Popover chung ── */
+const pop = $('#pop');
+function openPop(anchor, html, w = 260, right = false) {
+  const r = anchor.getBoundingClientRect(), fr = document.querySelector('.frame').getBoundingClientRect(), fs = document.querySelector('.frame').scrollTop;
+  pop.style.width = w + 'px'; pop.style.left = Math.max(8, Math.min((right ? r.right - w : r.left) - fr.left, fr.width - w - 8)) + 'px'; pop.style.top = (r.bottom - fr.top + fs + 4) + 'px';
+  pop.innerHTML = html; pop.classList.add('open'); pop.onclick = null; pop.onchange = null; return pop; }
+const closePop = () => pop.classList.remove('open');
+
+function openDrill(k, title) {
   const d = DRILL[k]; if (!d) return;
-  HX.modal(`<div class="modal" role="dialog" aria-modal="true" style="width:min(560px,100%)"><div class="mh">${esc(d.title)} (${d.rows.length})<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
-    <div class="mb"><div class="drl">${d.rows.length ? d.rows.map(r => `<a href="${r.href}"><b>${esc(r.name)}</b><span class="nil">${esc(r.sub)}</span></a>`).join('') : '<p class="nil">Không có bản ghi.</p>'}</div></div></div>`);
+  HX.modal(`<div class="modal" role="dialog" aria-modal="true" style="width:min(560px,100%)"><div class="mh">${esc(title || d.title)} (${d.rows.length})<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
+    <div class="mb"><div class="drl">${d.rows.length ? d.rows.map(r => `<a href="${r.href}"><b>${esc(r.name)}</b><span class="nil">${esc(r.sub)}</span></a>`).join('') : '<p class="nil">Không có bản ghi.</p>'}</div></div>
+    <div class="mf"><button class="btn btn--secondary" data-csv="${k}"><span class="ms xs">download</span>Xuất CSV</button><button class="btn btn--primary" data-close>Đóng</button></div></div>`, bg => { bg.querySelector('[data-csv]').onclick = () => csv(k, title); });
 }
-$('#grid').addEventListener('click', e => { const t = e.target.closest('[data-drill]'); if (t) openDrill(t.dataset.drill); });
+function csv(k, title) { const d = DRILL[k]; if (!d || !d.rows.length) { toast('Không có dữ liệu để xuất'); return; }
+  const cols = Object.keys(d.rows[0].cols || { 'Tên':1 }); const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const text = '﻿' + [cols.map(q).join(','), ...d.rows.map(r => cols.map(c => q((r.cols || { 'Tên': r.name })[c])).join(','))].join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type:'text/csv;charset=utf-8' })); a.download = `${HX.slug(title || d.title) || 'bao-cao'}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast(`Đã xuất ${d.rows.length} dòng ra CSV`); }
+
+/* ── Sự kiện ── */
 const tip = $('#tip');
 $('#grid').addEventListener('mousemove', e => { const t = e.target.closest('[data-tip]'); if (!t) { tip.style.display = 'none'; return; }
   tip.textContent = t.dataset.tip; tip.style.display = 'block'; tip.style.left = Math.min(innerWidth - 270, e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px'; });
 $('#grid').addEventListener('mouseleave', () => tip.style.display = 'none');
-$('#fRange').onchange = e => { st.range = e.target.value; render(); };
-$('#fOwner').onchange = e => { st.owner = e.target.value; render(); };
-$('#refresh').onclick = () => { render(); toast('Đã làm mới dữ liệu'); };
-$('#dBtn').onclick = e => { e.stopPropagation(); $('#dPop').classList.toggle('open'); };
-document.addEventListener('click', e => { const d = e.target.closest('[data-dash]'); if (d) { st.dash = d.dataset.dash; history.replaceState(null, '', '?d=' + st.dash); render(); }
-  const t = e.target.closest('[data-toast]'); if (t) toast(t.dataset.toast);
-  if (!e.target.closest('#dBtn')) $('#dPop').classList.remove('open'); });
+// Kéo thả sắp xếp báo cáo (bấm giữ tay cầm ⠿)
+let dragId = null;
+$('#grid').addEventListener('mousedown', e => { const g = e.target.closest('[data-grip]'); const c = e.target.closest('.rc'); if (c) c.draggable = !!g; });
+$('#grid').addEventListener('dragstart', e => { const c = e.target.closest('.rc'); if (!c || !c.draggable) return; dragId = c.dataset.rid; c.classList.add('dragging'); e.dataTransfer.setData('text/plain', dragId); });
+$('#grid').addEventListener('dragover', e => { const c = e.target.closest('.rc[data-rid]'); if (c && dragId) { e.preventDefault(); document.querySelectorAll('.dropt').forEach(x => x.classList.remove('dropt')); if (c.dataset.rid !== dragId) c.classList.add('dropt'); } });
+$('#grid').addEventListener('drop', e => { const c = e.target.closest('.rc[data-rid]'); if (!c || !dragId) return; e.preventDefault();
+  const d = D0(st.dash), ord = reportsOf(st.dash).map(r => r.id).filter(x => x !== dragId); ord.splice(ord.indexOf(c.dataset.rid), 0, dragId); d.order = [...ord, ...d.hidden]; save(); dragId = null; render(); toast('Đã sắp xếp lại báo cáo'); });
+$('#grid').addEventListener('dragend', () => { dragId = null; document.querySelectorAll('.dragging,.dropt').forEach(x => x.classList.remove('dragging', 'dropt')); });
+
+document.addEventListener('click', e => {
+  const t = e.target;
+  const dr = t.closest('[data-drill]'); if (dr && t.closest('#grid')) { openDrill(dr.dataset.drill); return; }
+  const tt = t.closest('[data-toast]'); if (tt) { toast(tt.dataset.toast); closePop(); return; }
+  // Bộ chọn dashboard: Tất cả · Xem gần đây · Yêu thích · Dashboard của tôi + tìm
+  if (t.closest('#dBtn')) { e.stopPropagation(); let tab = 'all', q = '';
+    const draw = () => { const ids = tab === 'recent' ? S.recent.filter(k => DASH[k]) : tab === 'fav' ? Object.keys(DASH).filter(k => S.fav[k]) : Object.keys(DASH);
+      pop.querySelector('#dL').innerHTML = ids.filter(k => DASH[k].toLowerCase().includes(q)).map(k => `<button class="mi" data-dash="${k}" ${k === st.dash ? 'style="font-weight:700"' : ''}>${S.fav[k] ? '<span class="ms sm" style="color:#eda100;font-variation-settings:\'FILL\' 1">star</span>' : '<span class="ms sm">dashboard</span>'}${DASH[k]}</button>`).join('') || '<div class="nil" style="padding:10px;font-size:13px">Không có dashboard</div>'; };
+    openPop(t.closest('#dBtn'), `<div class="dtabs" role="tablist">${[['all','Tất cả'],['recent','Xem gần đây'],['fav','Yêu thích'],['mine','Của tôi']].map(([k, l]) => `<button role="tab" data-dt="${k}" aria-selected="${k === 'all'}">${l}</button>`).join('')}</div>
+      <label class="srch2" style="height:34px;margin-bottom:6px"><input id="dQ" placeholder="Tìm dashboard"><span class="ms sm">search</span></label><div id="dL"></div>`, 420);
+    draw(); pop.querySelector('#dQ').focus(); pop.querySelector('#dQ').oninput = ev => { q = ev.target.value.trim().toLowerCase(); draw(); };
+    pop.onclick = ev => { ev.stopPropagation(); const b = ev.target.closest('[data-dt]'); if (b) { tab = b.dataset.dt; pop.querySelectorAll('[data-dt]').forEach(x => x.setAttribute('aria-selected', x === b)); draw(); }
+      const dd = ev.target.closest('[data-dash]'); if (dd) { st.dash = dd.dataset.dash; history.replaceState(null, '', '?d=' + st.dash); closePop(); render(); } }; return; }
+  if (t.closest('#favBtn')) { S.fav[st.dash] = !S.fav[st.dash]; save(); render(); toast(S.fav[st.dash] ? 'Đã thêm vào Yêu thích' : 'Đã bỏ khỏi Yêu thích'); return; }
+  if (t.closest('#actBtn')) { e.stopPropagation(); openPop(t.closest('#actBtn'), `<button class="mi" data-drn><span class="ms sm">edit</span>Đổi tên dashboard</button><button class="mi" data-toast="Nhân bản dashboard (ngoài phạm vi giai đoạn 2)"><span class="ms sm">content_copy</span>Nhân bản</button>
+      <button class="mi" data-toast="Đặt làm dashboard mặc định khi mở mục Báo cáo"><span class="ms sm">home</span>Đặt làm mặc định</button><button class="mi" data-dcsv><span class="ms sm">download</span>Xuất dữ liệu (CSV)</button>
+      <button class="mi" data-toast="Gửi dashboard qua email theo lịch — cần dịch vụ email của ERP"><span class="ms sm">schedule_send</span>Gửi email định kỳ</button><div class="sep"></div><button class="mi" data-dreset><span class="ms sm">restart_alt</span>Khôi phục bố cục mặc định</button>`, 260, true); return; }
+  if (t.closest('[data-drn]')) { closePop(); HX.modal(`<div class="modal" role="dialog" aria-modal="true" style="width:min(420px,100%)"><div class="mh">Đổi tên dashboard<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div><div class="mb field-form"><label>Tên<input class="in" id="dnIn" value="${esc(DASH[st.dash])}"></label></div><div class="mf"><button class="btn btn--secondary" data-close>Huỷ</button><button class="btn btn--primary" id="dnOk">Lưu</button></div></div>`, (bg, close) => { bg.querySelector('#dnOk').onclick = () => { const v = bg.querySelector('#dnIn').value.trim(); if (v) { DASH[st.dash] = v; D0(st.dash).title = v; save(); } close(); render(); }; }); return; }
+  if (t.closest('[data-dcsv]')) { closePop(); const rows = reportsOf(st.dash).flatMap(r => (DRILL[r._k] || { rows:[] }).rows); const k = drill(DASH[st.dash], [...new Map(rows.map(r => [r.href + r.name, r])).values()]); csv(k, DASH[st.dash]); return; }
+  if (t.closest('[data-dreset]')) { closePop(); S[st.dash] = { order:null, size:{}, names:{}, hidden:[] }; save(); render(); toast('Đã khôi phục bố cục mặc định'); return; }
+  if (t.closest('#shareBtn')) { e.stopPropagation(); openPop(t.closest('#shareBtn'), `<button class="mi" data-copyl><span class="ms sm">link</span>Sao chép liên kết</button><button class="mi" data-toast="Gửi qua email — cần dịch vụ email của ERP"><span class="ms sm">mail</span>Gửi qua email</button><button class="mi" data-toast="Chia sẻ với người dùng / nhóm trong ERP (phân quyền dashboard)"><span class="ms sm">group</span>Quản lý quyền truy cập</button>`, 240, true); return; }
+  if (t.closest('[data-copyl]')) { closePop(); navigator.clipboard?.writeText(location.href).catch(() => {}); toast('Đã sao chép liên kết dashboard'); return; }
+  if (t.closest('#addBtn')) { e.stopPropagation(); const hid = D0(st.dash).hidden.map(id => REPORTS[st.dash].find(r => r.id === id)).filter(Boolean);
+    openPop(t.closest('#addBtn'), `<div class="hd">Báo cáo đã gỡ khỏi dashboard</div>${hid.map(r => `<button class="mi" data-radd="${r.id}"><span class="ms sm">add_chart</span>${esc(r.title)}</button>`).join('') || '<div class="nil" style="padding:6px 10px;font-size:13px">Không có — mọi báo cáo đang hiển thị</div>'}
+      <div class="sep"></div><button class="mi" data-toast="Tạo báo cáo mới bằng Report Builder (ngoài phạm vi giai đoạn 2)"><span class="ms sm">bar_chart</span>Tạo báo cáo mới</button><button class="mi" data-toast="Thêm văn bản / hình ảnh vào dashboard (ngoài phạm vi)"><span class="ms sm">text_fields</span>Văn bản & hình ảnh</button>`, 300, true); return; }
+  const ra = t.closest('[data-radd]'); if (ra) { const d = D0(st.dash); d.hidden = d.hidden.filter(x => x !== ra.dataset.radd); save(); closePop(); render(); toast('Đã thêm lại báo cáo'); return; }
+  // Bộ lọc nhanh
+  if (t.closest('#qEdit')) { e.stopPropagation(); const f = F();
+    openPop(t.closest('#qEdit'), `<div class="hd">Bộ lọc nhanh hiển thị</div>${[['range','Khoảng thời gian'],['owner', st.dash === 'pipe' ? 'Deal owner' : 'Owners']].map(([k, l]) => `<label class="mi"><input type="checkbox" data-qk="${k}" ${f.quick.includes(k) ? 'checked' : ''}>${l}</label>`).join('')}`, 240);
+    pop.onclick = ev => ev.stopPropagation(); pop.onchange = ev => { const k = ev.target.dataset.qk; f.quick = ev.target.checked ? [...f.quick, k] : f.quick.filter(x => x !== k); if (!ev.target.checked) { if (k === 'owner') f.owners = []; if (k === 'range') f.range = st.dash === 'pipe' ? 'quarter' : 'month'; } render(); }; return; }
+  const q = t.closest('[data-q]'); if (q) { e.stopPropagation(); const f = F();
+    if (q.dataset.q === 'range') { const cur = f.range;
+      openPop(q, `<div style="display:flex;flex-direction:column">${DATE_P.map(([v, l]) => `<button class="qp-d ${cur === v ? 'cur' : ''}" data-rg="${v}"><b>${l}</b><small>${v === 'all' ? 'Không giới hạn' : (([a, b]) => `${fmtD(a)} – ${fmtD(new Date(b - 864e5))}`)(range(v))}</small></button>`).join('')}</div>
+        <div class="qp-c"><b style="font-size:12.5px;width:100%">Tuỳ chọn</b><input type="date" id="rgA" value="${typeof cur === 'object' ? cur.from : ''}"> – <input type="date" id="rgB" value="${typeof cur === 'object' ? cur.to : ''}"><button class="btn btn--primary sm" id="rgOk">Áp dụng</button></div>`, 300);
+      pop.onclick = ev => { ev.stopPropagation(); const b = ev.target.closest('[data-rg]'); if (b) { f.range = b.dataset.rg; closePop(); render(); }
+        if (ev.target.closest('#rgOk')) { const a = pop.querySelector('#rgA').value, bb = pop.querySelector('#rgB').value; if (!a || !bb || a > bb) { toast('Chọn ngày bắt đầu ≤ ngày kết thúc'); return; } f.range = { from:a, to:bb }; closePop(); render(); } }; return; }
+    const sel = new Set(f.owners);
+    openPop(q, `<label class="srch2" style="height:32px;margin-bottom:6px"><input id="oQ" placeholder="Tìm"><span class="ms sm">search</span></label><div id="oL"></div><div class="qp-c" style="justify-content:space-between"><button class="lk" id="oClr" style="font-weight:600;font-size:12.5px">Bỏ chọn</button><button class="btn btn--primary sm" id="oOk">Áp dụng</button></div>`, 260);
+    const drawO = (qq = '') => { pop.querySelector('#oL').innerHTML = HX.USERS.filter(u => u.toLowerCase().includes(qq)).map(u => `<label class="mi"><input type="checkbox" value="${esc(u)}" ${sel.has(u) ? 'checked' : ''}>${esc(u)}${u === HXC.ME ? ' (tôi)' : ''}</label>`).join(''); };
+    drawO(); pop.querySelector('#oQ').oninput = ev => drawO(ev.target.value.trim().toLowerCase());
+    pop.onchange = ev => { if (ev.target.type === 'checkbox') ev.target.checked ? sel.add(ev.target.value) : sel.delete(ev.target.value); };
+    pop.onclick = ev => { ev.stopPropagation(); if (ev.target.closest('#oOk')) { f.owners = [...sel]; closePop(); render(); } if (ev.target.closest('#oClr')) { f.owners = []; closePop(); render(); } }; return; }
+  if (t.closest('#advBtn')) { const p = $('#panel');
+    p.innerHTML = `<div class="pn-h"><h2>Bộ lọc nâng cao</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
+      <div class="pn-b af"><p class="nil" style="font-size:13px">Áp dụng cho mọi báo cáo trên dashboard (VÀ với bộ lọc nhanh).</p>
+        <fieldset><legend>Contact · Lifecycle stage</legend>${HXC.LIFECYCLE.map(l => `<label><input type="checkbox" data-al="lifecycle" value="${esc(l)}" ${st.adv.lifecycle.includes(l) ? 'checked' : ''}>${esc(l)}</label>`).join('')}</fieldset>
+        <fieldset><legend>Deal · Gói dịch vụ mục tiêu</legend>${(HX.F.g_i_d_ch_v_m_c_ti_u ? HX.F.g_i_d_ch_v_m_c_ti_u.choices : []).map(l => `<label><input type="checkbox" data-al="goi" value="${esc(l)}" ${st.adv.goi.includes(l) ? 'checked' : ''}>${esc(l)}</label>`).join('')}</fieldset></div>
+      <div class="pn-f"><button class="btn btn--primary" id="afOk">Áp dụng</button><button class="btn btn--secondary" data-pclose>Huỷ</button><button class="btn btn--text" id="afClr" style="margin-left:auto">Xoá tất cả</button></div>`;
+    p.onclick = ev => { if (ev.target.closest('[data-pclose]')) HX.closePanel();
+      if (ev.target.closest('#afClr')) p.querySelectorAll('[data-al]').forEach(i => i.checked = false);
+      if (ev.target.closest('#afOk')) { st.adv = { lifecycle:[], goi:[] }; p.querySelectorAll('[data-al]:checked').forEach(i => st.adv[i.dataset.al].push(i.value)); HX.closePanel(); render(); } };
+    document.body.classList.remove('dock'); p.classList.add('open'); document.body.classList.add('panel-open'); return; }
+  if (t.closest('#fClr')) { const f = F(); f.owners = []; f.range = st.dash === 'pipe' ? 'quarter' : 'month'; st.adv = { lifecycle:[], goi:[] }; render(); return; }
+  if (t.closest('#refresh')) { render(); toast('Đã làm mới dữ liệu'); return; }
+  // Thanh công cụ trên thẻ báo cáo
+  const rr = t.closest('[data-rrf]'); if (rr) { render(); toast('Đã làm mới báo cáo'); return; }
+  const rf = t.closest('[data-rfl]'); if (rf) { e.stopPropagation(); const r = REPORTS[st.dash].find(x => x.id === rf.dataset.rfl);
+    openPop(rf, `<div class="hd">Bộ lọc của báo cáo</div><div style="padding:4px 10px 8px;font-size:13px;display:flex;flex-direction:column;gap:6px"><span>• ${esc(rangeTip())}${r.freq ? ' · theo tháng' : ''}</span>${F().owners.length ? `<span>• Owner: ${esc(F().owners.join(', '))}</span>` : ''}${r.filt ? `<span>• ${r.id === 'dcl' ? 'Giai đoạn là Closed Won hoặc Closed Lost' : 'Giai đoạn là Closed Won'}</span>` : ''}${st.adv.lifecycle.length ? `<span>• Lifecycle: ${esc(st.adv.lifecycle.join(', '))}</span>` : ''}${st.adv.goi.length ? `<span>• Gói: ${esc(st.adv.goi.join(', '))}</span>` : ''}</div>`, 280, true); return; }
+  const rm = t.closest('[data-rm]'); if (rm) { e.stopPropagation(); const r = REPORTS[st.dash].find(x => x.id === rm.dataset.rm);
+    openPop(rm, `${r.list ? `<a class="mi" href="${r.list}"><span class="ms sm">open_in_new</span>Đi tới ${r.list.includes('contacts') ? 'Contacts' : 'Deals'}</a>` : ''}<button class="mi" data-rview="${r.id}"><span class="ms sm">list</span>Xem bản ghi</button>
+      <button class="mi" data-toast="Sửa trong Report Builder (ngoài phạm vi giai đoạn 2)"><span class="ms sm">edit_note</span>Sửa trong Report Builder</button><button class="mi" data-rrn="${r.id}"><span class="ms sm">edit</span>Đổi tên</button>
+      <button class="mi" data-rcsv="${r.id}"><span class="ms sm">download</span>Xuất dữ liệu chi tiết (CSV)</button><button class="mi" data-toast="Chia sẻ báo cáo qua liên kết / email"><span class="ms sm">share</span>Chia sẻ</button>
+      <button class="mi" data-rmv="${r.id}"><span class="ms sm">swap_horiz</span>Chuyển sang ${st.dash === 'crm' ? 'Pipeline Overview' : 'CRM Data Overview'}</button><div class="sep"></div>
+      <button class="mi" data-rhide="${r.id}" style="color:var(--error)"><span class="ms sm">remove_circle</span>Gỡ khỏi dashboard</button>`, 280, true); return; }
+  const rv = t.closest('[data-rview]'); if (rv) { closePop(); const r = REPORTS[st.dash].find(x => x.id === rv.dataset.rview); openDrill(r._k, D0(st.dash).names[r.id] || r.title); return; }
+  const rc = t.closest('[data-rcsv]'); if (rc) { closePop(); const r = REPORTS[st.dash].find(x => x.id === rc.dataset.rcsv); csv(r._k, D0(st.dash).names[r.id] || r.title); return; }
+  const rn = t.closest('[data-rrn]'); if (rn) { closePop(); const r = REPORTS[st.dash].find(x => x.id === rn.dataset.rrn), d = D0(st.dash);
+    HX.modal(`<div class="modal" role="dialog" aria-modal="true" style="width:min(420px,100%)"><div class="mh">Đổi tên báo cáo<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div><div class="mb field-form"><label>Tên<input class="in" id="rnIn" value="${esc(d.names[r.id] || r.title)}"></label></div><div class="mf"><button class="btn btn--secondary" data-close>Huỷ</button><button class="btn btn--primary" id="rnOk">Lưu</button></div></div>`,
+      (bg, close) => { bg.querySelector('#rnOk').onclick = () => { const v = bg.querySelector('#rnIn').value.trim(); if (v) d.names[r.id] = v; save(); close(); render(); toast('Đã đổi tên báo cáo'); }; }); return; }
+  const mv = t.closest('[data-rmv]'); if (mv) { closePop(); toast('Mỗi báo cáo dùng dữ liệu riêng của dashboard — chuyển dashboard cần Report Builder (ngoài phạm vi)'); return; }
+  const rh = t.closest('[data-rhide]'); if (rh) { closePop(); const d = D0(st.dash); d.hidden.push(rh.dataset.rhide); save(); render(); toast('Đã gỡ báo cáo — thêm lại ở “Thêm nội dung”'); return; }
+  const rs = t.closest('[data-rsz]'); if (rs) { const r = REPORTS[st.dash].find(x => x.id === rs.dataset.rsz), d = D0(st.dash); d.size[r.id] = ((d.size[r.id] || r.size) % 3) + 1; save(); render(); return; }
+  if (!t.closest('#pop')) closePop();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
+Object.keys(DASH).forEach(k => { if (S[k] && S[k].title) DASH[k] = S[k].title; });
 render();
 </script>
 </body>

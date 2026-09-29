@@ -225,3 +225,19 @@ Khảo sát trên Deal 001 (chỉ mở rồi đóng cửa sổ soạn, không l�
 | Tab timeline | All · Notes · Emails · Calls · Tasks · Meetings; mỗi tab có nút riêng (Log a call / Make a phone call, Log a meeting / Schedule a meeting…) | Như HubSpot | — |
 | Bộ lọc timeline | "Activity (x/y) ▾" theo nhóm Communication / Team activity / Updates, "All time ▾", "Activity assigned to ▾", "Clear all", "Collapse all ▾" | Như HubSpot (Giao tiếp / Hoạt động nhóm / Cập nhật: Hoạt động Deal, Thay đổi liên kết, Thay đổi thuộc tính, Tạo bản ghi) | — |
 | Thẻ hoạt động | Bấm để thu gọn/mở; "Actions ▾": Pin, Edit, History, Delete; "N associations ▾" | Như HubSpot: Ghim lên đầu, Sửa (mở lại cửa sổ soạn), Xem liên kết, Xoá; task tick hoàn thành ngay trên thẻ | Bình luận trên hoạt động: chưa làm |
+
+## 15. Phần 5 — Line items & trường tuỳ chỉnh (29/09/2026)
+
+Portal HubSpot của dự án chưa có sản phẩm nào; mình chỉ mở form "Create product" để xem các trường rồi thoát, không tạo gì. Trình sửa line item bám theo màn "Edit line items" chuẩn của HubSpot.
+
+| Khu vực | HubSpot | Prototype sau chỉnh | Cần BE ERP? |
+|---|---|---|---|
+| Kiểu màn hình | Trang toàn màn hình, thanh trên tối: Cancel · tiêu đề · Save | Như HubSpot (thay cho hộp thoại cũ) | Không |
+| Thêm line item | "Add line item ▾": Select from product library / Create custom line item | Như HubSpot. Thư viện sản phẩm mở ở panel bên phải: tìm theo tên/SKU, tick nhiều sản phẩm, chỉnh số lượng (− / +) rồi "Thêm (n)" | Collection Sản phẩm |
+| Cột bảng | Name, Billing frequency, Term, Quantity, Unit price, Unit discount, Net price, Total + các thuộc tính chọn thêm | Tên, Tần suất thanh toán (Một lần / Hằng tháng / Hằng quý / Nửa năm / Hằng năm), Kỳ hạn, Chiết khấu (₫ hoặc %), SL, Đơn giá, Thành tiền (định kỳ = giá/kỳ × số kỳ); bật thêm SKU, Giá vốn, Mô tả | Collection Line item (bảng nối Deal ↔ Sản phẩm) |
+| Trường tuỳ chỉnh | "Edit columns" + tạo thuộc tính line item | "Chỉnh sửa cột": chọn / sắp xếp cột + **tạo thuộc tính mới** (Văn bản, Số, Ngày, Lựa chọn đơn, Hộp kiểm) → điền ngay trên từng dòng; cột tuỳ chỉnh có nhãn "TUỲ CHỈNH" | Thêm trường vào collection Line item |
+| Tự điền | Mô tả, giá, tần suất lấy từ sản phẩm | Khi thêm từ thư viện: tên, giá, tần suất, kỳ hạn **và giá trị mặc định các trường tuỳ chỉnh** của sản phẩm (vd. Thời hạn 6/12 tháng) tự điền | Trường mặc định trên Sản phẩm |
+| Thao tác dòng | Kéo để sắp xếp, ⋯ (Clone, Delete…) | Kéo thả, ⋯: Nhân bản · Lưu vào thư viện sản phẩm (dòng tuỳ chỉnh) · Chuyển lên/xuống · Xoá | Không |
+| Tổng kết | Subtotal, + discount / fee / tax cấp báo giá, Total, doanh thu định kỳ | Tạm tính · + Chiết khấu / + Phí / + Thuế (% hoặc ₫; thuế tính sau chiết khấu + phí) · Tổng · ARR / MRR | Lưu điều chỉnh cấp Deal |
+| Amount của Deal | Tuỳ chọn dùng tổng line item làm Amount | Ô "Dùng tổng line item làm Amount" (mặc định bật) → cập nhật Tổng Cash-In Dự Kiến, ghi vào timeline | Không |
+| Card trên Deal | Danh sách line item + tổng | Như HubSpot + dòng điều chỉnh và ARR khi có hàng định kỳ | Không |

@@ -434,3 +434,77 @@ body.panel-open .demo{display:none}
 .ta-as .ms,.ta-h .ms{overflow-wrap:normal}
 .ta-t .nil{white-space:nowrap}
 .ta-h time{flex:none}
+
+/* ═══ Phần 5 — Line items: trình sửa toàn màn hình (clone "Edit line items" HubSpot) ═══ */
+body.lie-open{overflow:hidden}
+.lie-full{position:fixed;inset:0;z-index:960;background:var(--page-bg);display:flex;flex-direction:column}
+.lie-top{display:flex;align-items:center;gap:12px;height:56px;padding:0 12px;background:var(--shell-bg);color:var(--shell-fg);flex:none}
+.lie-top h2{flex:1;text-align:center;font-size:17px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lie-top h2 span{font-weight:400;opacity:.75;font-size:14px}
+.lie-x{border:1px solid rgba(255,255,255,.5);color:var(--shell-fg);background:transparent}
+.lie-x:hover{background:rgba(255,255,255,.1)}
+.lie-main{flex:1;min-height:0;display:flex;gap:12px;padding:12px}
+.lie-wrap{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--frame-radius);overflow:hidden}
+.lie-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--outline-variant)}
+.lie-cur{margin-left:auto;font-size:13px;color:var(--on-surface-variant)}
+.lie-cur b{color:var(--on-surface)}
+.lie-tw{flex:1;min-height:0;overflow:auto;padding:0 8px}
+.lie-t{width:100%;border-collapse:collapse;min-width:900px}
+.lie-t th{position:sticky;top:0;z-index:1;background:var(--surface);text-align:left;font-size:12.5px;color:var(--on-surface-variant);font-weight:600;padding:10px 6px;border-bottom:1px solid var(--outline);white-space:nowrap}
+.lie-t td{padding:6px;border-bottom:1px solid var(--outline-variant);vertical-align:top;font-size:13px}
+.lie-t .n{text-align:right}
+.lie-t .ed{height:32px;min-width:0;width:100%;border:1px solid transparent;border-radius:var(--radius-sm);padding:0 8px;background:transparent;color:var(--on-surface);font-size:13px}
+.lie-t .ed:hover{border-color:var(--outline-variant)}
+.lie-t .ed:focus{border-color:var(--primary);outline:none;background:var(--surface)}
+.lie-t td.n .ed{text-align:right;width:130px}
+.lie-t td .ed.nm{min-width:220px;font-weight:600}
+.lie-t td small{display:block;margin:2px 8px 0;font-size:11.5px}
+.lie-t td.n small{margin-right:0}
+.lie-t td b{display:block;padding-top:7px;white-space:nowrap}
+.lie-t .disc{display:inline-flex;gap:2px}
+.lie-t .disc .ed{width:96px}
+.lie-t .disc select.ed{width:52px;padding:0 4px}
+.lie-t .dg{width:28px;color:var(--on-surface-variant);cursor:grab;padding-top:12px}
+.lie-t tr.dragging{opacity:.4}
+.lie-t tr.dropb td{box-shadow:inset 0 2px 0 var(--primary)}
+.cfb{font-size:10px;font-weight:700;padding:1px 5px;border-radius:var(--radius-pill);background:var(--primary-container);color:var(--on-primary-container);text-transform:uppercase;letter-spacing:.03em}
+.lie-empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:40px 12px;color:var(--on-surface-variant);text-align:center}
+.lie-empty .ms{font-size:36px;max-width:none}
+.lie-empty b{color:var(--on-surface)}
+.lie-empty span{margin-top:6px;display:flex;gap:6px}
+.lie-foot{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--outline-variant)}
+.lie-use{display:flex;align-items:center;gap:8px;font-size:13px}
+.lie-sum{display:flex;flex-direction:column;gap:6px;font-size:13px;min-width:min(420px,100%)}
+.lie-sum>div{display:flex;gap:16px;justify-content:space-between;align-items:center}
+.lie-sum .ls-sub{color:var(--on-surface-variant);font-size:12.5px}
+.lie-sum .tot{font-size:16px;border-top:1px solid var(--outline);padding-top:8px}
+.lie-sum .adj{display:grid;grid-template-columns:100px 1fr 80px 52px auto 28px;gap:4px;align-items:center}
+.lie-sum .adj .ed{height:30px;border:1px solid var(--outline-variant);border-radius:var(--radius-sm);padding:0 6px;background:var(--surface);color:var(--on-surface);font-size:12.5px;min-width:0}
+.lie-sum .adj .n{text-align:right}
+.lie-sum .adj .amt{text-align:right;white-space:nowrap;font-weight:600}
+.lie-sum .addadj{justify-content:flex-start;gap:14px}
+.lie-sum .addadj .lk{font-weight:600;font-size:12.5px}
+.lie-lib{width:min(380px,40vw);flex:none;display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--frame-radius);padding:14px}
+.lie-lib[hidden]{display:none}
+.ll-h{display:flex;align-items:center;justify-content:space-between;font-size:15px}
+.ll-l{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.ll-p{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--outline-variant);border-radius:var(--radius-md);cursor:pointer}
+.ll-p:hover{background:var(--surface-2)}
+.ll-p input{margin-top:3px;accent-color:var(--primary)}
+.ll-i{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:13px}
+.ll-i small{font-size:11.5px;color:var(--on-surface-variant)}
+.ll-r{display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:13px;white-space:nowrap}
+.ll-r .qty{display:inline-flex;align-items:center;border:1px solid var(--outline);border-radius:var(--radius-pill);overflow:hidden}
+.ll-r .qty button{width:26px;height:24px;font-weight:700}
+.ll-r .qty button:hover{background:var(--surface-2)}
+.ll-r .qty span{min-width:22px;text-align:center;font-weight:600}
+.ll-f{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--outline-variant);padding-top:10px}
+.ll-f .lk{font-weight:600;font-size:13px}
+.lc-new{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--outline-variant);padding-top:10px;margin-top:10px}
+.lc-new .in{height:34px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 10px;background:var(--surface);color:var(--on-surface)}
+.lc-new .btn{align-self:flex-start}
+.li-t.sm{font-size:12.5px;padding-top:4px}
+@media(max-width:720px){.lie-main{flex-direction:column}.lie-lib{width:auto;max-height:50vh}.lie-sum .adj{grid-template-columns:1fr 1fr 70px 50px}}
+
+.lie-t td.nmc{min-width:260px}
+.lie-t{min-width:1000px}

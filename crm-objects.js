@@ -114,12 +114,12 @@ const HXC = (() => {
       if (d) dealLinks[d.id].contacts.push({ id:'ct' + n, label });
     });
     const products = [
-      {id:'p1', name:'HarnexAI STARTER – 6 tháng', sku:'HX-ST-6', price:15000000, desc:'Gói Starter, trả trước 6 tháng'},
-      {id:'p2', name:'HarnexAI STARTER – 12 tháng', sku:'HX-ST-12', price:28000000, desc:'Gói Starter, trả trước 12 tháng'},
-      {id:'p3', name:'HarnexAI PROFESSIONAL – 12 tháng', sku:'HX-PRO-12', price:48000000, desc:'Gói Professional, trả trước 12 tháng'},
-      {id:'p4', name:'HarnexAI ENTERPRISE BYOC – 12 tháng', sku:'HX-ENT-12', price:180000000, desc:'Triển khai trên hạ tầng khách hàng'},
+      {id:'p1', name:'HarnexAI STARTER – 6 tháng', sku:'HX-ST-6', price:15000000, desc:'Gói Starter, trả trước 6 tháng', defaults:{thoi_han:6}},
+      {id:'p2', name:'HarnexAI STARTER – 12 tháng', sku:'HX-ST-12', price:28000000, desc:'Gói Starter, trả trước 12 tháng', defaults:{thoi_han:12}},
+      {id:'p3', name:'HarnexAI PROFESSIONAL – 12 tháng', sku:'HX-PRO-12', price:48000000, desc:'Gói Professional, trả trước 12 tháng', defaults:{thoi_han:12}},
+      {id:'p4', name:'HarnexAI ENTERPRISE BYOC – 12 tháng', sku:'HX-ENT-12', price:180000000, desc:'Triển khai trên hạ tầng khách hàng', defaults:{thoi_han:12}},
       {id:'p5', name:'Phí khởi tạo (Setup)', sku:'HX-SETUP', price:3000000, desc:'Cấu hình, nhập dữ liệu ban đầu'},
-      {id:'p6', name:'User bổ sung / tháng', sku:'HX-USER', price:250000, desc:'Tính theo user theo tháng'},
+      {id:'p6', name:'User bổ sung / tháng', sku:'HX-USER', price:250000, desc:'Tính theo user theo tháng', freq:'Hằng tháng', term:12},
       {id:'p7', name:'Đào tạo onsite (buổi)', sku:'HX-TRAIN', price:5000000, desc:'1 buổi 4 giờ tại văn phòng khách'},
     ];
     const liFields = [{key:'thoi_han', name:'Thời hạn (tháng)', type:'NUMBER'}, {key:'ghi_chu', name:'Ghi chú', type:'TEXT'}];
@@ -162,6 +162,10 @@ const HXC = (() => {
     return { companies, contacts, dealLinks, products, lineItems, liFields, activities, events:[] };
   }
   let db = load() || seed();
+  // Nâng cấp dữ liệu cũ (Phần 5: line item có tần suất / kỳ hạn; điều chỉnh cấp Deal; mặc định trường tuỳ chỉnh của sản phẩm)
+  db.liAdj = db.liAdj || {}; db.liUseAmount = db.liUseAmount || {};
+  db.lineItems.forEach(li => { if (!li.freq) li.freq = 'Một lần'; if (!li.term) li.term = 1; });
+  db.products.forEach(p => { if (!p.defaults && /– (6|12) tháng/.test(p.name)) p.defaults = { thoi_han: Number(p.name.match(/– (6|12) tháng/)[1]) }; if (p.id === 'p6' && !p.freq) { p.freq = 'Hằng tháng'; p.term = 12; } });
   // Nâng cấp dữ liệu cũ trong trình duyệt (Phần 2: thêm Quốc gia, Lead status cho Company)
   db.companies.forEach(c => { if (!('country' in c.values)) c.values.country = 'Việt Nam'; if (!('leadstatus' in c.values)) c.values.leadstatus = c.values.lifecycle === 'Customer' ? null : c.values.lifecycle === 'Opportunity' ? 'Có deal' : 'Mới'; });
   if (!load()) persist();
@@ -261,12 +265,26 @@ const HXC = (() => {
   const lastContacted = (t, id) => { const a = activitiesOf(t, id).find(x => ['CALL','MEETING'].includes(x.type) && x.at <= new Date().toISOString()); return a ? a.at : null; };
 
   /* ── Line items ── */
-  const liTotal = li => { const gross = (Number(li.qty) || 0) * (Number(li.price) || 0); const d = Number(li.disc) || 0; return Math.max(0, gross - (li.discType === '%' ? gross * d / 100 : d)); };
+  // Thành tiền 1 kỳ = SL × đơn giá − chiết khấu; định kỳ: × số kỳ (như Total của HubSpot)
+  const liNet = li => { const gross = (Number(li.qty) || 0) * (Number(li.price) || 0); const d = Number(li.disc) || 0; return Math.max(0, gross - (li.discType === '%' ? gross * d / 100 : d)); };
+  const liTotal = li => liNet(li) * (li.freq && li.freq !== 'Một lần' ? Math.max(1, Number(li.term) || 1) : 1);
+  const PERY = { 'Hằng tháng':12, 'Hằng quý':4, 'Nửa năm':2, 'Hằng năm':1 };
+  function totalsOf(items, adj = []) {
+    const sub = items.reduce((s, li) => s + liTotal(li), 0);
+    const gross = items.reduce((s, li) => s + (Number(li.qty) || 0) * (Number(li.price) || 0) * (li.freq && li.freq !== 'Một lần' ? Math.max(1, Number(li.term) || 1) : 1), 0);
+    let run = sub; const out = [];
+    // Thứ tự như HubSpot: chiết khấu → phí → thuế (thuế tính trên số sau chiết khấu + phí)
+    ['discount','fee','tax'].forEach(ty => adj.forEach((a, j) => { if (a.type !== ty) return; const base = ty === 'tax' ? run : sub; const amt = a.mode === '₫' ? Number(a.value) || 0 : base * (Number(a.value) || 0) / 100;
+      out[j] = { label: `${ty === 'discount' ? 'Chiết khấu' : ty === 'fee' ? 'Phí' : 'Thuế'}${a.name ? ' · ' + a.name : ''}${a.mode === '₫' ? '' : ` (${a.value || 0}%)`}`, amount: amt, sign: ty === 'discount' ? -1 : 1 }; run += ty === 'discount' ? -amt : amt; }));
+    const arr = items.reduce((s, li) => s + (PERY[li.freq] ? liNet(li) * PERY[li.freq] : 0), 0);
+    return { sub, lineDisc: Math.max(0, gross - sub), adj: out, adjTotal: out.filter(Boolean).length, total: Math.max(0, run), recurring: items.some(li => PERY[li.freq]), arr };
+  }
+  const dealTotals = dealId => { const T = totalsOf(itemsOf(dealId), db.liAdj[dealId] || []); return { ...T, adj: T.adj.filter(Boolean) }; };
   const itemsOf = dealId => db.lineItems.filter(li => li.deal === dealId);
-  function saveItems(dealId, items) {
+  function saveItems(dealId, items, useAmount = true) {
     db.lineItems = [...db.lineItems.filter(li => li.deal !== dealId), ...items.map(li => ({ ...li, deal: dealId }))]; persist();
-    const total = items.reduce((s, li) => s + liTotal(li), 0);
-    if (HX.F[CASH]) deals.update(dealId, CASH, items.length ? total : deals.get(dealId).values[CASH]);
+    const total = totalsOf(items, db.liAdj[dealId] || []).total;
+    if (HX.F[CASH] && useAmount && items.length) deals.update(dealId, CASH, total);
     logEvent('deal', dealId, `Cập nhật line items: ${items.length} dòng, tổng ${money(total)}`);
     return total;
   }
@@ -623,73 +641,174 @@ const HXC = (() => {
     w.onkeydown = e => { if (e.key === 'Escape') close(); if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') w.querySelector('#cmSave').click(); };
   }
 
-  /* ── Line items: card + trình sửa ── */
+  /* ── Line items: card + trình sửa toàn màn hình — clone "Edit line items" của HubSpot ──
+     Thanh trên: Huỷ · tiêu đề · Lưu | "Thêm line item ▾" (Chọn từ thư viện sản phẩm / Tạo line item tuỳ chỉnh) · Chỉnh sửa cột · Tiền tệ
+     Bảng: kéo để sắp xếp · Tên + mô tả · Tần suất thanh toán · Kỳ hạn · SL · Đơn giá · Chiết khấu (₫/%) · [trường tuỳ chỉnh] · Thành tiền · ⋯
+     Tổng kết: Tạm tính · Chiết khấu / Phí / Thuế cấp Deal · Tổng · doanh thu định kỳ; “Dùng tổng line item làm Amount của Deal”.
+     Trường tuỳ chỉnh: tạo ngay trong "Chỉnh sửa cột"; khi thêm từ thư viện, giá trị mặc định của sản phẩm tự điền vào line item. */
   function lineItemsCard(el, dealId, refresh) {
-    const items = itemsOf(dealId); const total = items.reduce((s, li) => s + liTotal(li), 0);
+    const items = itemsOf(dealId), T = dealTotals(dealId);
     el.innerHTML = `<div class="ch"><span class="ms sm">expand_more</span>Line items (${items.length})<span class="r"><button class="btn btn--text sm" data-liedit>${items.length ? '<span class="ms xs">edit</span>Sửa' : '<span class="ms xs">add</span>Thêm'}</button></span></div>
-      <div class="cb">${items.length ? items.map(li => `<div class="li-r"><span class="nm">${esc(li.name)}</span><span class="nil">${li.qty} × ${money(li.price).replace(' ₫', '')}</span><b>${money(liTotal(li))}</b></div>`).join('') + `<div class="li-t"><span>Tổng</span><b>${money(total)}</b></div>`
+      <div class="cb">${items.length ? items.map(li => `<div class="li-r"><span class="nm">${esc(li.name)}</span><span class="nil">${li.qty} × ${money(li.price)}${li.freq && li.freq !== 'Một lần' ? ` · ${esc(li.freq.toLowerCase())} × ${li.term || 1} kỳ` : ''}</span><b>${money(liTotal(li))}</b></div>`).join('')
+          + (T.adjTotal ? `<div class="li-t sm"><span>Tạm tính</span><span>${money(T.sub)}</span></div>${T.adj.map(a => `<div class="li-t sm"><span>${esc(a.label)}</span><span>${a.sign < 0 ? '− ' : '+ '}${money(a.amount)}</span></div>`).join('')}` : '')
+          + `<div class="li-t"><span>Tổng</span><b>${money(T.total)}</b></div>${T.recurring ? `<div class="li-t sm nil"><span>Doanh thu định kỳ hằng năm (ARR)</span><span>${money(T.arr)}</span></div>` : ''}`
         : `<div class="ac-empty"><span class="ms">receipt_long</span>Thêm sản phẩm, dịch vụ vào Deal. Tổng line item sẽ thành Amount của Deal.</div>`}</div>`;
     el.onclick = e => { if (e.target.closest('[data-liedit]')) lineItemEditor(dealId, refresh); };
   }
+  const FREQ = ['Một lần','Hằng tháng','Hằng quý','Nửa năm','Hằng năm'];
+  const PER_YEAR = { 'Hằng tháng':12, 'Hằng quý':4, 'Nửa năm':2, 'Hằng năm':1 };
+  // Thuộc tính line item có sẵn (bật/tắt ở "Chỉnh sửa cột") — cột cố định: Tên, SL, Đơn giá, Thành tiền
+  const LI_STD = [{key:'freq', name:'Tần suất thanh toán', type:'SELECT', std:true}, {key:'term', name:'Kỳ hạn (số kỳ)', type:'NUMBER', std:true}, {key:'disc', name:'Chiết khấu', type:'NUMBER', std:true},
+    {key:'sku', name:'SKU', type:'TEXT', std:true}, {key:'cost', name:'Giá vốn / đơn vị', type:'NUMBER', std:true}, {key:'desc', name:'Mô tả', type:'TEXT', std:true}];
   function lineItemEditor(dealId, refresh) {
-    let items = itemsOf(dealId).map(li => ({ ...li, custom:{ ...(li.custom || {}) } }));
-    let shown = db.liFields.map(f => f.key);
+    document.querySelector('.lie-full')?.remove();
+    let items = itemsOf(dealId).map(li => ({ freq:'Một lần', term:1, ...li, custom:{ ...(li.custom || {}) } }));
+    let adj = (db.liAdj[dealId] || []).map(a => ({ ...a }));
+    let useAmount = db.liUseAmount[dealId] !== false;
+    let cols = db.liCols ? [...db.liCols] : ['freq','disc', ...db.liFields.map(f => f.key)];
     const d = deals.get(dealId);
-    HX.modal(`<div class="modal xl lie" role="dialog" aria-modal="true" aria-labelledby="lieT">
-      <div class="mh" id="lieT">Line items · ${esc(HX.title(d))}<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
-      <div class="lie-bar"><div style="position:relative"><button class="btn btn--primary sm" id="lieLib"><span class="ms xs">inventory_2</span>Chọn từ thư viện sản phẩm</button><div class="pop" id="liePop" style="top:34px;left:0;width:340px"></div></div>
-        <button class="btn btn--secondary sm" id="lieCustom"><span class="ms xs">add</span>Tạo line item tùy chỉnh</button>
-        <div style="position:relative;margin-left:auto"><button class="btn btn--secondary sm" id="lieCols"><span class="ms xs">view_column</span>Chỉnh sửa cột</button><div class="pop" id="lieColPop" style="top:34px;right:0;width:300px"></div></div></div>
-      <div class="lie-tw"><table class="lie-t"><thead id="lieH"></thead><tbody id="lieB"></tbody></table></div>
-      <div class="lie-sum" id="lieSum"></div>
-      <div class="mf"><span class="nil" style="margin-right:auto;font-size:12px">Lưu xong: Amount (Tổng Cash-In Dự Kiến) của Deal = Tổng</span><button class="btn btn--secondary" data-close>Huỷ</button><button class="btn btn--primary" id="lieSave">Lưu</button></div></div>`, (bg, close) => {
-      const cf = () => db.liFields.filter(f => shown.includes(f.key));
-      const drawH = () => { $('#lieH', bg).innerHTML = `<tr><th>Tên</th><th class="n">SL</th><th class="n">Đơn giá (₫)</th><th class="n">Chiết khấu</th>${cf().map(f => `<th>${esc(f.name)}</th>`).join('')}<th class="n">Thành tiền</th><th></th></tr>`; };
-      const cell = (li, i, f) => f.type === 'NUMBER' ? `<input class="ed" type="number" data-i="${i}" data-c="${f.key}" value="${li.custom[f.key] ?? ''}">` : f.type === 'DATE' ? `<input class="ed" type="date" data-i="${i}" data-c="${f.key}" value="${li.custom[f.key] ?? ''}">`
-        : f.type === 'SELECT' ? `<select class="ed" data-i="${i}" data-c="${f.key}"><option value=""></option>${(f.choices || []).map(c => `<option ${c === li.custom[f.key] ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>` : `<input class="ed" data-i="${i}" data-c="${f.key}" value="${esc(li.custom[f.key] ?? '')}">`;
-      const drawB = () => {
-        $('#lieB', bg).innerHTML = items.length ? items.map((li, i) => `<tr><td><input class="ed nm" data-i="${i}" data-k="name" value="${esc(li.name)}" aria-label="Tên line item">${li.product ? `<small class="nil">${esc((db.products.find(p => p.id === li.product) || {}).sku || '')}</small>` : '<small class="nil">Tùy chỉnh</small>'}</td>
-          <td class="n"><input class="ed" type="number" min="0" data-i="${i}" data-k="qty" value="${li.qty}" aria-label="Số lượng"></td>
-          <td class="n"><input class="ed" type="number" min="0" data-i="${i}" data-k="price" value="${li.price}" aria-label="Đơn giá"></td>
-          <td class="n"><span class="disc"><input class="ed" type="number" min="0" data-i="${i}" data-k="disc" value="${li.disc || 0}" aria-label="Chiết khấu"><select class="ed" data-i="${i}" data-k="discType" aria-label="Kiểu chiết khấu"><option ${li.discType !== '%' ? 'selected' : ''}>₫</option><option ${li.discType === '%' ? 'selected' : ''}>%</option></select></span></td>
-          ${cf().map(f => `<td>${cell(li, i, f)}</td>`).join('')}<td class="n"><b>${money(liTotal(li))}</b></td>
-          <td><button class="btn btn--text btn--icon" data-rm="${i}" aria-label="Xoá dòng"><span class="ms sm">delete</span></button></td></tr>`).join('')
-          : `<tr><td colspan="${6 + cf().length}" class="nil" style="text-align:center;padding:28px">Chưa có line item. Chọn từ thư viện sản phẩm hoặc tạo line item tùy chỉnh.</td></tr>`;
-        const gross = items.reduce((s, li) => s + (Number(li.qty) || 0) * (Number(li.price) || 0), 0), net = items.reduce((s, li) => s + liTotal(li), 0);
-        $('#lieSum', bg).innerHTML = `<div><span>Tạm tính</span><b>${money(gross)}</b></div><div><span>Chiết khấu</span><b>− ${money(gross - net)}</b></div><div class="tot"><span>Tổng</span><b>${money(net)}</b></div>`;
-      };
-      drawH(); drawB();
-      const refreshTotals = () => { const pos = document.activeElement && document.activeElement.dataset ? [document.activeElement.dataset.i, document.activeElement.dataset.k || document.activeElement.dataset.c] : null; drawB();
-        if (pos && pos[0] !== undefined) { const el2 = bg.querySelector(`[data-i="${pos[0]}"][data-k="${pos[1]}"],[data-i="${pos[0]}"][data-c="${pos[1]}"]`); if (el2) { el2.focus(); try { const L = el2.value.length; el2.setSelectionRange && el2.type !== 'number' && el2.setSelectionRange(L, L); } catch {} } } };
-      bg.querySelector('.lie').addEventListener('input', e => { const i = e.target.dataset.i; if (i === undefined) return; const li = items[i];
-        if (e.target.dataset.k) { const k = e.target.dataset.k; li[k] = ['qty','price','disc'].includes(k) ? Number(e.target.value) : e.target.value; }
-        if (e.target.dataset.c) { const f = db.liFields.find(x => x.key === e.target.dataset.c); li.custom[f.key] = f.type === 'NUMBER' ? (e.target.value === '' ? null : Number(e.target.value)) : e.target.value; }
-        if (['qty','price','disc','discType'].includes(e.target.dataset.k)) refreshTotals(); });
-      bg.querySelector('.lie').addEventListener('change', e => { if (e.target.dataset.k === 'discType') { items[e.target.dataset.i].discType = e.target.value; refreshTotals(); } });
-      bg.querySelector('.lie').addEventListener('click', e => {
-        const rm = e.target.closest('[data-rm]'); if (rm) { items.splice(+rm.dataset.rm, 1); drawB(); return; }
-        if (e.target.closest('#lieCustom')) { items.push({ id:'li' + Date.now().toString(36), product:null, name:'Line item tùy chỉnh', qty:1, price:0, disc:0, discType:'₫', custom:{} }); drawB(); bg.querySelector(`[data-i="${items.length - 1}"][data-k="name"]`).select(); return; }
-        if (e.target.closest('#lieLib')) { const pop = $('#liePop', bg); if (pop.classList.contains('open')) { pop.classList.remove('open'); return; }
-          pop.innerHTML = `<div class="hd">Thư viện sản phẩm</div><input class="in" id="lieQ" placeholder="Tìm theo tên hoặc SKU" style="width:100%;height:32px;margin:4px 0 6px"><div id="lieP" style="max-height:260px;overflow:auto"></div><div class="row" style="display:flex;justify-content:flex-end;gap:6px;padding-top:6px"><button class="btn btn--primary sm" id="lieAdd">Thêm</button></div>`;
-          const drawP = q => { $('#lieP', bg).innerHTML = db.products.filter(p => !q || (p.name + p.sku).toLowerCase().includes(q)).map(p => `<label class="mi" style="align-items:flex-start;padding:6px 8px"><input type="checkbox" value="${p.id}" style="margin-top:3px"><span><b style="font-weight:600">${esc(p.name)}</b><br><small class="nil">${esc(p.sku)} · ${money(p.price)}</small></span></label>`).join(''); };
-          drawP(''); $('#lieQ', bg).oninput = ev => drawP(ev.target.value.trim().toLowerCase()); pop.classList.add('open'); $('#lieQ', bg).focus(); e.stopPropagation(); return; }
-        if (e.target.closest('#lieAdd')) { [...bg.querySelectorAll('#lieP input:checked')].forEach(i => { const p = db.products.find(x => x.id === i.value); items.push({ id:'li' + Date.now().toString(36) + p.id, product:p.id, name:p.name, qty:1, price:p.price, disc:0, discType:'₫', custom:{} }); });
-          $('#liePop', bg).classList.remove('open'); drawB(); return; }
-        if (e.target.closest('#lieCols')) { const pop = $('#lieColPop', bg); if (pop.classList.contains('open')) { pop.classList.remove('open'); return; }
-          const drawC = () => { pop.innerHTML = `<div class="hd">Thuộc tính line item</div>${db.liFields.map(f => `<label class="mi"><input type="checkbox" data-sc="${f.key}" ${shown.includes(f.key) ? 'checked' : ''}>${esc(f.name)}<small class="nil" style="margin-left:auto">${HX.TYPE[f.type].name}</small></label>`).join('')}
-            <div class="sep"></div><div class="hd">Tạo thuộc tính mới</div><div style="display:flex;flex-direction:column;gap:6px;padding:4px 8px 8px"><input class="in" id="nfName" placeholder="Tên thuộc tính" style="height:32px"><select class="in" id="nfType" style="height:32px"><option value="TEXT">Văn bản</option><option value="NUMBER">Số</option><option value="DATE">Ngày</option><option value="SELECT">Lựa chọn đơn</option></select>
-            <input class="in" id="nfOpts" placeholder="Lựa chọn, cách nhau bằng dấu phẩy" style="height:32px;display:none"><button class="btn btn--primary sm" id="nfGo">Tạo thuộc tính</button></div>`;
-            $('#nfType', bg).onchange = ev => { $('#nfOpts', bg).style.display = ev.target.value === 'SELECT' ? '' : 'none'; }; };
-          drawC(); pop.classList.add('open'); pop._redraw = drawC; e.stopPropagation(); return; }
-        if (e.target.closest('#nfGo')) { const name = $('#nfName', bg).value.trim(); if (!name) { $('#nfName', bg).focus(); return; }
-          const type = $('#nfType', bg).value; const key = HX.slug(name) || 'tt' + db.liFields.length; if (db.liFields.some(f => f.key === key)) { toast('Đã có thuộc tính này'); return; }
-          const f = { key, name, type }; if (type === 'SELECT') f.choices = $('#nfOpts', bg).value.split(',').map(s => s.trim()).filter(Boolean);
-          db.liFields.push(f); persist(); shown.push(key); drawH(); drawB(); $('#lieColPop', bg)._redraw(); toast(`Đã tạo thuộc tính “${name}”`); return; }
-        if (!e.target.closest('.pop')) bg.querySelectorAll('.lie .pop.open').forEach(p => p.classList.remove('open'));
-      });
-      bg.querySelector('.lie').addEventListener('change', e => { const sc = e.target.dataset.sc; if (sc) { shown = e.target.checked ? [...shown, sc] : shown.filter(x => x !== sc); drawH(); drawB(); } });
-      $('#lieSave', bg).onclick = () => { if (items.some(li => !String(li.name).trim())) { toast('Line item cần có tên'); return; } const tot = saveItems(dealId, items); close(); toast(`Đã lưu ${items.length} line item · Amount = ${money(tot)}`); refresh && refresh(); };
+    const allProps = () => [...LI_STD, ...db.liFields];
+    const P = k => allProps().find(f => f.key === k);
+    const w = document.createElement('div'); w.className = 'lie-full'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', 'Sửa line items');
+    w.innerHTML = `<header class="lie-top"><button class="btn lie-x" data-liex>Huỷ</button><h2>Line items · ${esc(HX.title(d))}${d.values.t_n_deal ? ` <span>${esc(d.values.t_n_deal)}</span>` : ''}</h2><button class="btn btn--primary" id="lieSave">Lưu</button></header>
+      <div class="lie-main"><div class="lie-wrap">
+        <div class="lie-bar"><div style="position:relative"><button class="btn btn--primary sm" id="lieAddB">Thêm line item<span class="ms xs">arrow_drop_down</span></button>
+          <div class="pop" id="lieAddP" style="top:36px;left:0;width:260px"><button class="mi" data-lib><span class="ms sm">inventory_2</span>Chọn từ thư viện sản phẩm</button><button class="mi" data-cust><span class="ms sm">add</span>Tạo line item tuỳ chỉnh</button></div></div>
+          <button class="btn btn--secondary sm" id="lieCols"><span class="ms xs">view_column</span>Chỉnh sửa cột</button>
+          <span class="lie-cur">Tiền tệ: <b>VND (₫)</b></span></div>
+        <div class="lie-tw"><table class="lie-t"><thead id="lieH"></thead><tbody id="lieB"></tbody></table></div>
+        <div class="lie-foot"><label class="lie-use"><input type="checkbox" id="lieUse" ${useAmount ? 'checked' : ''}> Dùng tổng line item làm <b>Amount</b> của Deal (Tổng Cash-In Dự Kiến)</label><div class="lie-sum" id="lieSum"></div></div>
+      </div><aside class="lie-lib" id="lieLib" hidden></aside></div><div class="pop" id="lieRowP" style="width:240px"></div>`;
+    document.body.appendChild(w); document.body.classList.add('lie-open');
+    const $w = s => w.querySelector(s);
+    const drawH = () => { $w('#lieH').innerHTML = `<tr><th class="dg"></th><th>Tên</th>${cols.filter(k => P(k)).map(k => `<th class="${['term','disc','cost'].includes(k) || P(k).type === 'NUMBER' ? 'n' : ''}">${esc(P(k).name)}${P(k).std ? '' : ' <span class="cfb" title="Thuộc tính tuỳ chỉnh">tuỳ chỉnh</span>'}</th>`).join('')}<th class="n">Số lượng</th><th class="n">Đơn giá</th><th class="n">Thành tiền</th><th></th></tr>`; };
+    const inp = (i, k, v, type, extra = '') => `<input class="ed" data-i="${i}" data-k="${k}" type="${type}" value="${esc(v ?? '')}" ${extra}>`;
+    const cellOf = (li, i, k) => {
+      const f = P(k); if (!f) return '';
+      if (k === 'freq') return `<td><select class="ed" data-i="${i}" data-k="freq">${FREQ.map(x => `<option ${x === li.freq ? 'selected' : ''}>${x}</option>`).join('')}</select></td>`;
+      if (k === 'term') return `<td class="n">${li.freq === 'Một lần' ? '<span class="nil">—</span>' : inp(i, 'term', li.term || 1, 'number', 'min="1" aria-label="Số kỳ"')}</td>`;
+      if (k === 'disc') return `<td class="n"><span class="disc">${inp(i, 'disc', li.disc || 0, 'number', 'min="0" aria-label="Chiết khấu"')}<select class="ed" data-i="${i}" data-k="discType" aria-label="Kiểu chiết khấu"><option ${li.discType !== '%' ? 'selected' : ''}>₫</option><option ${li.discType === '%' ? 'selected' : ''}>%</option></select></span></td>`;
+      if (k === 'sku') return `<td>${inp(i, 'sku', li.sku ?? ((db.products.find(p => p.id === li.product) || {}).sku || ''), 'text', 'aria-label="SKU"')}</td>`;
+      if (k === 'cost') return `<td class="n">${inp(i, 'cost', li.cost ?? '', 'number', 'min="0" aria-label="Giá vốn"')}</td>`;
+      if (k === 'desc') return `<td>${inp(i, 'desc', li.desc ?? ((db.products.find(p => p.id === li.product) || {}).desc || ''), 'text', 'aria-label="Mô tả"')}</td>`;
+      const v = li.custom[k];
+      if (f.type === 'SELECT') return `<td><select class="ed" data-i="${i}" data-c="${k}"><option value=""></option>${(f.choices || []).map(c => `<option ${c === v ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></td>`;
+      if (f.type === 'CHECKBOX') return `<td style="text-align:center"><input type="checkbox" data-i="${i}" data-c="${k}" ${v ? 'checked' : ''} aria-label="${esc(f.name)}"></td>`;
+      return `<td class="${f.type === 'NUMBER' ? 'n' : ''}"><input class="ed" data-i="${i}" data-c="${k}" type="${f.type === 'NUMBER' ? 'number' : f.type === 'DATE' ? 'date' : 'text'}" value="${esc(v ?? '')}" aria-label="${esc(f.name)}"></td>`;
+    };
+    const drawB = () => {
+      const vc = cols.filter(k => P(k));
+      $w('#lieB').innerHTML = items.length ? items.map((li, i) => `<tr draggable="true" data-row="${i}"><td class="dg" title="Kéo để sắp xếp"><span class="ms sm">drag_indicator</span></td>
+          <td class="nmc">${inp(i, 'name', li.name, 'text', 'class="ed nm" aria-label="Tên line item"')}<small class="nil">${li.product ? 'Từ thư viện sản phẩm' : 'Line item tuỳ chỉnh'}</small></td>
+          ${vc.map(k => cellOf(li, i, k)).join('')}
+          <td class="n">${inp(i, 'qty', li.qty, 'number', 'min="0" aria-label="Số lượng" style="width:80px"')}</td>
+          <td class="n">${inp(i, 'price', li.price, 'number', 'min="0" aria-label="Đơn giá"')}</td>
+          <td class="n"><b>${money(liTotal(li))}</b>${li.freq !== 'Một lần' ? `<small class="nil">${money(liNet(li))} / ${li.freq === 'Hằng tháng' ? 'tháng' : li.freq === 'Hằng quý' ? 'quý' : li.freq === 'Nửa năm' ? '6 tháng' : 'năm'}</small>` : ''}</td>
+          <td><button class="btn btn--text btn--icon" data-rowm="${i}" aria-label="Thao tác dòng"><span class="ms sm">more_horiz</span></button></td></tr>`).join('')
+        : `<tr><td colspan="${6 + vc.length}"><div class="lie-empty"><span class="ms">receipt_long</span><b>Chưa có line item</b>Thêm sản phẩm từ thư viện hoặc tạo line item tuỳ chỉnh.<span><button class="btn btn--primary sm" data-lib>Chọn từ thư viện</button> <button class="btn btn--secondary sm" data-cust>Tạo tuỳ chỉnh</button></span></div></td></tr>`;
+      const T = totalsOf(items, adj);
+      $w('#lieSum').innerHTML = `<div><span>Tạm tính</span><b>${money(T.sub)}</b></div>${T.lineDisc ? `<div class="ls-sub"><span>Đã gồm chiết khấu dòng</span><span>− ${money(T.lineDisc)}</span></div>` : ''}
+        ${adj.map((a, j) => `<div class="adj"><select class="ed sm" data-aj="${j}" data-ak="type"><option value="discount" ${a.type === 'discount' ? 'selected' : ''}>Chiết khấu</option><option value="fee" ${a.type === 'fee' ? 'selected' : ''}>Phí</option><option value="tax" ${a.type === 'tax' ? 'selected' : ''}>Thuế</option></select>
+          <input class="ed sm" data-aj="${j}" data-ak="name" value="${esc(a.name || '')}" placeholder="Tên (vd. VAT)"><input class="ed sm n" type="number" min="0" data-aj="${j}" data-ak="value" value="${a.value ?? 0}"><select class="ed sm" data-aj="${j}" data-ak="mode"><option ${a.mode !== '₫' ? 'selected' : ''}>%</option><option ${a.mode === '₫' ? 'selected' : ''}>₫</option></select>
+          <span class="amt">${T.adj[j].sign < 0 ? '− ' : '+ '}${money(T.adj[j].amount)}</span><button class="btn btn--text btn--icon" data-ajrm="${j}" aria-label="Xoá"><span class="ms xs">close</span></button></div>`).join('')}
+        <div class="addadj"><button class="lk" data-ajadd="discount">+ Chiết khấu</button><button class="lk" data-ajadd="fee">+ Phí</button><button class="lk" data-ajadd="tax">+ Thuế</button></div>
+        <div class="tot"><span>Tổng</span><b>${money(T.total)}</b></div>${T.recurring ? `<div class="ls-sub"><span>Doanh thu định kỳ hằng năm (ARR)</span><span>${money(T.arr)}</span></div><div class="ls-sub"><span>Doanh thu định kỳ hằng tháng (MRR)</span><span>${money(T.arr / 12)}</span></div>` : ''}`;
+    };
+    drawH(); drawB();
+    const keepFocus = fn => { const a = document.activeElement, ds = a && a.dataset ? { ...a.dataset } : {}; fn();
+      const sel = ds.i !== undefined ? `[data-i="${ds.i}"][data-${ds.k ? 'k' : 'c'}="${ds.k || ds.c}"]` : ds.aj !== undefined ? `[data-aj="${ds.aj}"][data-ak="${ds.ak}"]` : null;
+      const el2 = sel && w.querySelector(sel); if (el2) { el2.focus(); try { if (el2.type === 'text') el2.setSelectionRange(el2.value.length, el2.value.length); } catch {} } };
+    /* Thư viện sản phẩm — panel bên phải */
+    const libSel = new Map();
+    const drawLib = (q = '') => { const L = $w('#lieLib'); L.hidden = false;
+      L.innerHTML = `<div class="ll-h"><b>Thư viện sản phẩm</b><button class="btn btn--text btn--icon" data-libx aria-label="Đóng"><span class="ms sm">close</span></button></div>
+        <label class="srch2" style="height:34px;flex:none"><input id="libQ" placeholder="Tìm theo tên, SKU" value="${esc(q)}"><span class="ms sm">search</span></label>
+        <div class="ll-l">${db.products.filter(p => !q || (p.name + ' ' + p.sku).toLowerCase().includes(q.toLowerCase())).map(p => `<label class="ll-p"><input type="checkbox" data-pid="${p.id}" ${libSel.has(p.id) ? 'checked' : ''}><span class="ll-i"><b>${esc(p.name)}</b><small>${esc(p.sku)} · ${esc(p.freq || 'Một lần')}</small><small class="nil">${esc(p.desc || '')}</small></span><span class="ll-r"><b>${money(p.price)}</b>${libSel.has(p.id) ? `<span class="qty"><button data-pq="${p.id}" data-d="-1" aria-label="Giảm">−</button><span>${libSel.get(p.id)}</span><button data-pq="${p.id}" data-d="1" aria-label="Tăng">+</button></span>` : ''}</span></label>`).join('') || '<div class="nil" style="padding:12px">Không tìm thấy sản phẩm</div>'}</div>
+        <div class="ll-f"><button class="lk" data-toast="Tạo sản phẩm mới trong thư viện (collection Sản phẩm của ERP)">+ Tạo sản phẩm</button><button class="btn btn--primary sm" id="libAdd" ${libSel.size ? '' : 'disabled'}>Thêm${libSel.size ? ` (${libSel.size})` : ''}</button></div>`;
+      const qi = $w('#libQ'); qi.oninput = () => { drawLib(qi.value); const n = $w('#libQ'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }; };
+    const addFromLib = () => { libSel.forEach((qty, pid) => { const p = db.products.find(x => x.id === pid);
+        items.push({ id:'li' + Date.now().toString(36) + pid, product:p.id, name:p.name, qty, price:p.price, disc:0, discType:'₫', freq:p.freq || 'Một lần', term:p.term || 1, custom:{ ...(p.defaults || {}) } }); });
+      const n = libSel.size, filled = [...libSel.keys()].some(pid => Object.keys((db.products.find(x => x.id === pid) || {}).defaults || {}).length);
+      libSel.clear(); $w('#lieLib').hidden = true; drawB(); toast(`Đã thêm ${n} line item${filled ? ' · trường tuỳ chỉnh đã tự điền từ sản phẩm' : ''}`); };
+    const closeAll = () => w.querySelectorAll('.pop.open').forEach(p => p.classList.remove('open'));
+    const exit = () => { w.remove(); document.body.classList.remove('lie-open'); };
+    w.addEventListener('input', e => { const t = e.target;
+      if (t.dataset.i !== undefined && t.type !== 'checkbox') { const li = items[t.dataset.i];
+        if (t.dataset.k) { const k = t.dataset.k; li[k] = ['qty','price','disc','term','cost'].includes(k) ? (t.value === '' ? (k === 'cost' ? null : 0) : Number(t.value)) : t.value; if (['qty','price','disc','term'].includes(k)) keepFocus(drawB); }
+        if (t.dataset.c) { const f = P(t.dataset.c); li.custom[f.key] = f.type === 'NUMBER' ? (t.value === '' ? null : Number(t.value)) : t.value; } }
+      if (t.dataset.aj !== undefined && t.tagName === 'INPUT') { adj[t.dataset.aj][t.dataset.ak] = t.dataset.ak === 'value' ? Number(t.value) : t.value; if (t.dataset.ak === 'value') keepFocus(drawB); } });
+    w.addEventListener('change', e => { const t = e.target;
+      if (t.dataset.k === 'discType' || t.dataset.k === 'freq') { items[t.dataset.i][t.dataset.k] = t.value; keepFocus(drawB); }
+      if (t.dataset.c && t.type === 'checkbox') items[t.dataset.i].custom[t.dataset.c] = t.checked;
+      if (t.dataset.c && t.tagName === 'SELECT') items[t.dataset.i].custom[t.dataset.c] = t.value;
+      if (t.dataset.aj !== undefined && t.tagName === 'SELECT') { adj[t.dataset.aj][t.dataset.ak] = t.value; drawB(); }
+      if (t.dataset.pid) { t.checked ? libSel.set(t.dataset.pid, 1) : libSel.delete(t.dataset.pid); drawLib($w('#libQ').value); }
+      if (t.id === 'lieUse') useAmount = t.checked; });
+    w.addEventListener('click', e => {
+      const t = e.target;
+      if (t.closest('[data-toast]')) { toast(t.closest('[data-toast]').dataset.toast); return; }
+      if (t.closest('[data-liex]')) { exit(); return; }
+      if (t.closest('#lieAddB')) { e.stopPropagation(); $w('#lieAddP').classList.toggle('open'); return; }
+      if (t.closest('[data-lib]')) { closeAll(); drawLib(); $w('#libQ').focus(); return; }
+      if (t.closest('[data-libx]')) { libSel.clear(); $w('#lieLib').hidden = true; return; }
+      const pq = t.closest('[data-pq]'); if (pq) { e.preventDefault(); const id = pq.dataset.pq; libSel.set(id, Math.max(1, libSel.get(id) + Number(pq.dataset.d))); drawLib($w('#libQ').value); return; }
+      if (t.closest('#libAdd')) { addFromLib(); return; }
+      if (t.closest('[data-cust]')) { closeAll(); items.push({ id:'li' + Date.now().toString(36), product:null, name:'', qty:1, price:0, disc:0, discType:'₫', freq:'Một lần', term:1, custom:{} }); drawB(); w.querySelector(`[data-i="${items.length - 1}"][data-k="name"]`).focus(); return; }
+      if (t.closest('#lieCols')) { editCols(); return; }
+      const rm = t.closest('[data-rowm]'); if (rm) { e.stopPropagation(); const i = +rm.dataset.rowm, p = $w('#lieRowP'), r = rm.getBoundingClientRect();
+        p.style.position = 'fixed'; p.style.left = Math.min(r.right - 240, innerWidth - 248) + 'px'; p.style.top = (r.bottom + 4) + 'px';
+        p.innerHTML = `<button class="mi" data-rcl="${i}"><span class="ms sm">content_copy</span>Nhân bản</button>${items[i].product ? '' : `<button class="mi" data-rsv="${i}"><span class="ms sm">inventory_2</span>Lưu vào thư viện sản phẩm</button>`}
+          ${i > 0 ? `<button class="mi" data-rmv="${i}" data-d="-1"><span class="ms sm">arrow_upward</span>Chuyển lên</button>` : ''}${i < items.length - 1 ? `<button class="mi" data-rmv="${i}" data-d="1"><span class="ms sm">arrow_downward</span>Chuyển xuống</button>` : ''}
+          <div class="sep"></div><button class="mi" data-rdel="${i}" style="color:var(--error)"><span class="ms sm">delete</span>Xoá</button>`; p.classList.add('open'); return; }
+      const rcl = t.closest('[data-rcl]'); if (rcl) { const i = +rcl.dataset.rcl; items.splice(i + 1, 0, { ...items[i], id:'li' + Date.now().toString(36), custom:{ ...items[i].custom } }); closeAll(); drawB(); return; }
+      const rsv = t.closest('[data-rsv]'); if (rsv) { const li = items[+rsv.dataset.rsv]; if (!String(li.name).trim()) { toast('Nhập tên trước khi lưu vào thư viện'); return; }
+        const p = { id:'p' + Date.now().toString(36), name:li.name, sku:'CUSTOM-' + (db.products.length + 1), price:li.price, desc:li.desc || '', freq:li.freq, term:li.term, defaults:{ ...li.custom } }; db.products.push(p); persist(); li.product = p.id; closeAll(); drawB(); toast(`Đã lưu “${li.name}” vào thư viện sản phẩm`); return; }
+      const rmv = t.closest('[data-rmv]'); if (rmv) { const i = +rmv.dataset.rmv, j = i + Number(rmv.dataset.d); [items[i], items[j]] = [items[j], items[i]]; closeAll(); drawB(); return; }
+      const rd = t.closest('[data-rdel]'); if (rd) { items.splice(+rd.dataset.rdel, 1); closeAll(); drawB(); return; }
+      const aa = t.closest('[data-ajadd]'); if (aa) { const ty = aa.dataset.ajadd; adj.push({ type:ty, name: ty === 'tax' ? 'VAT' : ty === 'fee' ? 'Phí' : 'Chiết khấu Deal', value: ty === 'tax' ? 10 : 0, mode:'%' }); drawB(); return; }
+      const ar = t.closest('[data-ajrm]'); if (ar) { adj.splice(+ar.dataset.ajrm, 1); drawB(); return; }
+      if (t.closest('#lieSave')) {
+        const bad = items.findIndex(li => !String(li.name).trim()); if (bad >= 0) { toast('Line item cần có tên'); w.querySelector(`[data-i="${bad}"][data-k="name"]`).focus(); return; }
+        db.liAdj[dealId] = adj; db.liUseAmount[dealId] = useAmount; db.liCols = cols;
+        const tot = saveItems(dealId, items, useAmount); exit(); toast(`Đã lưu ${items.length} line item · Tổng ${money(tot)}${useAmount ? ' → Amount của Deal' : ''}`); refresh && refresh(); return; }
+      if (!t.closest('.pop')) closeAll();
     });
+    // Kéo thả sắp xếp dòng
+    let dragI = null;
+    w.addEventListener('dragstart', e => { const r = e.target.closest('[data-row]'); if (!r) return; if (!e.target.closest('.dg') && document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-row]') === r) {} dragI = +r.dataset.row; r.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(dragI)); });
+    w.addEventListener('dragover', e => { const r = e.target.closest('[data-row]'); if (r && dragI !== null) { e.preventDefault(); w.querySelectorAll('.dropb').forEach(x => x.classList.remove('dropb')); r.classList.add('dropb'); } });
+    w.addEventListener('drop', e => { const r = e.target.closest('[data-row]'); if (!r || dragI === null) return; e.preventDefault(); const j = +r.dataset.row; const [m] = items.splice(dragI, 1); items.splice(j, 0, m); dragI = null; drawB(); });
+    w.addEventListener('dragend', () => { dragI = null; w.querySelectorAll('.dragging,.dropb').forEach(x => x.classList.remove('dragging', 'dropb')); });
+    w.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$w('#lieLib').hidden) { $w('#lieLib').hidden = true; return; } exit(); } });
+    /* "Chỉnh sửa cột" — chọn cột hiển thị + tạo thuộc tính line item tuỳ chỉnh (HubSpot: Choose which columns you see / Create property) */
+    function editCols() {
+      let shown = [...cols];
+      HX.modal(`<div class="modal xl" role="dialog" aria-modal="true" aria-labelledby="lcT" style="height:min(600px,92vh);z-index:1100"><div class="mh" id="lcT">Chọn cột hiển thị<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
+        <div class="ec"><div class="ec-l"><label class="srch2" style="height:34px;flex:none;margin-bottom:8px"><input id="lcQ" placeholder="Tìm thuộc tính"><span class="ms sm">search</span></label><div class="lst" id="lcL"></div>
+          <div class="lc-new"><div class="grp">Tạo thuộc tính line item mới</div><input class="in" id="nfName" placeholder="Tên thuộc tính (vd. Số user, Ngày bắt đầu)">
+            <select class="in" id="nfType"><option value="TEXT">Văn bản</option><option value="NUMBER">Số</option><option value="DATE">Ngày</option><option value="SELECT">Lựa chọn đơn</option><option value="CHECKBOX">Hộp kiểm</option></select>
+            <input class="in" id="nfOpts" placeholder="Các lựa chọn, cách nhau bằng dấu phẩy" hidden><button class="btn btn--secondary sm" id="nfGo"><span class="ms xs">add</span>Tạo thuộc tính</button></div></div>
+        <div class="ec-r"><div class="top"><span id="lcN"></span></div><div class="sel fixed"><span class="nm">Tên</span><span class="nil" style="font-size:12px">Cố định</span></div><div class="lst" id="lcR"></div>
+          <div class="sel fixed"><span class="nm">Số lượng · Đơn giá · Thành tiền</span><span class="nil" style="font-size:12px">Cố định</span></div></div></div>
+        <div class="mf l"><button class="btn btn--primary" id="lcOk">Áp dụng</button><button class="btn btn--secondary" data-close>Huỷ</button></div></div>`, (bg, close) => {
+        let q = '';
+        const draw = () => { $('#lcL', bg).innerHTML = `<div class="grp">Thuộc tính có sẵn</div>${LI_STD.filter(f => !q || f.name.toLowerCase().includes(q)).map(f => `<label><input type="checkbox" data-k="${f.key}" ${shown.includes(f.key) ? 'checked' : ''}>${esc(f.name)}</label>`).join('')}
+            <div class="grp">Thuộc tính tuỳ chỉnh (${db.liFields.length})</div>${db.liFields.filter(f => !q || f.name.toLowerCase().includes(q)).map(f => `<label><input type="checkbox" data-k="${f.key}" ${shown.includes(f.key) ? 'checked' : ''}>${esc(f.name)}<small class="nil" style="margin-left:auto">${HX.TYPE[f.type] ? HX.TYPE[f.type].name : f.type}</small></label>`).join('') || '<div class="nil" style="font-size:13px">Chưa có</div>'}`;
+          $('#lcN', bg).textContent = `Cột đang hiển thị (${shown.length + 4})`;
+          $('#lcR', bg).innerHTML = shown.filter(k => P(k)).map((k, i) => `<div class="sel"><span class="ms sm">drag_indicator</span><span class="nm">${esc(P(k).name)}</span>${i ? `<button class="rm" data-up="${i}" aria-label="Chuyển lên"><span class="ms xs">arrow_upward</span></button>` : ''}<button class="rm" data-rm="${k}" aria-label="Bỏ cột"><span class="ms xs">close</span></button></div>`).join(''); };
+        draw();
+        $('#lcQ', bg).oninput = e => { q = e.target.value.trim().toLowerCase(); draw(); };
+        $('#lcL', bg).onchange = e => { const k = e.target.dataset.k; if (!k) return; shown = e.target.checked ? [...shown, k] : shown.filter(x => x !== k); draw(); };
+        $('#lcR', bg).onclick = e => { const r = e.target.closest('[data-rm]'); if (r) { shown = shown.filter(x => x !== r.dataset.rm); draw(); }
+          const up = e.target.closest('[data-up]'); if (up) { const i = +up.dataset.up; [shown[i - 1], shown[i]] = [shown[i], shown[i - 1]]; draw(); } };
+        $('#nfType', bg).onchange = e => { $('#nfOpts', bg).hidden = e.target.value !== 'SELECT'; };
+        $('#nfGo', bg).onclick = () => { const name = $('#nfName', bg).value.trim(); if (!name) { $('#nfName', bg).focus(); return; }
+          const type = $('#nfType', bg).value, key = 'cf_' + (HX.slug(name) || db.liFields.length); if (db.liFields.some(f => f.key === key)) { toast('Đã có thuộc tính này'); return; }
+          const f = { key, name, type }; if (type === 'SELECT') { f.choices = $('#nfOpts', bg).value.split(',').map(s => s.trim()).filter(Boolean); if (!f.choices.length) { $('#nfOpts', bg).focus(); toast('Nhập ít nhất 1 lựa chọn'); return; } }
+          db.liFields.push(f); persist(); shown.push(key); $('#nfName', bg).value = ''; $('#nfOpts', bg).value = ''; draw(); toast(`Đã tạo thuộc tính “${name}” — điền giá trị ngay trên từng line item`); };
+        $('#lcOk', bg).onclick = () => { cols = shown; close(); drawH(); drawB(); };
+      });
+    }
   }
 
   /* ── Liên kết trong form "Tạo bản ghi" của Deals (HX.openCreate) ── */
@@ -700,7 +819,7 @@ const HXC = (() => {
     if (co && co.value) associate('deal', dealId, 'company', co.value); }
 
   return { ME, TODAY, LIFECYCLE, LEAD_STATUS, SOURCES, INDUSTRIES, ASSOC_LABELS, CONTACT_FIELDS, COMPANY_FIELDS, OBJ, STAGE, CASH, CLOSE, SALE, WON, LOST,
-    db: () => db, get, list, related, assoc, associate, dissociate, update, create, remove, activitiesOf, addActivity, lastContacted, itemsOf, liTotal, saveItems, money,
+    db: () => db, get, list, related, assoc, associate, dissociate, update, create, remove, activitiesOf, addActivity, lastContacted, itemsOf, liTotal, liNet, totalsOf, dealTotals, saveItems, money,
     titleOf, fullName, initials, url, dt, dOnly, props, createPanel, addAssocPanel, assocCard, timeline, composer, lineItemsCard, lineItemEditor, dealAssocForm, saveDealAssoc,
     reset() { try { localStorage.removeItem(KEY); } catch {} } };
 })();

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi" data-brand="crm">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Báo cáo — HarnexAI CRM (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link rel="stylesheet" href="crm-shared.css">
+<style>
+/* ═══ Báo cáo: 2 dashboard CRM Data Overview & Pipeline Overview ═══
+   Thẻ báo cáo lấy đúng danh sách trên portal HubSpot của khách (28/09/2026), bỏ thẻ Tickets (ngoài phạm vi).
+   Số liệu tính trực tiếp từ dữ liệu mẫu Contacts / Deals / Activities; bấm số hoặc cột để xem danh sách bản ghi.
+   Màu biểu đồ: bảng categorical đã kiểm (dataviz), 1 series = 1 màu; trạng thái Open/Won/Lost = 3 slot đầu + nhãn trực tiếp. */
+.viz{--series-1:#2a78d6;--st-open:#2a78d6;--st-won:#1baf7a;--st-lost:#eb6834;--grid:#e6e6e3;--axis:#8a8984;--ink:var(--on-surface);--ink-2:var(--on-surface-variant)}
+@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .viz{--series-1:#3987e5;--st-open:#3987e5;--st-won:#199e70;--st-lost:#d95926;--grid:#3a3a38;--axis:#8f8e88}}
+:root[data-theme="dark"] .viz{--series-1:#3987e5;--st-open:#3987e5;--st-won:#199e70;--st-lost:#d95926;--grid:#3a3a38;--axis:#8f8e88}
+.frame{overflow:auto}
+.dh{display:flex;align-items:center;gap:10px;padding:18px 20px 14px;border-bottom:1px solid var(--outline-variant);flex-wrap:wrap}
+.dh h1{font-size:24px;font-weight:600}
+.dsel{display:flex;align-items:center;gap:2px;border-radius:var(--radius-md);padding:0 4px}
+.dsel:hover{background:var(--surface-2)}
+.dh .r{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:relative}
+.fl{display:flex;align-items:center;gap:6px;padding:12px 20px;flex-wrap:wrap}
+.fl .qfs{height:30px;border:none;background:none;font-weight:600;font-size:13px;color:var(--on-surface);padding:0 6px;border-radius:var(--radius-sm);cursor:pointer}
+.fl .qfs:hover{background:var(--surface-2)}
+.fl .sepv{width:1px;height:22px;background:var(--outline);margin:0 6px}
+.dg{display:grid;grid-template-columns:1fr;gap:14px;padding:0 20px 24px}
+@media(min-width:760px){.dg{grid-template-columns:1fr 1fr}}
+@media(min-width:1240px){.dg{grid-template-columns:repeat(3,1fr)}}
+.rc{border:1px solid var(--outline-variant);border-radius:var(--radius-lg);padding:14px 16px;background:var(--surface);display:flex;flex-direction:column;gap:8px;min-width:0}
+.rc.w2{grid-column:span 1}@media(min-width:760px){.rc.w2{grid-column:span 2}}
+.rc h2{font-size:15px;font-weight:600;color:var(--link);display:flex;align-items:center;gap:6px}
+.rc h2 .ms{font-size:16px;color:var(--on-surface-variant)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips span{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:var(--radius-pill);background:var(--surface-2);color:var(--on-surface-variant)}
+.kpi{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:14px 0;gap:4px}
+.kpi small{font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--on-surface-variant)}
+.kpi button{font-size:40px;font-weight:700;color:var(--link);line-height:1.1}
+.kpi button:hover{text-decoration:underline}
+.kpi .dl{font-size:12.5px;color:var(--on-surface-variant)}
+.viz svg{width:100%;height:auto;display:block;overflow:visible}
+.viz text{font-family:inherit}
+.viz [data-drill]{cursor:pointer}
+.viz [data-drill]:hover{opacity:.85}
+.lg{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--on-surface)}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hb{display:flex;flex-direction:column;gap:6px;padding:4px 0}
+.hb-r{display:grid;grid-template-columns:minmax(90px,38%) 1fr;gap:10px;align-items:center;font-size:12.5px;cursor:pointer;border-radius:var(--radius-sm);padding:2px 0}
+.hb-r:hover{background:var(--surface-variant)}
+.hb-l{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.hb-t{position:relative;display:block;height:18px;margin-right:72px;min-width:0}
+.hb-t i{position:absolute;left:0;top:1px;display:block;height:16px;border-radius:0 4px 4px 0}
+.hb-t b{position:absolute;top:0;font-weight:600;white-space:nowrap}
+.tt{width:100%;border-collapse:collapse;font-size:13px}
+.tt th,.tt td{padding:7px 8px;border-bottom:1px solid var(--outline-variant);text-align:right}
+.tt th:first-child,.tt td:first-child{text-align:left}
+.tt th{color:var(--on-surface-variant);font-weight:600;font-size:12px}
+.tt button{color:var(--link);font-weight:600}
+.tip{position:fixed;z-index:999;pointer-events:none;background:var(--on-surface);color:var(--surface);font-size:12.5px;padding:6px 9px;border-radius:var(--radius-md);box-shadow:var(--shadow-2);display:none;max-width:260px}
+.tview{font-size:12px;color:var(--link);font-weight:600;align-self:flex-start}
+.drl{display:flex;flex-direction:column}
+.drl a{display:flex;justify-content:space-between;gap:12px;padding:9px 4px;border-bottom:1px solid var(--outline-variant);font-size:13.5px}
+.drl a b{color:var(--link);font-weight:600}
+.drl a:hover{background:var(--surface-variant)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar" id="topbar"></header>
+  <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
+  <main class="main"><div class="frame">
+    <div class="dh">
+      <button class="btn btn--text btn--icon" data-toast="Đã đánh dấu dashboard yêu thích" aria-label="Yêu thích"><span class="ms">star</span></button>
+      <div style="position:relative"><button class="dsel" id="dBtn" aria-haspopup="menu"><h1 id="dName"></h1><span class="ms">arrow_drop_down</span></button><div class="pop" id="dPop" role="menu" style="top:44px;left:0;width:280px"></div></div>
+      <div class="r"><button class="btn btn--text sm" data-toast="Explore reports: thư viện báo cáo mẫu (ngoài phạm vi)">Khám phá báo cáo</button>
+        <button class="btn btn--secondary" data-toast="Tạo dashboard mới (ngoài phạm vi giai đoạn 2)">Tạo dashboard</button>
+        <button class="btn btn--secondary" data-toast="Thao tác: đổi tên, sao chép, xoá dashboard">Thao tác<span class="ms xs">arrow_drop_down</span></button>
+        <button class="btn btn--secondary" data-toast="Chia sẻ dashboard với nhóm">Chia sẻ<span class="ms xs">arrow_drop_down</span></button>
+        <button class="btn btn--primary" data-toast="Thêm báo cáo vào dashboard (ngoài phạm vi)">Thêm nội dung<span class="ms xs">arrow_drop_down</span></button></div>
+    </div>
+    <div class="fl"><span class="ms sm" style="color:var(--on-surface-variant)">bolt</span>
+      <select class="qfs" id="fRange" aria-label="Khoảng thời gian"><option value="month">Tháng này</option><option value="quarter" selected>Quý này</option><option value="30">30 ngày qua</option><option value="year">Năm nay</option><option value="all">Mọi thời gian</option></select>
+      <select class="qfs" id="fOwner" aria-label="Owner"><option value="">Tất cả owner</option></select>
+      <span class="sepv"></span><button class="btn btn--text sm" data-toast="Bộ lọc nâng cao theo mọi thuộc tính (như màn danh sách)"><span class="ms xs">tune</span>Bộ lọc nâng cao</button>
+      <button class="btn btn--text btn--icon" id="refresh" aria-label="Làm mới" style="margin-left:auto"><span class="ms sm">refresh</span></button></div>
+    <div class="dg viz" id="grid"></div>
+  </div></main>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel"></aside>
+<div class="modal-bg" id="modal"></div>
+<div class="demo" id="demo" role="group" aria-label="Điều khiển mockup"></div>
+<div class="toast" id="toast" role="status"></div>
+<script src="crm-shared.js"></script>
+<script src="crm-objects.js"></script>
+<script>
+const {esc, toast, $} = HX;
+HX.shell('reports');
+const TODAY = HXC.TODAY, STAGE = HXC.STAGE, CASH = HXC.CASH, CLOSE = HXC.CLOSE, SALE = HXC.SALE;
+const DASH = { crm:'CRM Data Overview', pipe:'Pipeline Overview' };
+const st = { dash: new URLSearchParams(location.search).get('d') === 'pipe' ? 'pipe' : 'crm', range:'quarter', owner:'' };
+$('#fOwner').innerHTML += HX.USERS.map(u => `<option>${u}</option>`).join('');
+$('#dPop').innerHTML = Object.entries(DASH).map(([k, n]) => `<button class="mi" data-dash="${k}"><span class="ms sm">dashboard</span>${n}</button>`).join('');
+
+/* ── Khoảng thời gian ── */
+function range(key = st.range) {
+  const y = TODAY.getFullYear(), m = TODAY.getMonth();
+  if (key === 'month') return [new Date(y, m, 1), new Date(y, m + 1, 1), 'Tháng này'];
+  if (key === 'quarter') { const q = Math.floor(m / 3) * 3; return [new Date(y, q, 1), new Date(y, q + 3, 1), 'Quý này']; }
+  if (key === '30') return [new Date(TODAY.getTime() - 30 * 864e5), new Date(TODAY.getTime() + 864e5), '30 ngày qua'];
+  if (key === 'year') return [new Date(y, 0, 1), new Date(y + 1, 0, 1), 'Năm nay'];
+  return [new Date(2000, 0, 1), new Date(2100, 0, 1), 'Mọi thời gian'];
+}
+function prevRange() { const [a, b] = range(); const len = b - a; return [new Date(a.getTime() - len), a]; }
+const inR = (iso, [a, b]) => iso && new Date(iso) >= a && new Date(iso) < b;
+const ownerOK = v => !st.owner || v === st.owner;
+const months = () => { const out = []; for (let i = 3; i >= 0; i--) { const d = new Date(TODAY.getFullYear(), TODAY.getMonth() - i, 1); out.push([d, new Date(d.getFullYear(), d.getMonth() + 1, 1), `T${d.getMonth() + 1}/${d.getFullYear() % 100}`]); } return out; };
+
+/* ── Dữ liệu cho drill-down ── */
+const DRILL = {}; let dn = 0;
+const drill = (title, rows) => { const k = 'd' + (++dn); DRILL[k] = { title, rows }; return k; };
+const rowC = c => ({ href: HXC.url('contact', c.id), name: HXC.fullName(c), sub: HXC.dOnly(c.createdAt) });
+const rowD = d => ({ href: HXC.url('deal', d.id), name: `${HX.title(d)} · ${d.values.t_n_deal || ''}`, sub: HX.F[CASH] ? (HX.fmt(d.values[CASH], HX.F[CASH]) || '—') : '' });
+const rowA = a => { const t = a.deals && a.deals[0] ? ['deal', a.deals[0]] : a.contacts && a.contacts[0] ? ['contact', a.contacts[0]] : ['company', (a.companies || [])[0]];
+  return { href: HXC.url(t[0], t[1]), name: `${a.title || a.body || ''}`.slice(0, 70), sub: `${a.by} · ${HXC.dOnly(a.at)}` }; };
+
+/* ── Biểu đồ SVG (mark mảnh, đầu bo 4px, lưới nhạt, 1 series 1 màu) ── */
+const nf = v => Number(v).toLocaleString('vi-VN');
+const money = v => { v = Number(v) || 0; return v >= 1e9 ? (v / 1e9).toLocaleString('vi-VN', {maximumFractionDigits:2}) + ' tỷ' : v >= 1e6 ? (v / 1e6).toLocaleString('vi-VN', {maximumFractionDigits:1}) + ' tr' : nf(v); };
+const nice = m => { if (m <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(m))); const n = m / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p; };
+function hbar(rows, { fmt = nf, color = 'var(--series-1)', title } = {}) {
+  const mx = Math.max(1, ...rows.map(r => r.value));
+  return `<div class="hb" role="img" aria-label="${esc(title || '')}">${rows.map(r => `<div class="hb-r" data-tip="${esc(r.label)}: ${esc(fmt(r.value))}" ${r.drill ? `data-drill="${r.drill}"` : ''}>
+    <span class="hb-l" title="${esc(r.label)}">${esc(r.label)}</span>${(w => `<span class="hb-t"><i style="width:${w}%;background:${r.color || color}"></i><b style="left:calc(${w}% + 6px)">${esc(fmt(r.value))}</b></span>`)(r.value ? Math.max(1.5, r.value / mx * 100) : 0)}</div>`).join('')}</div>`;
+}
+const CH = {}; let cn = 0;
+const vcol = (rows, opts = {}) => { const k = 'c' + (++cn); CH[k] = [rows, opts]; return `<div class="ch-host" data-chart="${k}" style="min-height:204px"></div>`; };
+function drawCharts() { document.querySelectorAll('.ch-host').forEach(h => { const [rows, o] = CH[h.dataset.chart]; h.innerHTML = vcolSvg(rows, o, Math.max(260, h.clientWidth)); }); }
+function vcolSvg(rows, { fmt = nf, title, line = false } = {}, W = 480) {
+  const H = 200, l = 36, b = 170, t = 14, pw = W - l - 10, mx = nice(Math.max(1, ...rows.map(r => r.value))), step = pw / rows.length;
+  const ticks = [0, .5, 1].map(f => f * mx), Y = v => b - v / mx * (b - t);
+  const grid = ticks.map(v => `<line x1="${l}" x2="${W - 10}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${l - 6}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="var(--ink-2)">${esc(fmt(v))}</text>`).join('');
+  const labels = rows.map((r, i) => `<text x="${l + step * i + step / 2}" y="${b + 18}" text-anchor="middle" font-size="11.5" fill="var(--ink-2)">${esc(r.label)}</text>`).join('');
+  if (line) { const pts = rows.map((r, i) => [l + step * i + step / 2, Y(r.value)]);
+    return `<svg viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="${esc(title || '')}">${grid}${labels}<path d="${pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join('')}" fill="none" stroke="var(--series-1)" stroke-width="2"/>
+      ${rows.map((r, i) => `<g data-tip="${esc(r.label)}: ${esc(fmt(r.value))}" ${r.drill ? `data-drill="${r.drill}"` : ''}><rect x="${pts[i][0] - step / 2}" y="${t}" width="${step}" height="${b - t}" fill="transparent"/><circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="4.5" fill="var(--series-1)" stroke="var(--surface)" stroke-width="2"/><text x="${pts[i][0]}" y="${pts[i][1] - 10}" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--ink)">${esc(fmt(r.value))}</text></g>`).join('')}</svg>`; }
+  const bw = Math.min(44, step * .55);
+  return `<svg viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="${esc(title || '')}">${grid}${labels}${rows.map((r, i) => { const x = l + step * i + step / 2 - bw / 2, h = b - Y(r.value);
+    return `<g data-tip="${esc(r.label)}: ${esc(fmt(r.value))}" ${r.drill ? `data-drill="${r.drill}"` : ''}><rect x="${x - 6}" y="${t}" width="${bw + 12}" height="${b - t}" fill="transparent"/>${h > 0 ? `<path d="M${x} ${b}v-${Math.max(0, h - 4)}a4 4 0 0 1 4 -4h${bw - 8}a4 4 0 0 1 4 4v${Math.max(0, h - 4)}z" fill="var(--series-1)"/>` : ''}
+      <text x="${x + bw / 2}" y="${Y(r.value) - 6}" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--ink)">${esc(fmt(r.value))}</text></g>`; }).join('')}</svg>`;
+}
+function donut(parts, title) {
+  const tot = parts.reduce((s, p) => s + p.value, 0) || 1, R = 70, r = 44, cx = 90, cy = 90; let a0 = -Math.PI / 2;
+  const arcs = parts.filter(p => p.value).map(p => { const a1 = a0 + p.value / tot * Math.PI * 2 - (parts.filter(q => q.value).length > 1 ? .03 : 0);
+    const P = (a, rr) => [cx + rr * Math.cos(a), cy + rr * Math.sin(a)], lg = a1 - a0 > Math.PI ? 1 : 0;
+    const d = parts.filter(q => q.value).length === 1 ? `M${cx} ${cy - R}a${R} ${R} 0 1 1 -.01 0zM${cx} ${cy - r}a${r} ${r} 0 1 0 .01 0z`
+      : `M${P(a0, R)}A${R} ${R} 0 ${lg} 1 ${P(a1, R)}L${P(a1, r)}A${r} ${r} 0 ${lg} 0 ${P(a0, r)}z`;
+    const out = `<path d="${d}" fill="${p.color}" fill-rule="evenodd" data-tip="${esc(p.label)}: ${p.value} (${Math.round(p.value / tot * 100)}%)" ${p.drill ? `data-drill="${p.drill}"` : ''}/>`; a0 = a1 + .03; return out; }).join('');
+  return `<svg viewBox="0 0 180 180" style="max-width:190px;margin:0 auto" role="img" aria-label="${esc(title)}">${arcs}<text x="90" y="88" text-anchor="middle" font-size="22" font-weight="700" fill="var(--ink)">${parts.reduce((s, p) => s + p.value, 0)}</text><text x="90" y="106" text-anchor="middle" font-size="11" fill="var(--ink-2)">deal</text></svg>
+    <div class="lg">${parts.map(p => `<span><i style="background:${p.color}"></i>${esc(p.label)} · <b>${p.value}</b> (${Math.round(p.value / tot * 100)}%)</span>`).join('')}</div>`;
+}
+const card = (title, info, chips, body, cls = '') => `<section class="rc ${cls}"><h2>${esc(title)}<span class="ms" title="${esc(info)}">info</span></h2><div class="chips">${chips.map(c => `<span>${esc(c)}</span>`).join('')}</div>${body}</section>`;
+const kpi = (label, v, prevV, k) => { const d = prevV ? Math.round((v - prevV) / prevV * 100) : null;
+  return `<div class="kpi"><small>${label}</small><button data-drill="${k}" aria-label="Xem danh sách">${nf(v)}</button>${st.range === 'all' ? '' : `<span class="dl">${d === null ? 'Kỳ trước: 0' : `${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% so với kỳ trước (${prevV})`}</span>`}</div>`; };
+
+/* ── CRM Data Overview ── */
+function crm() {
+  const R = range(), P = prevRange(), rl = R[2], M = months();
+  const C = HXC.list('contact').filter(c => ownerOK(c.values.owner)), D = HX.api.list().filter(d => ownerOK(d.values[SALE]));
+  const A = [...HXC.db().activities].filter(a => ownerOK(a.by));
+  const newC = C.filter(c => inR(c.createdAt, R)), prevC = C.filter(c => inR(c.createdAt, P));
+  const src = HXC.SOURCES.map(s => ({ label:s, value: newC.filter(c => c.values.source === s).length })).map(r => ({ ...r, drill: drill(`Contacts nguồn ${r.label} · ${rl}`, newC.filter(c => c.values.source === r.label).map(rowC)) }));
+  const cOver = M.map(([a, b, l]) => { const x = C.filter(c => inR(c.createdAt, [a, b])); return { label:l, value:x.length, drill: drill(`Contacts tạo ${l}`, x.map(rowC)) }; });
+  const dOver = M.map(([a, b, l]) => { const x = D.filter(d => inR(d.createdAt, [a, b])); return { label:l, value:x.length, drill: drill(`Deals tạo ${l}`, x.map(rowD)) }; });
+  const dR = D.filter(d => inR(d.createdAt, R));
+  const byStage = HX.STAGES.map(s => { const x = dR.filter(d => d.values[STAGE] === s); return { label:s, value:x.length, drill: drill(`Deals ở ${s} · ${rl}`, x.map(rowD)) }; });
+  const aR = A.filter(a => inR(a.at, R));
+  const TY = [['NOTE','Ghi chú'],['TASK','Task'],['MEETING','Cuộc họp'],['CALL','Cuộc gọi']];
+  const byType = TY.map(([k, l]) => { const x = aR.filter(a => a.type === k); return { label:l, value:x.length, drill: drill(`${l} · ${rl}`, x.map(rowA)) }; });
+  const team = HX.USERS.filter(u => ownerOK(u)).map(u => ({ u, cells: TY.map(([k, l]) => { const x = aR.filter(a => a.by === u && a.type === k); return { v:x.length, drill: drill(`${l} của ${u} · ${rl}`, x.map(rowA)) }; }) }));
+  return [
+    card('Contacts mới tạo', 'Số contact được tạo trong khoảng thời gian, so với kỳ liền trước', [rl, 'So với kỳ trước'], kpi('(SỐ LƯỢNG) CONTACTS', newC.length, prevC.length, drill(`Contacts tạo · ${rl}`, newC.map(rowC)))),
+    card('Nguồn contact', 'Contacts mới theo thuộc tính Nguồn', [rl], vcol(src, { title:'Nguồn contact' }), 'w2'),
+    card('Contacts thêm theo thời gian', 'Số contact tạo mới theo tháng', ['4 tháng gần nhất', 'Theo tháng'], vcol(cOver, { title:'Contacts theo tháng', line:true })),
+    card('Deals tạo theo thời gian', 'Số deal tạo mới theo tháng', ['4 tháng gần nhất', 'Theo tháng'], vcol(dOver, { title:'Deals theo tháng' })),
+    card('Deals theo giai đoạn', 'Deals tạo trong kỳ, nhóm theo Giai Đoạn Pipeline', [rl], hbar(byStage, { title:'Deals theo giai đoạn' })),
+    card('Phân loại hoạt động', 'Số hoạt động ghi nhận theo loại', [rl], hbar(byType, { title:'Hoạt động theo loại' })),
+    card('Tổng hợp hoạt động theo nhóm', 'Số hoạt động của từng người theo loại', [rl], `<table class="tt"><thead><tr><th>Người thực hiện</th>${TY.map(([, l]) => `<th>${l}</th>`).join('')}<th>Tổng</th></tr></thead>
+      <tbody>${team.map(t => `<tr><td>${esc(t.u)}</td>${t.cells.map(c => `<td>${c.v ? `<button data-drill="${c.drill}">${c.v}</button>` : '0'}</td>`).join('')}<td><b>${t.cells.reduce((s, c) => s + c.v, 0)}</b></td></tr>`).join('')}</tbody></table>`, 'w2'),
+  ].join('');
+}
+
+/* ── Pipeline Overview ── */
+function pipe() {
+  const R = range(), P = prevRange(), rl = R[2], M = months();
+  const D = HX.api.list().filter(d => ownerOK(d.values[SALE]));
+  const closed = d => [HXC.WON, HXC.LOST].includes(d.values[STAGE]);
+  const created = D.filter(d => inR(d.createdAt, R)), createdP = D.filter(d => inR(d.createdAt, P));
+  const closedR = D.filter(d => closed(d) && inR(d.values[CLOSE], R)), closedP = D.filter(d => closed(d) && inR(d.values[CLOSE], P));
+  const open = created.filter(d => !closed(d)), won = created.filter(d => d.values[STAGE] === HXC.WON), lost = created.filter(d => d.values[STAGE] === HXC.LOST);
+  const wonR = D.filter(d => d.values[STAGE] === HXC.WON && inR(d.values[CLOSE], R));
+  const perf = HX.USERS.filter(u => ownerOK(u)).map(u => { const x = wonR.filter(d => d.values[SALE] === u); return { label:u, value:x.reduce((s, d) => s + (Number(d.values[CASH]) || 0), 0), drill: drill(`Deals thắng của ${u} · ${rl}`, x.map(rowD)) }; });
+  const S = HX.STAGES.slice(0, 5);
+  const funnel = S.map((s, i) => { const x = created.filter(d => { const k = HX.STAGES.indexOf(d.values[STAGE]); return k >= i && k <= 4; }); return { label:s, value:x.length, drill: drill(`Deals đã tới ${s} · ${rl}`, x.map(rowD)) }; });
+  const ttc = M.map(([a, b, l]) => { const x = D.filter(d => d.values[STAGE] === HXC.WON && inR(d.values[CLOSE], [a, b]));
+    const avg = x.length ? Math.round(x.reduce((s, d) => s + (new Date(d.values[CLOSE]) - new Date(d.createdAt)) / 864e5, 0) / x.length) : 0; return { label:l, value:Math.max(0, avg), drill: drill(`Deals thắng chốt ${l}`, x.map(rowD)) }; });
+  return [
+    card('Deals đã tạo', 'Số deal tạo trong kỳ', [rl], kpi('(SỐ LƯỢNG) DEALS', created.length, createdP.length, drill(`Deals tạo · ${rl}`, created.map(rowD)))),
+    card('Deals đã đóng', 'Deal ở Closed Won hoặc Closed Lost, ngày chốt trong kỳ', [rl, 'Bộ lọc (1)'], kpi('(SỐ LƯỢNG) DEALS', closedR.length, closedP.length, drill(`Deals đóng · ${rl}`, closedR.map(rowD)))),
+    card('Deals theo trạng thái', 'Deals tạo trong kỳ: đang mở, thắng, thua', [rl], donut([
+      { label:'Đang mở', value:open.length, color:'var(--st-open)', drill: drill('Deals đang mở', open.map(rowD)) },
+      { label:'Thắng', value:won.length, color:'var(--st-won)', drill: drill('Deals thắng', won.map(rowD)) },
+      { label:'Thua', value:lost.length, color:'var(--st-lost)', drill: drill('Deals thua', lost.map(rowD)) }], 'Deals theo trạng thái')),
+    card('Hiệu quả sale theo giá trị chốt', 'Tổng Cash-In của deal Closed Won theo Sale phụ trách', [rl, 'Bộ lọc (1)'], hbar(perf, { fmt: v => money(v) + ' ₫', title:'Giá trị chốt theo sale' }), 'w2'),
+    card('Tiến trình deal qua các giai đoạn', 'Số deal đã tới hoặc vượt qua từng giai đoạn (không tính Closed Lost)', [rl], hbar(funnel, { title:'Phễu giai đoạn' }) + `<div class="nil" style="font-size:12px">Tỷ lệ chuyển từ giai đoạn 1 sang Won: ${funnel[0].value ? Math.round(funnel[4].value / funnel[0].value * 100) : 0}%</div>`),
+    card('Thời gian chốt trung bình', 'Số ngày trung bình từ lúc tạo đến Ngày Dự Kiến Chốt của deal Closed Won, theo tháng chốt', ['4 tháng gần nhất', 'Theo tháng'], vcol(ttc, { fmt: v => v + ' ngày', title:'Thời gian chốt trung bình', line:true }), 'w2'),
+  ].join('');
+}
+
+function render() {
+  dn = 0; cn = 0; Object.keys(DRILL).forEach(k => delete DRILL[k]); Object.keys(CH).forEach(k => delete CH[k]);
+  $('#dName').textContent = DASH[st.dash]; document.title = `${DASH[st.dash]} — Báo cáo`;
+  $('#grid').innerHTML = st.dash === 'crm' ? crm() : pipe();
+  drawCharts();
+}
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawCharts, 150); });
+function openDrill(k) {
+  const d = DRILL[k]; if (!d) return;
+  HX.modal(`<div class="modal" role="dialog" aria-modal="true" style="width:min(560px,100%)"><div class="mh">${esc(d.title)} (${d.rows.length})<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
+    <div class="mb"><div class="drl">${d.rows.length ? d.rows.map(r => `<a href="${r.href}"><b>${esc(r.name)}</b><span class="nil">${esc(r.sub)}</span></a>`).join('') : '<p class="nil">Không có bản ghi.</p>'}</div></div></div>`);
+}
+$('#grid').addEventListener('click', e => { const t = e.target.closest('[data-drill]'); if (t) openDrill(t.dataset.drill); });
+const tip = $('#tip');
+$('#grid').addEventListener('mousemove', e => { const t = e.target.closest('[data-tip]'); if (!t) { tip.style.display = 'none'; return; }
+  tip.textContent = t.dataset.tip; tip.style.display = 'block'; tip.style.left = Math.min(innerWidth - 270, e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px'; });
+$('#grid').addEventListener('mouseleave', () => tip.style.display = 'none');
+$('#fRange').onchange = e => { st.range = e.target.value; render(); };
+$('#fOwner').onchange = e => { st.owner = e.target.value; render(); };
+$('#refresh').onclick = () => { render(); toast('Đã làm mới dữ liệu'); };
+$('#dBtn').onclick = e => { e.stopPropagation(); $('#dPop').classList.toggle('open'); };
+document.addEventListener('click', e => { const d = e.target.closest('[data-dash]'); if (d) { st.dash = d.dataset.dash; history.replaceState(null, '', '?d=' + st.dash); render(); }
+  const t = e.target.closest('[data-toast]'); if (t) toast(t.dataset.toast);
+  if (!e.target.closest('#dBtn')) $('#dPop').classList.remove('open'); });
+render();
+</script>
+</body>
+</html>

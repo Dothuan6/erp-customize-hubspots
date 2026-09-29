@@ -114,6 +114,7 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
 .kc .ln{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--on-surface);min-width:0}
 .kc .ln .ms{font-size:15px;color:var(--on-surface-variant)}
 .kc .ln span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kc a.lk2{color:var(--link);font-weight:600}.kc a.lk2:hover{text-decoration:underline}
 .kc .kf{display:flex;align-items:center;gap:6px;border-top:1px solid var(--outline-variant);padding-top:8px;margin-top:4px}
 .kc .kf .qi{width:26px;height:26px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant)}
 .kc .kf .qi:hover{background:var(--surface-2);color:var(--on-surface)}
@@ -202,11 +203,12 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
 <div class="toast" id="toast" role="status"></div>
 
 <script src="crm-shared.js"></script>
+<script src="crm-objects.js"></script>
 <script>
 const {FIELDS,F,api,esc,empty,fmt,display,pill,pillCls,createdFmt,title,editor,toast,confirmBox,$} = HX;
 HX.shell();
 $('#objName').textContent = HX.COLLECTION.label;
-const DETAIL = id => `crm-deal-chi-tiet-hubspot.html?id=${id}`;
+const DETAIL = id => HXC.url('deal', id);
 
 /* ── Điều kiện lọc theo kiểu trường — đúng danh sách của ERP ── */
 const OPS = {
@@ -519,6 +521,7 @@ function card(r){
   return `<article class="kc" draggable="true" data-card="${r.id}">
     <a class="tt" href="${DETAIL(r.id)}">${esc(title(r))}</a>
     ${L('description', esc(v.t_n_deal || ''))}
+    ${(co => co ? L('domain', `<a class="lk2" href="${HXC.url('company', co.id)}">${esc(co.values.name)}</a>`) : '')(HXC.assoc.companyOfDeal(r.id))}
     ${L('event', v.ng_y_d_ki_n_ch_t && F.ng_y_d_ki_n_ch_t ? 'Chốt ' + fmt(v.ng_y_d_ki_n_ch_t, F.ng_y_d_ki_n_ch_t) : '')}
     ${L('payments', empty(v[CASH]) || !F[CASH] ? '' : `<b>${fmt(v[CASH], F[CASH])}</b>`)}
     ${L('person', esc(v.sale_ph_tr_ch || ''))}

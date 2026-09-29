@@ -103,7 +103,7 @@ const HX = (() => {
     removeField(key) { api.saveFields(FIELDS.filter(f => f.key !== key)); records.forEach(r => delete r.values[key]); save(KEY, records); },
     moveField(key, to) { const list = [...FIELDS], i = list.findIndex(f => f.key === key); if (i < 0) return;
       const [f] = list.splice(i, 1); list.splice(Math.max(0, Math.min(to, list.length)), 0, f); api.saveFields(list); },
-    reset() { try { [KEY, VKEY, FKEY, 'hx-crm-hidden-v1'].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
+    reset() { try { [KEY, VKEY, FKEY, 'hx-crm-hidden-v1', 'hx-crm-p2-v1'].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
   };
   // Tên trường → key kiểu ERP (bỏ dấu, ký tự lạ thành "_")
   function slug(s) { return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')
@@ -252,8 +252,10 @@ const HX = (() => {
 
   /* ── Shell: topbar + sidebar đúng menu ERP ── */
   // "Deals" = collection Deals_Pipeline đã được "Ghim vào sidebar" (chức năng có sẵn của ERP)
-  const NAV = [['forum','Cowork'],['home','Trang chủ'],['task_alt','Việc của tôi'],['sep'],['handshake','Deals','cur'],['sep'],['table_chart','Dữ liệu'],['account_tree','Workflow'],['description','Biểu mẫu'],['image','Media'],['bar_chart','Báo cáo']];
-  function shell() {
+  // Contacts / Companies / Deals = collection đã "Ghim vào sidebar" (chức năng có sẵn của ERP); Báo cáo = dashboard giai đoạn 2
+  const NAV = [['forum','Cowork'],['home','Trang chủ'],['task_alt','Việc của tôi'],['sep'],['person','Contacts','contacts','crm-contacts-hubspot.html'],['domain','Companies','companies','crm-companies-hubspot.html'],
+    ['handshake','Deals','deals','crm-giao-dich-hubspot.html'],['sep'],['table_chart','Dữ liệu'],['account_tree','Workflow'],['description','Biểu mẫu'],['image','Media'],['bar_chart','Báo cáo','reports','crm-bao-cao-hubspot.html']];
+  function shell(cur = 'deals') {
     $('#topbar').innerHTML = `
       <button class="icon-btn navbtn" id="navBtn" aria-label="Mở điều hướng"><span class="ms">menu</span></button>
       <a class="brand" href="index.html"><span class="brand-mark">H</span><span>HarnexAI</span></a>
@@ -263,7 +265,7 @@ const HX = (() => {
         <button class="icon-btn" aria-label="Thông báo: 86 chưa đọc" title="Thông báo"><span class="ms">notifications</span><span class="badge-count">86</span></button>
         <span class="avatar" title="Tài khoản">PN</span>
       </div>`;
-    $('#sidebar').innerHTML = NAV.map(([i, l, c]) => i === 'sep' ? '<div class="nav-sep"></div>' : `<a class="nav-i" href="${c ? 'crm-giao-dich-hubspot.html' : '#'}" ${c ? 'aria-current="page"' : ''} title="${l}"><span class="ms">${i}</span><span class="lbl">${l}</span></a>`).join('')
+    $('#sidebar').innerHTML = NAV.map(([i, l, k, href]) => i === 'sep' ? '<div class="nav-sep"></div>' : `<a class="nav-i" href="${href || '#'}" ${k && k === cur ? 'aria-current="page"' : ''} title="${l}"><span class="ms">${i}</span><span class="lbl">${l}</span></a>`).join('')
       + `<div class="nav-sp"></div><a class="nav-i" href="#" title="Cài đặt"><span class="ms">settings</span><span class="lbl">Cài đặt</span></a>`;
     $('#navBtn').onclick = () => document.body.classList.add('nav-open');
     $('#scrim').addEventListener('click', () => { document.body.classList.remove('nav-open'); closePanel(); });
@@ -299,7 +301,7 @@ const HX = (() => {
     const p = $('#panel');
     p.innerHTML = `<div class="pn-h"><h2>${esc(title(r))}</h2>
         <a class="btn btn--text sm" href="${FIELDS_URL}" title="Quản lý trường dữ liệu"><span class="ms xs">settings</span>Cột</a>
-        <a class="btn btn--text sm" href="crm-deal-chi-tiet-hubspot.html?id=${r.id}">Mở trang đầy đủ<span class="ms xs">arrow_forward</span></a>
+        <a class="btn btn--text sm" href="crm-record-hubspot.html?type=deal&id=${r.id}">Mở trang đầy đủ<span class="ms xs">arrow_forward</span></a>
         <button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
       <div class="pn-tabs" role="tablist"><button class="pn-tab" role="tab" aria-selected="true" data-t="info">Thông tin</button><button class="pn-tab" role="tab" aria-selected="false" data-t="hist">Lịch sử</button><button class="pn-tab" role="tab" aria-selected="false" data-t="link">Liên kết</button></div>
       <div class="pn-b" id="pnBody"></div>`;
@@ -345,7 +347,7 @@ const HX = (() => {
         else if (f.type === 'FILE') input = `<input class="in" id="${id}" type="file">`;
         else input = `<input class="in" id="${id}" type="${inputType(f.type)}" ${f.type === 'TEXT' && f.maxLength ? `maxlength="${f.maxLength}"` : ''}>`;
         return `<label for="${id}">${esc(f.name)}${f.required ? ' <span class="req">*</span>' : ''}${input}</label>`;
-      }).join('')}<p class="err" id="crErr" role="alert"></p></form>
+      }).join('')}${typeof HXC !== 'undefined' ? HXC.dealAssocForm() : ''}<p class="err" id="crErr" role="alert"></p></form>
       <div class="pn-f"><button class="btn btn--primary" id="crSave" title="Tạo bản ghi (Ctrl+Enter)">Tạo bản ghi</button><button class="btn btn--secondary" data-pclose>Huỷ</button><small style="margin-left:auto;align-self:center;color:var(--on-surface-variant)">Ctrl+Enter</small></div>`;
     const submit = () => {
       const values = {};
@@ -356,7 +358,7 @@ const HX = (() => {
         if (v === '' || (Array.isArray(v) && !v.length)) v = null; else if (isNum(f.type)) v = Number(v); else if (f.type === 'DATETIME') v = new Date(v).toISOString();
         const err = check(f, v, null); if (err) { $('#crErr', p).textContent = err; el.focus(); return; }
         values[f.key] = v; }
-      const r = api.create(values); closePanel(); toast('Đã tạo bản ghi'); onCreated && onCreated(r);
+      const r = api.create(values); if (typeof HXC !== 'undefined') HXC.saveDealAssoc(r.id, p); closePanel(); toast('Đã tạo bản ghi'); onCreated && onCreated(r);
     };
     p.onclick = e => { if (e.target.closest('[data-pclose]')) closePanel(); if (e.target.closest('#crSave')) submit(); };
     p.onkeydown = e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); submit(); } };

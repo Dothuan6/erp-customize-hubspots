@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi" data-brand="crm">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Companies — HarnexAI CRM (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link rel="stylesheet" href="crm-shared.css">
+<style>
+/* Danh sách Contacts / Companies — clone trang danh sách HubSpot (header ⌄ · views · Search/Filter/Sort · Board/Table · ⚙ · ⌃ · quick filters popover · mở rộng dòng) */
+.frame{position:relative}
+.ph{display:flex;align-items:center;gap:8px;padding:16px 16px 0;flex-wrap:wrap}
+.ttl{display:flex;align-items:center;gap:2px;font-size:24px;font-weight:600;border-radius:var(--radius-md);padding:0 4px;margin-left:-4px}
+.ttl:hover{background:var(--surface-2)}
+.ph .count{font-size:13px;color:var(--on-surface-variant)}
+.ph-act{margin-left:auto;display:flex;gap:8px;align-items:center;position:relative}
+.vtabs{display:flex;align-items:flex-end;gap:2px;padding:8px 16px 0;border-bottom:1px solid var(--outline-variant);overflow-x:auto}
+.vtab{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;font-weight:600;font-size:13px;color:var(--on-surface-variant);white-space:nowrap;border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
+.vtab:hover{background:var(--surface-variant)}
+.vtab[aria-selected="true"]{color:var(--on-surface);border-bottom-color:var(--on-surface);background:var(--surface-2)}
+.tools{display:flex;align-items:center;gap:8px;padding:12px 16px 0;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;width:220px;max-width:100%;border:1px solid var(--outline);border-radius:var(--btn-radius);color:var(--on-surface-variant)}
+.search input{border:none;outline:none;background:none;flex:1;min-width:0;color:var(--on-surface);font-size:13px}
+.tools-r{margin-left:auto;display:flex;gap:6px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden}
+.seg button{height:30px;width:34px;display:grid;place-items:center;color:var(--on-surface-variant)}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--on-surface)}
+#filterBtn[aria-pressed="true"]{background:var(--surface-2)}
+.pop-form{display:flex;flex-direction:column;gap:10px;padding:8px}
+.pop-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600}
+.pop-form input,.pop-form select{height:32px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 8px;background:var(--surface);font-weight:400}
+.pop-form .row{display:flex;justify-content:flex-end;gap:6px}
+.segtxt{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden}
+.segtxt button{height:28px;padding:0 10px;font-size:12px;font-weight:600;color:var(--on-surface-variant)}
+.segtxt button[aria-pressed="true"]{background:var(--primary-container);color:var(--on-primary-container)}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;font-size:13px}
+.colsrch{display:flex;align-items:center;gap:6px;height:34px;padding:0 10px;margin:2px 2px 6px;border:1px solid var(--outline);border-radius:var(--btn-radius);color:var(--on-surface-variant)}
+.colsrch input{flex:1;min-width:0;border:none;outline:none;background:none;color:var(--on-surface);font-size:13px}
+#pop{max-height:min(460px,70vh);overflow-y:auto}
+#pop .mi input{accent-color:var(--primary)}
+
+/* Bộ lọc nhanh (HubSpot: chữ đậm + ▾, mở popover tìm kiếm) */
+.qfbar{display:flex;align-items:center;gap:2px;flex-wrap:wrap;padding:8px 12px 10px}
+body.fcollapsed .qfbar{display:none}
+.qf{display:inline-flex;align-items:center;gap:2px;height:28px;padding:0 6px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:600;color:var(--on-surface);white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.qf:hover{background:var(--surface-2)}
+.qf.on{background:var(--primary-container);color:var(--on-primary-container)}
+.qf b{font-weight:700}
+.qsep{width:1px;height:18px;background:var(--outline-variant);margin:0 6px}
+.qa{width:28px;height:28px}
+.fclear{font-size:12px;font-weight:600;color:var(--link);margin-left:6px}
+.qp{display:flex;flex-direction:column;gap:6px}
+.qp .srch2{height:32px;flex:none}
+.qp-op{display:inline-flex;align-items:center;gap:2px;align-self:flex-start;font-size:12.5px;font-weight:600;padding:2px 6px;border-radius:var(--radius-sm);background:var(--surface-2)}
+.qp-l{max-height:280px;overflow-y:auto;display:flex;flex-direction:column}
+.qp-d{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 10px;border-radius:var(--radius-sm);text-align:left}
+.qp-d:hover{background:var(--surface-2)} .qp-d.cur{background:var(--primary-container);color:var(--on-primary-container)}
+.qp-d b{font-weight:600;font-size:13px} .qp-d small{font-size:11.5px;color:var(--on-surface-variant)}
+.qp-f{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--outline-variant);padding-top:6px}
+
+.bulk{display:none;align-items:center;gap:6px;padding:6px 16px;background:var(--primary-container);color:var(--on-primary-container);font-size:13px;font-weight:600}
+.bulk.on{display:flex}
+.bulk #bulkN{margin-right:8px}
+.body{flex:1;min-height:0;overflow:hidden;display:flex;border-top:1px solid var(--outline-variant)}
+.tw{flex:1;overflow:auto}
+table.lt{border-collapse:separate;border-spacing:0;min-width:100%}
+.lt th,.lt td{border-bottom:1px solid var(--outline-variant);text-align:left;white-space:nowrap;padding:0 12px;height:44px;max-width:300px;overflow:hidden;text-overflow:ellipsis}
+body.compact .lt td{height:34px}
+.lt th{position:sticky;top:0;z-index:2;background:var(--surface);font-weight:500;font-size:13px;color:var(--on-surface-variant);cursor:pointer;user-select:none}
+.lt th:hover{color:var(--on-surface);background:var(--surface-variant)}
+.lt th .srt{vertical-align:-2px;margin-left:2px}
+.lt td{font-size:13.5px}
+.lt td.num{text-align:right}
+.lt>tbody>tr:hover>td{background:var(--surface-2)}
+.lt>tbody>tr.sel>td{background:var(--primary-container)}
+.lt td.cb,.lt th.cb{width:44px;min-width:44px;text-align:center;cursor:default;position:sticky;left:0;z-index:1;background:var(--surface)}
+.lt th.cb{z-index:3}
+.lt .nmcol{min-width:260px;position:sticky;left:44px;z-index:1;background:var(--surface);border-right:1px solid var(--outline-variant)}
+.lt th.nmcol{z-index:3}
+.lt th.addc{width:44px;cursor:default}
+.pri{display:flex;align-items:center;gap:8px;min-width:0}
+.pri a{overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--link)}
+.pri a:hover,.lk:hover{text-decoration:underline}
+.lk{color:var(--link)} .lk.b{font-weight:600}
+.xbtn{width:22px;height:22px;border-radius:var(--radius-sm);display:grid;place-items:center;flex:none;color:var(--on-surface-variant);margin-left:-6px}
+.xbtn:hover{background:var(--surface-variant);color:var(--on-surface)}
+.xbtn .ms{transition:transform .15s} .xbtn.on .ms{transform:rotate(90deg)}
+.pvb{display:none;height:26px;padding:0 8px;border-radius:var(--btn-radius);border:1px solid var(--outline);background:var(--surface);align-items:center;gap:4px;flex:none;margin-left:auto;font-size:12px;font-weight:600}
+.pvb::after{content:"Xem trước"}
+tr:hover .pvb,.pvb:focus-visible{display:inline-flex}
+.obj{display:inline-flex;align-items:center;gap:6px}
+.av.xs{width:20px;height:20px;font-size:9px}
+.av.sq{border-radius:6px;background:var(--surface-2);color:var(--on-surface);border:1px solid var(--outline-variant)}
+.ext{color:var(--on-surface-variant);vertical-align:-2px;margin-left:4px}
+.empty{padding:48px 16px;text-align:center;color:var(--on-surface-variant);white-space:normal}
+.empty .ms{font-size:36px;display:block;margin:0 auto 6px;max-width:none}
+/* Dòng mở rộng: bảng đối tượng liên kết lồng */
+.xrow>td{background:var(--surface-2)!important;height:auto!important;padding:8px 12px 12px 56px!important;white-space:normal;max-width:none!important}
+.xin{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:8px 10px}
+.xh{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.xh .btn{margin-left:auto}
+table.xt{border-collapse:collapse;width:100%}
+.xt th,.xt td{height:34px;padding:0 10px;border-bottom:1px solid var(--outline-variant);font-size:13px;text-align:left;white-space:nowrap}
+.xt th{font-weight:500;color:var(--on-surface-variant);font-size:12px}
+.xt tr:last-child td{border-bottom:none}
+/* Board */
+.kb{flex:1;display:flex;gap:10px;padding:12px 16px;overflow-x:auto;align-items:stretch}
+.kcol{flex:none;width:82vw;max-width:280px;display:flex;flex-direction:column;min-height:0;background:#F0F0F0;border-radius:var(--radius-lg)}
+html[data-theme="dark"] .kcol{background:var(--surface-variant)}
+@media(min-width:600px){.kcol{width:280px}}
+.kh{display:flex;align-items:center;gap:6px;padding:10px 10px 6px}
+.kh .n{font-size:12px;font-weight:700;color:var(--on-surface-variant)}
+.kcards{flex:1;overflow-y:auto;padding:4px 8px 8px;display:flex;flex-direction:column;gap:8px;min-height:80px}
+.kcards.drop{outline:2px dashed var(--primary);outline-offset:-4px;border-radius:var(--radius-md)}
+.kc{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-lg);padding:12px;display:flex;flex-direction:column;gap:5px;cursor:grab;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.kc:hover{border-color:var(--outline);box-shadow:var(--shadow-2)}
+.kc.dragging{opacity:.5}
+.kc a.tt{font-weight:600;color:var(--link);align-self:flex-start}
+.kc a.tt:hover{text-decoration:underline}
+.kc .ln{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--on-surface);min-width:0}
+.kc .ln .ms{font-size:15px;color:var(--on-surface-variant)}
+.kc .ln span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kc .kf{display:flex;align-items:center;gap:6px;border-top:1px solid var(--outline-variant);padding-top:8px;margin-top:4px}
+.kc .kf .qi{width:26px;height:26px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant)}
+.kc .kf .qi:hover{background:var(--surface-2);color:var(--on-surface)}
+.kempty{padding:14px;text-align:center;font-size:12px;color:var(--on-surface-variant)}
+/* Panel: bộ lọc nâng cao + xem trước */
+.cond{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid var(--outline-variant);border-radius:var(--radius-md)}
+.cond .ch2{display:flex;align-items:center;justify-content:space-between}
+.cond .in,.addcond .in{height:34px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 10px;background:var(--surface);width:100%}
+.and{font-size:11px;font-weight:700;color:var(--on-surface-variant);text-align:center;padding:6px 0}
+.addcond{margin-top:12px}
+#advB{display:flex;flex-direction:column}
+.pvh{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--on-surface-variant);margin:16px 0 6px}
+.pva{display:flex;flex-direction:column;gap:10px;font-size:13px}
+.pva>div{display:flex;flex-direction:column;gap:3px}
+.foot{display:flex;align-items:center;gap:6px;padding:8px 16px;border-top:1px solid var(--outline-variant);flex:none}
+.foot .pillc{font-size:12px;font-weight:600;padding:3px 10px;border-radius:var(--radius-pill);background:var(--surface-2)}
+.foot .r{margin-left:auto;display:flex;gap:6px;align-items:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar" id="topbar"></header>
+  <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
+  <main class="main"><div class="frame">
+    <div class="ph">
+      <div style="position:relative"><button class="ttl" id="objBtn" aria-haspopup="menu"><span id="objName"></span><span class="ms">expand_more</span></button><div class="pop" id="objPop" role="menu" style="top:42px;left:0"></div></div>
+      <span class="count" id="count"></span>
+      <div class="ph-act">
+        <button class="btn btn--secondary btn--icon" id="moreBtn" aria-label="Thêm thao tác"><span class="ms sm">more_vert</span></button>
+        <div class="pop" id="morePop" role="menu" style="top:38px;right:150px"><button class="mi" data-imp><span class="ms sm">upload_file</span>Import</button><button class="mi" data-toast="Mockup: xuất danh sách"><span class="ms sm">ios_share</span>Export</button><button class="mi" data-toast="Quản lý trường của collection này (như trang Quản lý trường của Deals)"><span class="ms sm">tune</span>Chỉnh sửa thuộc tính</button></div>
+        <button class="btn btn--primary" id="addBtn" aria-haspopup="menu"></button>
+        <div class="pop" id="addPop" role="menu" style="top:38px;right:0"><button class="mi" data-new><span class="ms sm">add</span>Tạo mới</button><button class="mi" data-imp><span class="ms sm">upload_file</span>Import</button></div>
+      </div>
+    </div>
+    <div class="vtabs" role="tablist" id="vtabs"></div>
+    <div class="tools">
+      <label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm kiếm ( / )"></label>
+      <button class="btn btn--secondary" id="filterBtn" aria-pressed="true"><span class="ms sm">filter_list</span>Bộ lọc</button>
+      <button class="btn btn--secondary" id="sortBtn"><span class="ms sm">swap_vert</span>Sắp xếp</button>
+      <div class="tools-r">
+        <div class="seg" role="group" aria-label="Kiểu hiển thị">
+          <button data-mode="BOARD" title="Board" aria-label="Board"><span class="ms sm">view_kanban</span></button>
+          <button data-mode="TABLE" title="Bảng" aria-label="Bảng"><span class="ms sm">table_rows</span></button>
+        </div>
+        <button class="btn btn--secondary btn--icon" id="setBtn" title="Cài đặt view" aria-label="Cài đặt view"><span class="ms sm">settings</span></button>
+        <button class="btn btn--secondary btn--icon" id="colBtn2" title="Thu gọn thanh lọc" aria-label="Thu gọn thanh lọc"><span class="ms sm" id="colIc">expand_less</span></button>
+      </div>
+    </div>
+    <div class="qfbar" id="qf"></div>
+    <div class="bulk" id="bulk"><span id="bulkN"></span><button class="btn btn--text sm" id="bulkOwner"><span class="ms sm">person</span>Gán owner</button><button class="btn btn--text sm" id="bulkDel"><span class="ms sm">delete</span>Xoá</button><button class="btn btn--text sm" id="bulkCancel">Huỷ</button></div>
+    <div class="body" id="body"></div>
+    <div class="foot"><span class="pillc" id="footCount"></span>
+      <div class="r">
+        <button class="btn btn--secondary btn--icon" id="refresh" title="Làm mới" aria-label="Làm mới"><span class="ms sm">refresh</span></button>
+        <button class="btn btn--secondary" id="exportBtn"><span class="ms sm">ios_share</span>Export</button>
+        <button class="btn btn--secondary btn--icon" id="resetBtn" title="Khôi phục view" aria-label="Khôi phục view"><span class="ms sm">undo</span></button>
+        <button class="btn btn--secondary btn--icon" id="cloneBtn" title="Nhân bản view" aria-label="Nhân bản view"><span class="ms sm">content_copy</span></button>
+      </div>
+    </div>
+    <div class="pop" id="pop"></div>
+  </div></main>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel"></aside>
+<div class="modal-bg" id="modal"></div>
+<div class="demo" id="demo" role="group" aria-label="Điều khiển mockup"></div>
+<div class="toast" id="toast" role="status"></div>
+<script src="crm-shared.js"></script>
+<script src="crm-objects.js"></script>
+<script src="crm-list.js"></script>
+<script>HXList('company');</script>
+</body>
+</html>

@@ -140,3 +140,41 @@ Cột ẩn được nhớ theo từng view trong trình duyệt. Không áp dụ
 - Trường Lựa chọn đơn / Trạng thái mới dùng được cho “Cột theo” của Board.
 - Bắt buộc / Duy nhất / Độ dài / Min–Max được kiểm tra khi tạo bản ghi và khi sửa ô tại chỗ.
 - Trường bị xóa biến khỏi mọi màn; Board tự chuyển sang trường lựa chọn khác nếu xóa Giai Đoạn Pipeline.
+
+## 10. Giai đoạn 2 — Contacts · Companies · liên kết · Activities · Line items · Reports (28/09/2026)
+
+Nguyên tắc giai đoạn 2: **UX clone HubSpot**, dữ liệu liên kết giữa các bảng. Phần ERP chưa có được ghi rõ ở cột cuối. Kế hoạch chi tiết: Claude Doc “Kế hoạch triển khai giai đoạn 2 — CRM theo UX HubSpot”.
+
+| Màn / chức năng | Tệp | Mockup làm gì | ERP hiện tại |
+| --- | --- | --- | --- |
+| Danh sách Contacts, Companies | `crm-contacts-hubspot.html`, `crm-companies-hubspot.html`, `crm-list.js` | View Tất cả / của tôi / chưa có owner, lọc nhanh (owner, lifecycle, lead status, nguồn, ngành), sắp xếp, Xem trước (panel dock), xoá hàng loạt, “Thêm contacts ▾” (Tạo mới / Import) | Collection + bảng có sẵn; cần tạo collection Contacts, Companies |
+| Panel Tạo Contact / Company | `crm-objects.js` `createPanel` | Trường theo form HubSpot + mục “Liên kết với” Company, Deal; Tạo · Tạo và thêm tiếp · Huỷ | Form tạo bản ghi có sẵn; mục liên kết cần FE |
+| Record page 3 cột | `crm-record-hubspot.html?type=contact\|company\|deal&id=` | Trái: định danh, 6 nút nhanh, Lifecycle stage dạng thanh bước, thuộc tính sửa tại chỗ · giữa: Tổng quan (Contact) + Hoạt động · phải: card liên kết | Trang đầy đủ có sẵn; card liên kết + timeline cần FE/BE |
+| Card liên kết | `assocCard`, `addAssocPanel` | + Thêm → Tạo mới / Thêm có sẵn; Deal tạo từ Contact/Company điền sẵn “<công ty> - New Deal” và tự gắn liên kết; nhãn liên kết Deal–Contact; Gỡ liên kết có xác nhận | Cần API liên kết ngược + bảng nối Deal_Contacts |
+| Activities | `timeline`, `composer` | Ghi chú, Task (hạn, ưu tiên, người làm, tick hoàn thành), Cuộc họp (người tham dự, kết quả), Cuộc gọi (kết quả, hướng); tab lọc, tìm, khoảng thời gian, thu gọn; nhóm “Sắp tới” + theo tháng; tự liên kết Contact ↔ Company ↔ Deal | Tab Lịch sử “sắp ra mắt”; cần collection Activities + log sự kiện |
+| Sự kiện hệ thống | `logEvent` | Ghi tạo bản ghi, đổi Lifecycle, đổi owner, đổi giai đoạn Deal (từ board, bảng, panel, record), thêm liên kết, cập nhật line items | Cần audit log phía server |
+| Line items | `lineItemsCard`, `lineItemEditor` | Chọn từ thư viện 7 sản phẩm, dòng tùy chỉnh, SL, đơn giá, chiết khấu % / ₫, thuộc tính tùy chỉnh (tạo trong “Chỉnh sửa cột”), tạm tính / chiết khấu / tổng; Lưu → Amount (Tổng Cash-In Dự Kiến) = Tổng | Rollup chưa bật — mockup ghi lại Amount khi lưu |
+| Tạo Deal ở màn Deals | `crm-shared.js` `openCreate` | Thêm mục “Liên kết Deal với” Company, Contact | Cần FE |
+| Báo cáo | `crm-bao-cao-hubspot.html` | CRM Data Overview (7 thẻ) và Pipeline Overview (6 thẻ), lọc thời gian + owner, bấm số liệu mở danh sách bản ghi | Chưa có module Báo cáo |
+
+Trang chi tiết Deal cũ (`crm-deal-chi-tiet-hubspot.html`) chuyển hướng sang record page mới. Dữ liệu mẫu giai đoạn 2 lưu ở `localStorage` khoá `hx-crm-p2-v1`; nút “⚙ Giao diện → Dữ liệu mẫu” xoá cả dữ liệu giai đoạn 1 và 2.
+
+Ngoài phạm vi (theo kế hoạch): gửi email, gọi điện thật, Quotes, Tickets, Payments, trình tạo báo cáo tự do.
+
+## 11. Phần 1 — Contacts: chỉnh sát HubSpot (29/09/2026)
+
+Khảo sát lại trang Contacts của HubSpot (portal 247428660) rồi chỉnh prototype cho khớp.
+
+| Khu vực | HubSpot | Prototype sau chỉnh | Cần BE ERP? |
+|---|---|---|---|
+| Header danh sách | "Contacts ⌄", ⋮, "Add contacts ▾" | Như HubSpot (Tạo mới / Import) | Không |
+| Thanh công cụ | Search · Filter · Sort by · Board/Table · ⚙ · ⌃ | Đủ; ⚙ = kiểu hiển thị, mật độ, chỉnh cột, khôi phục view | Không |
+| Bộ lọc nhanh | Owner, Create date, Last activity date, Lead status; ⊕ thêm, ✎ sửa, Advanced filters | Popover có ô tìm; ngày dùng preset (Hôm nay…Năm nay); bộ lọc nâng cao dạng panel, các điều kiện nối bằng VÀ | Ngày hoạt động gần nhất cần trường tính (rollup) |
+| Cột bảng | Name (avatar, mũi tên mở đối tượng liên kết), Email ↗, Phone, Owner, Primary company, Last activity, Lead status, Create date | Đủ; mở rộng dòng hiện bảng Companies/Deals liên kết; "+" thêm cột | Back-reference (company ↔ contact) |
+| Board | Có | Cột theo Lifecycle stage; kéo thả thẻ để đổi stage, thay đổi ghi vào timeline | Không |
+| Footer | Đếm · làm mới · Export · reset · clone | Đủ | Không |
+| Record — định danh | Avatar, tên + ✎, công ty, email ↗ ⧉, 6 nút nhanh | Đủ; "Thêm" mở menu có ô tìm (cuộc gọi / cuộc họp / email / SMS… / sắp xếp lại nút) | Email, SMS: ngoài giai đoạn 2 |
+| Record — Key information | Owner, Phone, City, Lifecycle (pill), Lead status, Last contacted; Actions ▾ · ⚙ | Đủ. **Đã bỏ thanh bước lifecycle** vì HubSpot không có | Last contacted: trường tính |
+| Menu Thao tác | Theo dõi, Xem tất cả thuộc tính, Lịch sử thuộc tính, Lịch sử liên kết, Tìm trên Google, Nhân bản, Gộp, Xoá | Đủ; Lịch sử thuộc tính & Gộp gắn nhãn "Sắp có" | Audit log, API gộp |
+| Tab giữa | Catch-up (Overview/Health) · Activities · Customize | Tổng quan: tóm tắt AI (demo), Việc sắp tới, Tương tác gần đây + "Tạo hoạt động ▾"; Sức khoẻ: 3 thẻ AI "sắp ra mắt" | Cần module AI |
+| Card phải | Companies (Primary, Domain ↗ ⧉, Phone, nhãn liên kết, xem tất cả), Deals, Attachments | Đủ | Nhãn liên kết contact↔company cần bảng liên kết có cột nhãn |

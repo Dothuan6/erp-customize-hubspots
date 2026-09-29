@@ -210,3 +210,18 @@ Khảo sát lại trang Contacts của HubSpot (portal 247428660) rồi chỉnh 
 | About this deal | Owner, Last contacted, Deal type, Priority, Closed lost reason | Sale phụ trách, Liên hệ gần nhất, Gói dịch vụ, Thời hạn thanh toán, Tỷ lệ thành công, Lý do thất bại (ánh xạ sang trường ERP) | Không |
 | Timeline | "Deal Activity — X moved Deal từ A sang B", "Created — This deal was created by X" | "Hoạt động Deal — X đã chuyển DEAL-… từ A sang B", "Đã tạo — Deal này được tạo bởi X"; hiện cả trên Contact/Company liên kết | Audit log |
 | Card phải | Contacts, Companies, Tickets, Payments, Attachments | Contacts, Companies, **Line items** (yêu cầu dự án), Tệp đính kèm | — |
+
+## 14. Phần 4 — Activities: chỉnh sát HubSpot (29/09/2026)
+
+Khảo sát trên Deal 001 (chỉ mở rồi đóng cửa sổ soạn, không lưu gì vào HubSpot).
+
+| Khu vực | HubSpot | Prototype sau chỉnh | Cần BE ERP? |
+|---|---|---|---|
+| Cửa sổ soạn (chung) | Góc phải dưới; ⌄ thu gọn · ⛶ phóng to · ✕; soạn thảo có B I U, định dạng, liên kết, đính kèm; "Associated with N records ▾"; ☐ "Create a To-do task to follow up In 3 business days"; hỏi trước khi bỏ nội dung | Như HubSpot. Bỏ chọn được từng bản ghi liên kết; task theo dõi được tạo cùng lúc và liên kết cùng bản ghi. Ctrl+Enter để lưu | Đính kèm tệp: dùng trường Tệp ERP |
+| Ghi chú | "For [bản ghi]" + nội dung → "Create note" | Như HubSpot (nội dung có định dạng đậm / nghiêng / gạch chân / danh sách) | Lưu HTML đã lọc |
+| Task | Tên; Activity date (preset "In 3 business days (Friday)") + giờ; Send reminder; Set to repeat; Task type · Priority · Queue · Assigned to; Notes → "Create" | Như HubSpot (preset ngày làm việc tự bỏ T7/CN, "Chọn ngày…") | Nhắc nhở & lặp lại cần job ở BE |
+| Ghi lại cuộc gọi | Contacted · Call outcome · Call direction · Activity date · nội dung → "Log call" | Như HubSpot. Nút "Gọi" gọi trực tiếp = ngoài phạm vi (cần tổng đài) | — |
+| Ghi lại / lên lịch cuộc họp | Log: Attendees · Outcome · Start time · Duration · nội dung. Schedule: cần kết nối lịch | "Ghi lại cuộc họp" như HubSpot; "Lên lịch cuộc họp" = cuộc họp tương lai có tiêu đề, kết quả "Đã lên lịch" (chưa đồng bộ lịch) | Đồng bộ Google/Outlook Calendar |
+| Tab timeline | All · Notes · Emails · Calls · Tasks · Meetings; mỗi tab có nút riêng (Log a call / Make a phone call, Log a meeting / Schedule a meeting…) | Như HubSpot | — |
+| Bộ lọc timeline | "Activity (x/y) ▾" theo nhóm Communication / Team activity / Updates, "All time ▾", "Activity assigned to ▾", "Clear all", "Collapse all ▾" | Như HubSpot (Giao tiếp / Hoạt động nhóm / Cập nhật: Hoạt động Deal, Thay đổi liên kết, Thay đổi thuộc tính, Tạo bản ghi) | — |
+| Thẻ hoạt động | Bấm để thu gọn/mở; "Actions ▾": Pin, Edit, History, Delete; "N associations ▾" | Như HubSpot: Ghim lên đầu, Sửa (mở lại cửa sổ soạn), Xem liên kết, Xoá; task tick hoàn thành ngay trên thẻ | Bình luận trên hoạt động: chưa làm |

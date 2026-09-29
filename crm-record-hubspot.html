@@ -149,7 +149,7 @@ else {
   function openFp(anchor, html, w = 260, alignRight = false) {
     const a = anchor.getBoundingClientRect(); fp.style.width = w + 'px'; fp.innerHTML = html;
     const left = alignRight ? a.right - w : a.left; fp.style.left = Math.max(8, Math.min(left, innerWidth - w - 8)) + 'px';
-    fp.classList.add('open'); const h = fp.offsetHeight; fp.style.top = (a.bottom + 4 + h > innerHeight - 8 ? Math.max(8, a.top - h - 4) : a.bottom + 4) + 'px';
+    fp.classList.add('open'); fp.dataset.at = Date.now(); const h = fp.offsetHeight; fp.style.top = (a.bottom + 4 + h > innerHeight - 8 ? Math.max(8, a.top - h - 4) : a.bottom + 4) + 'px';
     return fp;
   }
   const closeFp = () => fp.classList.remove('open');
@@ -271,7 +271,7 @@ else {
     const draw = q => { $('#moL', p).innerHTML = MORE.filter(m => !q || m[2].toLowerCase().includes(q)).map(([k, i, l]) => `<button class="mi" data-mo="${k}"><span class="ms sm">${i}</span>${l}${k[0] === '_' || k === 'EMAIL' ? '<span class="soonb">Ngoài GĐ2</span>' : ''}</button>`).join('') || '<div class="nil" style="padding:8px">Không có kết quả</div>'; };
     draw(''); $('#moQ', p).oninput = e => draw(e.target.value.trim().toLowerCase()); $('#moQ', p).focus();
   }
-  const openComposer = k => { goTab('act'); HXC.composer(T, ID, k, type => { tl.draw(); tl.show(type); drawCatchup(); drawProps(); }); };
+  const openComposer = (k, o = {}) => { goTab('act'); HXC.composer(T, ID, k, type => { tl.draw(); drawCatchup(); drawProps(); }, o); };
   function allProps() {
     const p = $('#panel');
     p.innerHTML = `<div class="pn-h"><h2>Tất cả thuộc tính</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
@@ -302,7 +302,7 @@ else {
     const km = e.target.closest('[data-keymenu]'); if (km) { e.stopPropagation(); fp.classList.contains('open') && fp.dataset.src === 'key' ? closeFp() : (openFp(km, keyMenu(), 260, true), fp.dataset.src = 'key'); return; }
     const t = e.target.closest('[data-toast]'); if (t) { toast(t.dataset.toast); closeFp(); return; }
     const qa = e.target.closest('[data-qa]');
-    if (qa) { const k = qa.dataset.qa; if (k === 'MORE') { e.stopPropagation(); moreMenu(qa); fp.dataset.src = 'more'; return; } openComposer(k); return; }
+    if (qa) { const k = qa.dataset.qa; if (k === 'MORE') { e.stopPropagation(); moreMenu(qa); fp.dataset.src = 'more'; return; } openComposer(k, k === 'MEETING' ? { schedule:true } : {}); return; }
     const mo = e.target.closest('[data-mo]'); if (mo) { closeFp(); const k = mo.dataset.mo; if (k[0] === '_') toast('Kênh này nằm ngoài phạm vi giai đoạn 2'); else openComposer(k); return; }
     const ca = e.target.closest('[data-createact]'); if (ca) { e.stopPropagation(); openFp(ca, [['NOTE','edit_note','Ghi chú'],['EMAIL','mail','Email'],['CALL','call','Cuộc gọi'],['TASK','task_alt','Task'],['MEETING','event','Cuộc họp']].map(([k, i, l]) => `<button class="mi" data-mo="${k}"><span class="ms sm">${i}</span>${l}</button>`).join(''), 200); fp.dataset.src = 'create'; return; }
     const cs = e.target.closest('[data-cusec]'); if (cs) { cuOpen[cs.dataset.cusec] = !cuOpen[cs.dataset.cusec]; drawCatchup(); return; }
@@ -336,7 +336,7 @@ else {
     if (!e.target.closest('#fpop')) closeFp();
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFp(); if (e.key === 'Enter' && e.target.id === 'askQ') toast('“Đặt câu hỏi” cần tích hợp AI — mockup chỉ hiển thị giao diện'); });
-  $('#grid').parentElement.addEventListener('scroll', closeFp);
+  $('#grid').parentElement.addEventListener('scroll', () => { if (Date.now() - (+fp.dataset.at || 0) > 400) closeFp(); });
 }
 </script>
 </body>

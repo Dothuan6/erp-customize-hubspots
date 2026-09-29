@@ -407,112 +407,220 @@ const HXC = (() => {
         confirmBox('Gỡ liên kết', `Gỡ liên kết giữa “${esc(titleOf(fromT, get(fromT, fromId)))}” và “${esc(titleOf(toT, r))}”? Hai bản ghi vẫn được giữ nguyên.`, 'Gỡ liên kết', () => { dissociate(fromT, fromId, toT, ul.dataset.unlink); refresh(); toast('Đã gỡ liên kết'); }); }
     };
   }
-  function place(pop, anchor, host) { const r = anchor.getBoundingClientRect(), h = host.getBoundingClientRect(); pop.style.left = Math.max(4, Math.min(r.left - h.left, h.width - 230)) + 'px'; pop.style.top = (r.bottom - h.top + 4) + 'px'; pop.style.right = 'auto'; }
+  function place(pop, anchor, host) { const r = anchor.getBoundingClientRect(), h = host.getBoundingClientRect(); const pw = parseInt(pop.style.width) || 230; pop.style.left = Math.max(4, Math.min(r.left - h.left, h.width - pw - 4)) + 'px'; pop.style.top = (r.bottom - h.top + 4) + 'px'; pop.style.right = 'auto'; }
   document.addEventListener('click', e => { if (!e.target.closest('.pop')) document.querySelectorAll('.card .pop.open, .tl .pop.open').forEach(p => p.classList.remove('open')); });
 
-  /* ── Timeline hoạt động (cột giữa) ── */
+  /* ── Timeline hoạt động (cột giữa) — clone tab Activities của HubSpot (khảo sát 29/09/2026) ──
+     Tab: Tất cả · Ghi chú · Emails · Cuộc gọi · Tasks · Cuộc họp; mỗi tab có nút tạo/ghi riêng.
+     Bộ lọc: Hoạt động (x/y) ▾ nhóm Giao tiếp / Hoạt động nhóm / Cập nhật · Mọi thời gian ▾ · Người thực hiện ▾ · Xoá tất cả.
+     Thẻ hoạt động: ghim · sửa · lịch sử liên kết · xoá; bấm để thu gọn / mở rộng. */
   const ICON = { NOTE:'sticky_note_2', TASK:'task_alt', MEETING:'event', CALL:'call', SYSTEM:'history', EMAIL:'mail' };
   const TNAME = { NOTE:'Ghi chú', TASK:'Task', MEETING:'Cuộc họp', CALL:'Cuộc gọi', SYSTEM:'Hoạt động hệ thống', EMAIL:'Email' };
   const TABS = [['ALL','Tất cả hoạt động'],['NOTE','Ghi chú'],['EMAIL','Emails'],['CALL','Cuộc gọi'],['TASK','Tasks'],['MEETING','Cuộc họp']];
+  // Loại chi tiết dùng cho bộ lọc "Hoạt động (x/y)"
+  const KIND_GROUPS = [['Giao tiếp', [['CALL','Cuộc gọi'],['EMAIL','Emails']]], ['Hoạt động nhóm', [['MEETING','Cuộc họp'],['NOTE','Ghi chú'],['TASK','Tasks']]],
+    ['Cập nhật', [['S_DEAL','Hoạt động Deal'],['S_ASSOC','Thay đổi liên kết'],['S_PROP','Thay đổi thuộc tính'],['S_CREATED','Tạo bản ghi']]]];
+  const ALL_KINDS = KIND_GROUPS.flatMap(g => g[1].map(k => k[0]));
+  const kindOf = a => a.type !== 'SYSTEM' ? a.type : a.title === 'Hoạt động Deal' ? 'S_DEAL' : a.title === 'Đã tạo' ? 'S_CREATED' : /liên kết/i.test(a.body || '') ? 'S_ASSOC' : 'S_PROP';
+  const RANGES = [[0,'Mọi thời gian'],[1,'Hôm nay'],[7,'7 ngày qua'],[30,'30 ngày qua'],[90,'90 ngày qua'],[365,'12 tháng qua']];
+  const PIN_KEY = 'hx-crm-pins-v1';
+  let PINS = {}; try { PINS = JSON.parse(localStorage.getItem(PIN_KEY) || '{}'); } catch {}
+  const savePins = () => { try { localStorage.setItem(PIN_KEY, JSON.stringify(PINS)); } catch {} };
+  const richOf = a => a.html || esc(a.body || '').replace(/\n/g, '<br>');
   function timeline(el, t, id, onChange = () => {}) {
-    const st = { tab:'ALL', q:'', range:0, types:new Set(['NOTE','TASK','MEETING','CALL','SYSTEM']), collapsed:false };
-    const refsName = a => { const out = []; (a.contacts || []).forEach(i => { const r = get('contact', i); if (r) out.push(fullName(r)); }); (a.companies || []).forEach(i => { const r = get('company', i); if (r) out.push(r.values.name); }); (a.deals || []).forEach(i => { const r = get('deal', i); if (r) out.push(HX.title(r)); }); return out; };
-    const card = a => {
-      const who = a.type === 'SYSTEM' ? '' : ` bởi <b>${esc(a.by)}</b>`;
-      const head = a.type === 'TASK' ? `<button class="tk ${a.done ? 'on' : ''}" data-done="${a.id}" aria-label="${a.done ? 'Đánh dấu chưa xong' : 'Đánh dấu hoàn thành'}"><span class="ms sm">${a.done ? 'check_circle' : 'radio_button_unchecked'}</span></button><b class="${a.done ? 'strike' : ''}">${esc(a.title || a.body)}</b>`
-        : a.type === 'MEETING' ? `<b>${esc(a.title || 'Cuộc họp')}</b>` : a.type === 'SYSTEM' && a.title ? `<b>${esc(a.title)}</b>${a.title === 'Hoạt động Deal' ? '<span class="ms xs" style="color:var(--on-surface-variant)">handshake</span>' : ''}` : `<b>${TNAME[a.type]}</b><span class="nil">${who}</span>`;
-      const meta = a.type === 'TASK' ? `<div class="tm">Hạn: <b>${a.due ? dOnly(a.due) : '—'}</b> · Ưu tiên: ${esc(a.prio || 'Không')} · Người làm: ${esc(a.assignee || a.by)}${!a.done && a.due && a.due < TODAY.toISOString().slice(0, 10) ? ' · <span class="od">Quá hạn</span>' : ''}</div>`
-        : a.type === 'MEETING' ? `<div class="tm">${dt(a.at)} · ${a.dur || 30} phút · Kết quả: <b>${esc(a.outcome || '—')}</b>${(a.attendees || []).length ? ' · Tham dự: ' + a.attendees.map(i => get('contact', i)).filter(Boolean).map(fullName).map(esc).join(', ') : ''}</div>`
-        : a.type === 'CALL' ? `<div class="tm">${esc(a.dir || 'Gọi đi')} · Kết quả: <b>${esc(a.outcome || '—')}</b></div>` : '';
-      const rn = refsName(a);
-      return `<article class="ta ${a.type === 'SYSTEM' ? 'sys' : ''}" data-aid="${a.id}"><div class="ta-h"><span class="ms sm ic">${ICON[a.type]}</span>${head}<time>${dt(a.at)}</time>
-          ${a.type === 'SYSTEM' ? '' : `<button class="btn btn--text btn--icon" data-amenu="${a.id}" aria-label="Tuỳ chọn hoạt động"><span class="ms sm">more_horiz</span></button>`}</div>
-        <div class="ta-b">${meta}${a.type === 'TASK' ? (a.body && a.body !== a.title ? `<p>${esc(a.body)}</p>` : '') : `<p>${esc(a.body || '')}</p>`}
-          ${rn.length > 1 ? `<div class="ta-f"><span class="ms xs">link</span>${rn.length} liên kết: ${rn.map(esc).join(', ')}</div>` : ''}</div></article>`;
+    const st = { tab:'ALL', q:'', range:0, kinds:new Set(ALL_KINDS), who:new Set(), collapsedAll:false, open:new Set(), closed:new Set() };
+    const pinKey = `${t}:${id}`;
+    const refsName = a => { const out = []; (a.contacts || []).forEach(i => { const r = get('contact', i); if (r) out.push(['contact', i, fullName(r)]); }); (a.companies || []).forEach(i => { const r = get('company', i); if (r) out.push(['company', i, r.values.name]); }); (a.deals || []).forEach(i => { const r = get('deal', i); if (r) out.push(['deal', i, HX.title(r)]); }); return out; };
+    const isOpen = a => st.collapsedAll ? st.open.has(a.id) : !st.closed.has(a.id);
+    const card = (a, pinned) => {
+      const sys = a.type === 'SYSTEM';
+      const head = a.type === 'TASK' ? `<button class="tk ${a.done ? 'on' : ''}" data-done="${a.id}" aria-label="${a.done ? 'Đánh dấu chưa xong' : 'Đánh dấu hoàn thành'}"><span class="ms sm">${a.done ? 'check_circle' : 'radio_button_unchecked'}</span></button><span class="ta-t"><b class="${a.done ? 'strike' : ''}">${esc(a.title || a.body)}</b></span>`
+        : sys ? `<span class="ta-t"><b>${esc(a.title || TNAME.SYSTEM)}</b>${a.title === 'Hoạt động Deal' ? '<span class="ms xs" style="color:var(--on-surface-variant)">handshake</span>' : ''}</span>`
+        : `<span class="ta-t"><b>${a.type === 'MEETING' ? esc(a.title || 'Cuộc họp') : TNAME[a.type]}</b><span class="nil"> bởi ${esc(a.by)}</span></span>`;
+      const meta = a.type === 'TASK' ? `<div class="tm"><span>Hạn: <b>${a.due ? dOnly(a.due) + (a.dueTime ? ' ' + a.dueTime : '') : '—'}</b>${!a.done && a.due && a.due < TODAY.toISOString().slice(0, 10) ? ' <span class="od">Quá hạn</span>' : ''}</span><span>Loại: <b>${esc(a.kind || 'To-do')}</b></span><span>Ưu tiên: <b>${esc(a.prio || 'Không')}</b></span><span>Người thực hiện: <b>${esc(a.assignee || a.by)}</b></span>${a.repeat ? '<span><span class="ms xs">repeat</span>Lặp lại</span>' : ''}</div>`
+        : a.type === 'MEETING' ? `<div class="tm"><span>Bắt đầu: <b>${dt(a.at)}</b></span><span>Thời lượng: <b>${a.dur || 30} phút</b></span><span>Kết quả: <b>${esc(a.outcome || '—')}</b></span>${(a.attendees || []).length ? `<span>Tham dự: <b>${a.attendees.map(i => get('contact', i)).filter(Boolean).map(fullName).map(esc).join(', ')}</b></span>` : ''}</div>`
+        : a.type === 'CALL' ? `<div class="tm"><span>Hướng: <b>${esc(a.dir || 'Gọi đi')}</b></span><span>Kết quả: <b>${esc(a.outcome || '—')}</b></span>${(a.contacted || []).length ? `<span>Đã liên hệ: <b>${a.contacted.map(i => get('contact', i)).filter(Boolean).map(fullName).map(esc).join(', ')}</b></span>` : ''}</div>` : '';
+      const rn = refsName(a), open = isOpen(a);
+      const text = a.type === 'TASK' ? (a.body && a.body !== a.title ? richOf(a) : '') : sys ? esc(a.body || '') : richOf(a);
+      return `<article class="ta ${sys ? 'sys' : ''} ${open ? '' : 'shut'} ${pinned ? 'pin' : ''}" data-aid="${a.id}">
+        ${pinned ? '<div class="ta-pin"><span class="ms xs">push_pin</span>Đã ghim</div>' : ''}
+        <div class="ta-h" data-tog="${a.id}"><span class="ms sm ic">${ICON[a.type]}</span>${head}<time>${dt(a.at)}</time>
+          ${sys ? '' : `<button class="btn btn--text sm ta-act" data-amenu="${a.id}" aria-label="Thao tác hoạt động">Thao tác<span class="ms xs">arrow_drop_down</span></button>`}</div>
+        <div class="ta-b">${meta}${text ? `<div class="ta-x">${text}</div>` : ''}
+          ${rn.length > 1 || !sys ? `<div class="ta-f"><button class="ta-as" data-asl="${a.id}"><span class="ms xs">link</span>${rn.length} liên kết<span class="ms xs">arrow_drop_down</span></button><span class="ta-asl" id="asl-${a.id}" hidden>${rn.map(([ty, i, n]) => `<a class="lk" href="${url(ty, i)}">${esc(n)}</a>`).join(' · ')}</span></div>` : ''}</div></article>`;
     };
     const draw = () => {
       let all = activitiesOf(t, id);
-      const total = all.length;
       if (st.tab !== 'ALL') all = all.filter(a => a.type === st.tab);
-      all = all.filter(a => st.types.has(a.type) || st.tab !== 'ALL');
-      if (st.range) all = all.filter(a => new Date(a.at) >= new Date(TODAY.getTime() - st.range * 864e5));
+      else all = all.filter(a => st.kinds.has(kindOf(a)));
+      if (st.range) { const d0 = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate()), from = st.range === 1 ? d0 : new Date(TODAY.getTime() - st.range * 864e5); all = all.filter(a => new Date(a.at) >= from); }
+      if (st.who.size) all = all.filter(a => st.who.has(a.type === 'TASK' ? (a.assignee || a.by) : a.by));
       if (st.q) all = all.filter(a => `${a.title || ''} ${a.body || ''} ${a.by || ''}`.toLowerCase().includes(st.q));
-      const up = all.filter(a => (a.type === 'TASK' && !a.done) || (a.type === 'MEETING' && a.at > TODAY.toISOString()));
-      const past = all.filter(a => !up.includes(a));
+      const pins = PINS[pinKey] || []; const pinned = all.filter(a => pins.includes(a.id));
+      const rest = all.filter(a => !pins.includes(a.id));
+      const up = rest.filter(a => (a.type === 'TASK' && !a.done) || (a.type === 'MEETING' && a.at > TODAY.toISOString()));
+      const past = rest.filter(a => !up.includes(a));
       const groups = []; past.forEach(a => { const m = monthLabel(a.at); const g = groups.find(x => x.m === m); g ? g.items.push(a) : groups.push({ m, items:[a] }); });
+      const ACT = { NOTE:[['NOTE','Tạo ghi chú']], CALL:[['CALL','Ghi lại cuộc gọi'],['_dial','Gọi điện']], TASK:[['TASK','Tạo task']], MEETING:[['MEETING','Ghi lại cuộc họp'],['MEETING_S','Lên lịch cuộc họp']], EMAIL:[['EMAIL','Ghi lại email'],['EMAIL','Soạn email']] }[st.tab] || [];
+      el.querySelector('#tlActs').innerHTML = ACT.map(([k, l]) => `<button class="btn btn--secondary sm" data-tlnew="${k}"><span class="ms xs">${k === 'NOTE' ? 'edit_note' : k.startsWith('CALL') || k === '_dial' ? 'call' : k === 'TASK' ? 'task_alt' : k.startsWith('MEETING') ? 'event' : 'mail'}</span>${l}</button>`).join('');
+      el.querySelector('#tlF').hidden = st.tab !== 'ALL';
       el.querySelector('.tl-body').innerHTML = (st.tab === 'EMAIL' ? `<div class="soon"><span class="ms">mail</span>Gửi và ghi email nằm ngoài phạm vi giai đoạn 2 (chờ khách chốt).</div>` : '')
-        + (up.length ? `<h4 class="tl-m">Sắp tới</h4>${up.map(card).join('')}` : '')
-        + groups.map(g => `<h4 class="tl-m">${g.m}</h4>${g.items.map(card).join('')}`).join('')
-        + (!all.length && st.tab !== 'EMAIL' ? `<div class="soon"><span class="ms">history</span>Chưa có hoạt động phù hợp.</div>` : '');
-      el.querySelector('#tlCount').textContent = `Hoạt động (${st.types.size}/5)`;
-      el.classList.toggle('collapsed', st.collapsed);
-      void total;
+        + (pinned.length ? pinned.map(a => card(a, true)).join('') : '')
+        + (up.length ? `<h4 class="tl-m">Sắp tới</h4>${up.map(a => card(a)).join('')}` : '')
+        + groups.map(g => `<h4 class="tl-m">${g.m}</h4>${g.items.map(a => card(a)).join('')}`).join('')
+        + (!all.length && st.tab !== 'EMAIL' ? `<div class="soon"><span class="ms">manage_search</span>${st.tab === 'ALL' ? 'Không có hoạt động phù hợp bộ lọc.' : `Chưa có ${TNAME[st.tab].toLowerCase()} nào.`}</div>` : '');
+      el.querySelector('#tlCount').textContent = `Hoạt động (${st.kinds.size}/${ALL_KINDS.length})`;
+      el.querySelector('#tlKx').hidden = st.kinds.size === ALL_KINDS.length;
+      el.querySelector('#tlRangeL').textContent = RANGES.find(r => r[0] === st.range)[1];
+      el.querySelector('#tlWhoL').textContent = st.who.size ? `Người thực hiện (${st.who.size})` : 'Người thực hiện';
+      el.querySelector('#tlClr').hidden = st.kinds.size === ALL_KINDS.length && !st.range && !st.who.size;
+      el.querySelector('#tlCol').innerHTML = `${st.collapsedAll ? 'Mở rộng tất cả' : 'Thu gọn tất cả'}<span class="ms xs">arrow_drop_down</span>`;
     };
     el.innerHTML = `<div class="tl-tabs" role="tablist">${TABS.map(([k, l]) => `<button role="tab" aria-selected="${k === 'ALL'}" data-tt="${k}">${l}</button>`).join('')}</div>
-      <div class="tl-tools"><label class="srch2"><input id="tlQ" placeholder="Tìm hoạt động" aria-label="Tìm hoạt động"><span class="ms sm">search</span></label>
-        <button class="btn btn--secondary sm" id="tlCol">Thu gọn tất cả</button></div>
-      <div class="tl-tools"><button class="fchip2" id="tlTypes"><span id="tlCount"></span><span class="ms xs">arrow_drop_down</span></button>
-        <select class="fchip2" id="tlRange" aria-label="Khoảng thời gian"><option value="0">Mọi thời gian</option><option value="7">7 ngày qua</option><option value="30">30 ngày qua</option><option value="90">90 ngày qua</option></select></div>
+      <div class="tl-tools"><label class="srch2 tl-q"><input id="tlQ" placeholder="Tìm hoạt động" aria-label="Tìm hoạt động"><span class="ms sm">search</span></label>
+        <span id="tlActs" class="tl-acts"></span><button class="btn btn--text sm" id="tlCol"></button></div>
+      <div class="tl-tools" id="tlF"><span class="fchip2"><button id="tlTypes"><span id="tlCount"></span><span class="ms xs">arrow_drop_down</span></button><button id="tlKx" aria-label="Bỏ lọc loại hoạt động"><span class="ms xs">close</span></button></span>
+        <button class="fchip2 ghost" id="tlRange"><span id="tlRangeL"></span><span class="ms xs">arrow_drop_down</span></button>
+        <button class="fchip2 ghost" id="tlWho"><span id="tlWhoL"></span><span class="ms xs">arrow_drop_down</span></button>
+        <button class="btn btn--text sm" id="tlClr">Xoá tất cả</button></div>
       <div class="tl-body"></div><div class="pop" id="tlPop"></div>`;
     el.classList.add('tl');
+    const pop = () => $('#tlPop', el);
+    const openPop = (anchor, html, w) => { const p = pop(); p.style.width = (w || 240) + 'px'; place(p, anchor, el); p.innerHTML = html; p.classList.add('open'); return p; };
     el.onclick = e => {
       const tb = e.target.closest('[data-tt]'); if (tb) { st.tab = tb.dataset.tt; el.querySelectorAll('[data-tt]').forEach(b => b.setAttribute('aria-selected', b === tb)); draw(); return; }
-      if (e.target.closest('#tlCol')) { st.collapsed = !st.collapsed; e.target.closest('#tlCol').textContent = st.collapsed ? 'Mở rộng tất cả' : 'Thu gọn tất cả'; draw(); return; }
-      if (e.target.closest('#tlTypes')) { const pop = $('#tlPop', el); place(pop, e.target.closest('#tlTypes'), el);
-        pop.innerHTML = `<div class="hd">Loại hoạt động</div>${['NOTE','TASK','MEETING','CALL','SYSTEM'].map(k => `<label class="mi"><input type="checkbox" data-ty="${k}" ${st.types.has(k) ? 'checked' : ''}>${TNAME[k]}</label>`).join('')}`; pop.classList.add('open'); e.stopPropagation(); return; }
-      const dn = e.target.closest('[data-done]'); if (dn) { const a = db.activities.find(x => x.id === dn.dataset.done); updateActivity(a.id, { done: !a.done }); toast(a.done ? 'Đã hoàn thành task' : 'Đã mở lại task'); draw(); onChange(); return; }
-      const am = e.target.closest('[data-amenu]'); if (am) { const pop = $('#tlPop', el); place(pop, am, el); pop.innerHTML = `<button class="mi" data-adel="${am.dataset.amenu}" style="color:var(--error)"><span class="ms sm">delete</span>Xoá hoạt động</button>`; pop.classList.add('open'); e.stopPropagation(); return; }
-      const ad = e.target.closest('[data-adel]'); if (ad) { $('#tlPop', el).classList.remove('open'); confirmBox('Xoá hoạt động', 'Xoá hoạt động này khỏi mọi bản ghi liên kết?', 'Xoá', () => { removeActivity(ad.dataset.adel); draw(); onChange(); toast('Đã xoá hoạt động'); }); }
+      const nw = e.target.closest('[data-tlnew]'); if (nw) { const k = nw.dataset.tlnew; if (k === '_dial') { toast('Gọi điện trực tiếp cần tổng đài (ngoài phạm vi) — dùng “Ghi lại cuộc gọi”'); return; }
+        composer(t, id, k === 'MEETING_S' ? 'MEETING' : k, () => { draw(); onChange(); }, k === 'MEETING_S' ? { schedule:true } : {}); return; }
+      if (e.target.closest('#tlCol')) { e.stopPropagation(); openPop(e.target.closest('#tlCol'), `<button class="mi" data-cl="all">${st.collapsedAll ? 'Mở rộng tất cả' : 'Thu gọn tất cả'}</button><div class="sep"></div><div class="hd">Hiển thị</div><button class="mi" data-cl="newest">Mới nhất trước</button>`, 200); return; }
+      const cl = e.target.closest('[data-cl]'); if (cl) { pop().classList.remove('open'); if (cl.dataset.cl === 'all') { st.collapsedAll = !st.collapsedAll; st.open.clear(); st.closed.clear(); } draw(); return; }
+      if (e.target.closest('#tlKx')) { st.kinds = new Set(ALL_KINDS); draw(); return; }
+      if (e.target.closest('#tlClr')) { st.kinds = new Set(ALL_KINDS); st.range = 0; st.who.clear(); draw(); return; }
+      if (e.target.closest('#tlTypes')) { e.stopPropagation();
+        const p = openPop(e.target.closest('#tlTypes'), `<label class="srch2" style="height:32px;margin-bottom:6px"><input id="tkQ" placeholder="Tìm"><span class="ms sm">search</span></label>
+          <label class="mi"><input type="checkbox" data-kall ${st.kinds.size === ALL_KINDS.length ? 'checked' : ''}><b>Chọn tất cả</b></label>
+          <div class="tk-g">${KIND_GROUPS.map(([g, ks]) => `<div><div class="hd">${g}</div>${ks.map(([k, l]) => `<label class="mi" data-kl="${l.toLowerCase()}"><input type="checkbox" data-ty="${k}" ${st.kinds.has(k) ? 'checked' : ''}>${l}</label>`).join('')}</div>`).join('')}</div>`, 520);
+        $('#tkQ', p).oninput = ev => p.querySelectorAll('[data-kl]').forEach(x => x.hidden = !x.dataset.kl.includes(ev.target.value.trim().toLowerCase())); return; }
+      if (e.target.closest('#tlRange')) { e.stopPropagation(); openPop(e.target.closest('#tlRange'), RANGES.map(([v, l]) => `<button class="mi ${st.range === v ? 'cur' : ''}" data-rg="${v}">${l}</button>`).join(''), 200); return; }
+      const rg = e.target.closest('[data-rg]'); if (rg) { st.range = Number(rg.dataset.rg); pop().classList.remove('open'); draw(); return; }
+      if (e.target.closest('#tlWho')) { e.stopPropagation(); openPop(e.target.closest('#tlWho'), `<div class="hd">Người thực hiện</div>${USERS.map(u => `<label class="mi"><input type="checkbox" data-who="${esc(u)}" ${st.who.has(u) ? 'checked' : ''}>${esc(u)}${u === ME ? ' (tôi)' : ''}</label>`).join('')}`, 240); return; }
+      const asl = e.target.closest('[data-asl]'); if (asl) { e.stopPropagation(); const s = el.querySelector('#asl-' + asl.dataset.asl); s.hidden = !s.hidden; return; }
+      const dn = e.target.closest('[data-done]'); if (dn) { e.stopPropagation(); const a = db.activities.find(x => x.id === dn.dataset.done); updateActivity(a.id, { done: !a.done }); toast(a.done ? 'Đã hoàn thành task' : 'Đã mở lại task'); draw(); onChange(); return; }
+      const am = e.target.closest('[data-amenu]'); if (am) { e.stopPropagation(); const aid = am.dataset.amenu, pinned = (PINS[pinKey] || []).includes(aid);
+        openPop(am, `<button class="mi" data-apin="${aid}"><span class="ms sm">push_pin</span>${pinned ? 'Bỏ ghim' : 'Ghim lên đầu'}</button><button class="mi" data-aedit="${aid}"><span class="ms sm">edit</span>Sửa</button>
+          <button class="mi" data-aasl="${aid}"><span class="ms sm">link</span>Xem liên kết</button><div class="sep"></div><button class="mi" data-adel="${aid}" style="color:var(--error)"><span class="ms sm">delete</span>Xoá</button>`, 200); return; }
+      const ap = e.target.closest('[data-apin]'); if (ap) { const l = PINS[pinKey] || []; PINS[pinKey] = l.includes(ap.dataset.apin) ? l.filter(x => x !== ap.dataset.apin) : [ap.dataset.apin]; savePins(); pop().classList.remove('open'); toast(l.includes(ap.dataset.apin) ? 'Đã bỏ ghim' : 'Đã ghim lên đầu timeline'); draw(); return; }
+      const ae = e.target.closest('[data-aedit]'); if (ae) { pop().classList.remove('open'); const a = db.activities.find(x => x.id === ae.dataset.aedit); composer(t, id, a.type, () => { draw(); onChange(); }, { edit:a }); return; }
+      const aa = e.target.closest('[data-aasl]'); if (aa) { pop().classList.remove('open'); const s = el.querySelector('#asl-' + aa.dataset.aasl); if (s) s.hidden = false; return; }
+      const ad = e.target.closest('[data-adel]'); if (ad) { pop().classList.remove('open'); confirmBox('Xoá hoạt động', 'Xoá hoạt động này khỏi mọi bản ghi liên kết? Không thể hoàn tác.', 'Xoá', () => { removeActivity(ad.dataset.adel); draw(); onChange(); toast('Đã xoá hoạt động'); }); return; }
+      const tg = e.target.closest('[data-tog]'); if (tg && !e.target.closest('button,a')) { const aid = tg.dataset.tog; const a = { id: aid };
+        if (isOpen(a)) { st.open.delete(aid); st.closed.add(aid); } else { st.closed.delete(aid); st.open.add(aid); } draw(); return; }
+      if (!e.target.closest('#tlPop')) pop().classList.remove('open');
     };
-    el.addEventListener('change', e => { const ty = e.target.dataset.ty; if (ty) { e.target.checked ? st.types.add(ty) : st.types.delete(ty); draw(); } if (e.target.id === 'tlRange') { st.range = Number(e.target.value); draw(); } });
+    el.addEventListener('change', e => { const ty = e.target.dataset.ty; if (ty) { e.target.checked ? st.kinds.add(ty) : st.kinds.delete(ty); const all = el.querySelector('[data-kall]'); if (all) all.checked = st.kinds.size === ALL_KINDS.length; draw(); }
+      if (e.target.dataset.kall !== undefined) { st.kinds = e.target.checked ? new Set(ALL_KINDS) : new Set(); el.querySelectorAll('[data-ty]').forEach(x => x.checked = e.target.checked); draw(); }
+      const w = e.target.dataset.who; if (w) { e.target.checked ? st.who.add(w) : st.who.delete(w); draw(); } });
+    document.addEventListener('click', e => { if (!el.contains(e.target)) pop().classList.remove('open'); });
     el.querySelector('#tlQ').oninput = e => { st.q = e.target.value.trim().toLowerCase(); draw(); };
     draw();
     return { draw, show: tab => { const b = el.querySelector(`[data-tt="${tab}"]`); b && b.click(); } };
   }
 
-  /* ── Cửa sổ soạn hoạt động (góc phải dưới như HubSpot) ── */
-  function composer(t, id, type, onSaved) {
+  /* ── Cửa sổ soạn hoạt động — clone composer HubSpot (Note / Task / Log call / Log meeting) ──
+     ⌄ thu gọn · ⛶ phóng to · ✕ | "Cho: [bản ghi]" | soạn thảo có B I U · danh sách | "Liên kết với N bản ghi ▾" (bỏ chọn được)
+     | ☐ Tạo task [To-do ▾] để theo dõi sau [3 ngày làm việc ▾] | nút Tạo / Ghi lại. opts: { edit: activity } để sửa, { schedule:true } để lên lịch họp. */
+  const bizDays = n => { let d = new Date(TODAY); let k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() % 6 !== 0) k++; } return d; };
+  const WD = ['Chủ nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+  const ymd = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
+  const DUE_P = () => [['0','Hôm nay', ymd(TODAY)], ['1','Ngày mai', ymd(new Date(TODAY.getTime() + 864e5))], ['b2','Sau 2 ngày làm việc', ymd(bizDays(2))], ['b3',`Sau 3 ngày làm việc (${WD[bizDays(3).getDay()]})`, ymd(bizDays(3))],
+    ['w1','Sau 1 tuần', ymd(new Date(TODAY.getTime() + 7 * 864e5))], ['w2','Sau 2 tuần', ymd(new Date(TODAY.getTime() + 14 * 864e5))], ['m1','Sau 1 tháng', ymd(new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, TODAY.getDate()))], ['c','Chọn ngày…', '']];
+  const OK_TAGS = ['B','STRONG','I','EM','U','BR','DIV','P','UL','OL','LI'];
+  function cleanHtml(node) { return [...node.childNodes].map(n => n.nodeType === 3 ? esc(n.textContent) : n.nodeType === 1 ? (OK_TAGS.includes(n.tagName) ? (n.tagName === 'BR' ? '<br>' : `<${n.tagName.toLowerCase()}>${cleanHtml(n)}</${n.tagName.toLowerCase()}>`) : cleanHtml(n)) : '').join(''); }
+  const nowLocal = () => { const d = new Date(); return `${ymd(d)}T${p2(d.getHours())}:${p2(d.getMinutes())}`; };
+  function composer(t, id, type, onSaved, opts = {}) {
     if (type === 'EMAIL') { toast('Gửi / ghi email nằm ngoài phạm vi giai đoạn 2'); return; }
     document.querySelector('.composer')?.remove();
-    const refs = autoRefs(t, id);
-    const ctx = t === 'deal' ? assoc.contactsOfDeal(id) : t === 'company' ? assoc.contactsOfCompany(id) : [get('contact', id)];
-    const today = TODAY.toISOString().slice(0, 10);
-    const F = {
-      NOTE: `<textarea class="in" id="cmBody" rows="6" placeholder="Bắt đầu ghi chú…"></textarea>`,
-      TASK: `<input class="in" id="cmTitle" placeholder="Nhập tên task"><div class="cm-row"><label>Ngày đến hạn<input class="in" type="date" id="cmDue" value="${addDays(TODAY.toISOString(), 3).slice(0, 10)}"></label>
-        <label>Loại<select class="in" id="cmKind"><option>To-do</option><option>Gọi điện</option><option>Email</option></select></label><label>Ưu tiên<select class="in" id="cmPrio"><option>Không</option><option>Thấp</option><option selected>Trung bình</option><option>Cao</option></select></label></div>
-        <label>Người thực hiện<select class="in" id="cmAs">${USERS.map(u => `<option ${u === ME ? 'selected' : ''}>${u}</option>`).join('')}</select></label><textarea class="in" id="cmBody" rows="3" placeholder="Ghi chú…"></textarea>`,
-      MEETING: `<input class="in" id="cmTitle" placeholder="Tiêu đề cuộc họp"><div class="cm-row"><label>Ngày<input class="in" type="date" id="cmDay" value="${today}"></label><label>Giờ<input class="in" type="time" id="cmTime" value="10:00"></label>
-        <label>Thời lượng<select class="in" id="cmDur"><option>15</option><option selected>30</option><option>45</option><option>60</option><option>90</option></select></label></div>
-        <label>Kết quả<select class="in" id="cmOut"><option>Đã lên lịch</option><option>Đã hoàn thành</option><option>Đổi lịch</option><option>Không đến</option><option>Huỷ</option></select></label>
-        <div class="cm-att"><b>Người tham dự</b>${ctx.filter(Boolean).map(c => `<label><input type="checkbox" value="${c.id}" checked>${esc(fullName(c))}</label>`).join('') || '<span class="nil">Chưa có contact liên kết</span>'}</div>
-        <textarea class="in" id="cmBody" rows="3" placeholder="Mô tả…"></textarea>`,
-      CALL: `<div class="cm-row"><label>Kết quả cuộc gọi<select class="in" id="cmOut"><option>Đã kết nối</option><option>Bận</option><option>Không nghe máy</option><option>Để lại tin nhắn</option><option>Sai số</option></select></label>
-        <label>Hướng<select class="in" id="cmDir"><option>Gọi đi</option><option>Gọi đến</option></select></label></div><div class="cm-row"><label>Ngày<input class="in" type="date" id="cmDay" value="${today}"></label><label>Giờ<input class="in" type="time" id="cmTime" value="${p2(new Date().getHours())}:${p2(new Date().getMinutes())}"></label></div>
-        <textarea class="in" id="cmBody" rows="4" placeholder="Mô tả cuộc gọi…"></textarea>`,
+    const ed = opts.edit || null;
+    const base = ed ? { contacts:[...(ed.contacts || [])], companies:[...(ed.companies || [])], deals:[...(ed.deals || [])] } : autoRefs(t, id);
+    const recs = [...base.contacts.map(i => ['contact', i]), ...base.companies.map(i => ['company', i]), ...base.deals.map(i => ['deal', i])].filter(([ty, i]) => get(ty, i));
+    const on = new Set(recs.map(([ty, i]) => ty + ':' + i));
+    const people = (t === 'deal' ? assoc.contactsOfDeal(id) : t === 'company' ? assoc.contactsOfCompany(id) : [get('contact', id)]).filter(Boolean);
+    const self = get(t, id);
+    const sel = (idd, list, cur) => `<select class="cm-sel" id="${idd}">${list.map(o => `<option ${o === cur ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+    const pplPick = (idd, label, chosen) => `<div class="cm-f"><label>${label}</label><button class="cm-pp" data-pp="${idd}"><span id="${idd}N">${chosen.length} contact</span><span class="ms xs">arrow_drop_down</span></button><div class="cm-ppl" id="${idd}" hidden>${people.map(c => `<label><input type="checkbox" value="${c.id}" ${chosen.includes(c.id) ? 'checked' : ''}>${esc(fullName(c))}</label>`).join('') || '<span class="nil">Chưa có contact liên kết</span>'}</div></div>`;
+    const follow = ed ? '' : `<div class="cm-fu"><label><input type="checkbox" id="fuOn"> Tạo task</label>${sel('fuKind', ['To-do','Gọi điện','Email'], 'To-do')}<span>để theo dõi sau</span><select class="cm-sel" id="fuDue">${DUE_P().filter(d => d[0] !== 'c' && d[0] !== '0').map(d => `<option value="${d[2]}" ${d[0] === 'b3' ? 'selected' : ''}>${d[1]}</option>`).join('')}</select></div>`;
+    const editor = ph => `<div class="cm-ed" contenteditable="true" id="cmBody" data-ph="${ph}">${ed ? richOf(ed) : ''}</div>
+      <div class="cm-tb" role="toolbar" aria-label="Định dạng"><button data-x="bold" aria-label="Đậm"><b>B</b></button><button data-x="italic" aria-label="Nghiêng"><i>I</i></button><button data-x="underline" aria-label="Gạch chân"><u>U</u></button><button data-x="removeFormat" aria-label="Xoá định dạng"><span class="ms xs">format_clear</span></button><span class="sp"></span>
+        <button data-x="insertUnorderedList" aria-label="Danh sách"><span class="ms xs">format_list_bulleted</span></button><button data-x="insertOrderedList" aria-label="Danh sách số"><span class="ms xs">format_list_numbered</span></button><span class="sp"></span>
+        <button data-tbt="Chèn liên kết (mockup)" aria-label="Liên kết"><span class="ms xs">link</span></button><button data-tbt="Đính kèm tệp — dùng trường Tệp của ERP (sắp có)" aria-label="Đính kèm"><span class="ms xs">attach_file</span></button></div>`;
+    const dueSel = () => { const cur = ed && ed.due; return `<select class="cm-sel" id="cmDueP">${DUE_P().map(d => `<option value="${d[0]}" ${cur ? (d[0] === 'c' ? 'selected' : '') : d[0] === 'b3' ? 'selected' : ''}>${d[1]}</option>`).join('')}</select><input class="cm-in sm" type="date" id="cmDue" value="${cur || ymd(bizDays(3))}" ${cur ? '' : 'hidden'}>`; };
+    const toLocal = iso => { const d = new Date(iso); return `${ymd(d)}T${p2(d.getHours())}:${p2(d.getMinutes())}`; };
+    const B = {
+      NOTE: editor('Bắt đầu nhập để ghi chú…'),
+      TASK: `<input class="cm-title" id="cmTitle" placeholder="Nhập tên task" value="${esc(ed ? ed.title || '' : '')}">
+        <div class="cm-grid"><div class="cm-f"><label>Ngày thực hiện</label><div class="cm-inl">${dueSel()}<input class="cm-in sm" type="time" id="cmDueT" value="${ed && ed.dueTime || '08:00'}"></div></div>
+          <div class="cm-f"><label>Gửi nhắc nhở</label>${sel('cmRem', ['Không nhắc','Vào lúc đến hạn','30 phút trước','1 giờ trước','1 ngày trước'], ed && ed.reminder || 'Không nhắc')}</div></div>
+        <label class="cm-chk"><input type="checkbox" id="cmRep" ${ed && ed.repeat ? 'checked' : ''}> Lặp lại</label>
+        <div class="cm-grid4"><div class="cm-f"><label>Loại task</label>${sel('cmKind', ['To-do','Gọi điện','Email'], ed && ed.kind || 'To-do')}</div><div class="cm-f"><label>Ưu tiên</label>${sel('cmPrio', ['Không','Thấp','Trung bình','Cao'], ed && ed.prio || 'Không')}</div>
+          <div class="cm-f"><label>Hàng đợi</label>${sel('cmQ', ['Không'], 'Không')}</div><div class="cm-f"><label>Người thực hiện</label>${sel('cmAs', USERS, ed && ed.assignee || ME)}</div></div>
+        ${editor('Ghi chú…')}`,
+      CALL: `<div class="cm-grid3">${pplPick('cmWho', 'Đã liên hệ', ed ? ed.contacted || [] : people.slice(0, 1).map(c => c.id))}<div class="cm-f"><label>Kết quả cuộc gọi</label>${sel('cmOut', ['Chọn kết quả','Đã kết nối','Bận','Không nghe máy','Để lại tin nhắn thoại','Để lại tin nhắn trực tiếp','Sai số'], ed && ed.outcome || 'Chọn kết quả')}</div>
+          <div class="cm-f"><label>Hướng cuộc gọi</label>${sel('cmDir', ['Chọn hướng','Gọi đi','Gọi đến'], ed && ed.dir || 'Chọn hướng')}</div></div>
+        <div class="cm-f"><label>Thời điểm</label><input class="cm-in" type="datetime-local" id="cmAt" value="${ed ? toLocal(ed.at) : nowLocal()}"></div>${editor('Bắt đầu nhập để ghi lại cuộc gọi…')}`,
+      MEETING: `${opts.schedule || (ed && ed.title) ? `<input class="cm-title" id="cmTitle" placeholder="Tiêu đề cuộc họp" value="${esc(ed ? ed.title || '' : '')}">` : ''}
+        <div class="cm-grid3">${pplPick('cmWho', 'Người tham dự', ed ? ed.attendees || [] : people.map(c => c.id))}<div class="cm-f"><label>Kết quả cuộc họp</label>${sel('cmOut', ['Chọn kết quả','Đã lên lịch','Đã hoàn thành','Đổi lịch','Không đến','Huỷ'], ed ? ed.outcome : opts.schedule ? 'Đã lên lịch' : 'Chọn kết quả')}</div>
+          <div class="cm-f"><label>Bắt đầu</label><input class="cm-in" type="datetime-local" id="cmAt" value="${ed ? toLocal(ed.at) : opts.schedule ? ymd(new Date(TODAY.getTime() + 864e5)) + 'T10:00' : nowLocal()}"></div></div>
+        <div class="cm-f" style="max-width:180px"><label>Thời lượng</label>${sel('cmDur', ['15 phút','30 phút','45 phút','1 giờ','1 giờ 30 phút','2 giờ'], ed ? ({15:'15 phút',30:'30 phút',45:'45 phút',60:'1 giờ',90:'1 giờ 30 phút',120:'2 giờ'})[ed.dur] || '30 phút' : opts.schedule ? '30 phút' : '15 phút')}</div>${editor('Bắt đầu nhập để ghi lại cuộc họp…')}`,
     };
-    const names = [...refs.contacts.map(i => get('contact', i)).filter(Boolean).map(fullName), ...refs.companies.map(i => get('company', i)).filter(Boolean).map(c => c.values.name), ...refs.deals.map(i => get('deal', i)).filter(Boolean).map(HX.title)];
-    const w = document.createElement('section'); w.className = 'composer'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-label', TNAME[type]);
-    w.innerHTML = `<header><span class="ms sm">${ICON[type]}</span><b>${type === 'CALL' ? 'Ghi lại cuộc gọi' : type === 'MEETING' ? 'Ghi lại / lên lịch cuộc họp' : type === 'TASK' ? 'Tạo task' : 'Ghi chú'}</b><button class="btn btn--text btn--icon" data-cmx aria-label="Đóng"><span class="ms sm">close</span></button></header>
-      <div class="cm-b field-form">${F[type]}<div class="cm-assoc"><span class="ms xs">link</span>Liên kết với ${names.length} bản ghi: ${names.map(esc).join(', ')}</div><p class="err" id="cmErr"></p></div>
-      <footer><button class="btn btn--primary" id="cmSave">${type === 'TASK' ? 'Tạo' : type === 'NOTE' ? 'Lưu ghi chú' : 'Lưu'}</button><button class="btn btn--text" data-cmx>Huỷ</button></footer>`;
+    const TITLE = { NOTE:'Ghi chú', TASK:'Task', CALL:'Ghi lại cuộc gọi', MEETING: opts.schedule ? 'Lên lịch cuộc họp' : 'Ghi lại cuộc họp' };
+    const BTN = { NOTE:'Tạo ghi chú', TASK:'Tạo', CALL:'Ghi lại cuộc gọi', MEETING: opts.schedule ? 'Lưu lịch họp' : 'Ghi lại cuộc họp' };
+    const w = document.createElement('section'); w.className = 'composer'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-label', TITLE[type]);
+    const assocHtml = () => `<button class="cm-as" data-cmas>Liên kết với ${on.size} bản ghi<span class="ms xs">arrow_drop_down</span></button><div class="cm-asl" id="cmAsl" hidden>${recs.map(([ty, i]) => `<label><input type="checkbox" data-rk="${ty}:${i}" ${on.has(ty + ':' + i) ? 'checked' : ''}><span class="ms xs">${OBJ[ty].icon}</span>${esc(titleOf(ty, get(ty, i)))}<small class="nil">${OBJ[ty].label}</small></label>`).join('')}</div>`;
+    w.innerHTML = `<header><button class="cm-hb" data-cmmin aria-label="Thu gọn"><span class="ms sm">expand_more</span></button><b>${ed ? 'Sửa ' + TNAME[type].toLowerCase() : TITLE[type]}</b>
+        <button class="cm-hb" data-cmmax aria-label="Phóng to" style="margin-left:auto"><span class="ms sm">open_in_full</span></button><button class="cm-hb" data-cmx aria-label="Đóng"><span class="ms sm">close</span></button></header>
+      <div class="cm-body">${type === 'NOTE' ? `<div class="cm-for">Cho <span class="tag">${esc(titleOf(t, self))}</span></div>` : ''}<div class="cm-b">${B[type]}<p class="err" id="cmErr"></p></div>
+        <div class="cm-assoc" id="cmAssoc">${assocHtml()}</div>${follow}
+        <footer><button class="btn btn--primary" id="cmSave">${ed ? 'Lưu' : BTN[type]}</button>${ed ? '<button class="btn btn--text" data-cmx>Huỷ</button>' : ''}</footer></div>`;
     document.body.appendChild(w);
     const v = s => { const e = w.querySelector(s); return e ? e.value.trim() : ''; };
-    w.querySelector('.in').focus();
+    (w.querySelector('#cmTitle') || w.querySelector('#cmBody')).focus();
+    const dirty = () => !!(w.querySelector('#cmBody')?.innerText.trim() || v('#cmTitle'));
+    const close = () => { if (!ed && dirty()) { confirmBox('Bỏ nội dung đang soạn?', 'Nội dung chưa lưu sẽ mất.', 'Bỏ', () => w.remove()); } else w.remove(); };
+    w.addEventListener('mousedown', e => { if (e.target.closest('[data-x]')) e.preventDefault(); });
     w.onclick = e => {
-      if (e.target.closest('[data-cmx]')) { w.remove(); return; }
+      const x = e.target.closest('[data-x]'); if (x) { document.execCommand(x.dataset.x); w.querySelector('#cmBody').focus(); return; }
+      const tbt = e.target.closest('[data-tbt]'); if (tbt) { toast(tbt.dataset.tbt); return; }
+      if (e.target.closest('[data-cmx]')) { close(); return; }
+      if (e.target.closest('[data-cmmin]')) { w.classList.toggle('min'); return; }
+      if (e.target.closest('[data-cmmax]')) { w.classList.toggle('max'); return; }
+      if (e.target.closest('.composer.min header')) { w.classList.remove('min'); return; }
+      if (e.target.closest('[data-cmas]')) { const l = w.querySelector('#cmAsl'); l.hidden = !l.hidden; return; }
+      const pp = e.target.closest('[data-pp]'); if (pp) { const l = w.querySelector('#' + pp.dataset.pp); l.hidden = !l.hidden; return; }
       if (!e.target.closest('#cmSave')) return;
-      const body = v('#cmBody'), title = v('#cmTitle');
-      if (type === 'NOTE' && !body) { w.querySelector('#cmErr').textContent = 'Nhập nội dung ghi chú'; return; }
-      if ((type === 'TASK' || type === 'MEETING') && !title) { w.querySelector('#cmErr').textContent = type === 'TASK' ? 'Nhập tên task' : 'Nhập tiêu đề cuộc họp'; w.querySelector('#cmTitle').focus(); return; }
-      const at = (type === 'MEETING' || type === 'CALL') ? new Date(`${v('#cmDay')}T${v('#cmTime') || '09:00'}:00+07:00`).toISOString() : new Date().toISOString();
-      const a = { type, at, body, ...refs };
-      if (type === 'TASK') Object.assign(a, { title, due: v('#cmDue'), prio: v('#cmPrio'), kind: v('#cmKind'), assignee: v('#cmAs'), done:false });
-      if (type === 'MEETING') Object.assign(a, { title, dur: Number(v('#cmDur')), outcome: v('#cmOut'), attendees: [...w.querySelectorAll('.cm-att input:checked')].map(i => i.value) });
-      if (type === 'CALL') Object.assign(a, { outcome: v('#cmOut'), dir: v('#cmDir') });
-      addActivity(a); w.remove(); toast(`Đã lưu ${TNAME[type].toLowerCase()}`); onSaved && onSaved(type);
+      const bodyEl = w.querySelector('#cmBody'), body = bodyEl ? bodyEl.innerText.trim() : '', html = bodyEl ? cleanHtml(bodyEl) : '', title = v('#cmTitle');
+      const err = m => { w.querySelector('#cmErr').textContent = m; };
+      if (type === 'NOTE' && !body) { err('Nhập nội dung ghi chú'); bodyEl.focus(); return; }
+      if (type === 'TASK' && !title) { err('Nhập tên task'); w.querySelector('#cmTitle').focus(); return; }
+      if (w.querySelector('#cmTitle') && type === 'MEETING' && opts.schedule && !title) { err('Nhập tiêu đề cuộc họp'); w.querySelector('#cmTitle').focus(); return; }
+      if (!on.size) { err('Chọn ít nhất 1 bản ghi để liên kết'); return; }
+      const refs = { contacts:[], companies:[], deals:[] }; [...on].forEach(k => { const [ty, i] = k.split(':'); refs[ty === 'contact' ? 'contacts' : ty === 'company' ? 'companies' : 'deals'].push(i); });
+      const at = (type === 'MEETING' || type === 'CALL') ? new Date(v('#cmAt')).toISOString() : ed ? ed.at : new Date().toISOString();
+      const pick = idd => [...w.querySelectorAll('#' + idd + ' input:checked')].map(i => i.value);
+      const clean = s => /^Chọn /.test(s) ? '' : s;
+      const a = { type, at, body, html, ...refs };
+      if (type === 'TASK') { const dp = v('#cmDueP'); Object.assign(a, { title, due: dp === 'c' ? v('#cmDue') : DUE_P().find(d => d[0] === dp)[2], dueTime: v('#cmDueT'), reminder: v('#cmRem'), repeat: w.querySelector('#cmRep').checked, prio: v('#cmPrio'), kind: v('#cmKind'), assignee: v('#cmAs'), done: ed ? ed.done : false }); }
+      if (type === 'MEETING') Object.assign(a, { title: title || (ed && ed.title) || '', dur: ({'15 phút':15,'30 phút':30,'45 phút':45,'1 giờ':60,'1 giờ 30 phút':90,'2 giờ':120})[v('#cmDur')], outcome: clean(v('#cmOut')), attendees: pick('cmWho') });
+      if (type === 'CALL') Object.assign(a, { outcome: clean(v('#cmOut')), dir: clean(v('#cmDir')), contacted: pick('cmWho') });
+      if (ed) { updateActivity(ed.id, a); w.remove(); toast('Đã lưu thay đổi'); onSaved && onSaved(type); return; }
+      addActivity(a);
+      if (w.querySelector('#fuOn')?.checked) addActivity({ type:'TASK', at:new Date().toISOString(), title:`Theo dõi: ${TNAME[type].toLowerCase()} với ${titleOf(t, self)}`, body:'', due: v('#fuDue'), dueTime:'08:00', kind: v('#fuKind'), prio:'Không', assignee: ME, done:false, ...refs });
+      w.remove(); toast(`Đã lưu ${TNAME[type].toLowerCase()}${w.querySelector('#fuOn')?.checked ? ' + task theo dõi' : ''}`); onSaved && onSaved(type);
     };
-    w.onkeydown = e => { if (e.key === 'Escape') w.remove(); };
+    w.onchange = e => {
+      const rk = e.target.dataset.rk; if (rk) { e.target.checked ? on.add(rk) : on.delete(rk); w.querySelector('[data-cmas]').innerHTML = `Liên kết với ${on.size} bản ghi<span class="ms xs">arrow_drop_down</span>`; }
+      if (e.target.id === 'cmDueP') w.querySelector('#cmDue').hidden = e.target.value !== 'c';
+      const pl = e.target.closest('.cm-ppl'); if (pl) w.querySelector('#' + pl.id + 'N').textContent = `${pl.querySelectorAll('input:checked').length} contact`;
+    };
+    w.onkeydown = e => { if (e.key === 'Escape') close(); if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') w.querySelector('#cmSave').click(); };
   }
 
   /* ── Line items: card + trình sửa ── */

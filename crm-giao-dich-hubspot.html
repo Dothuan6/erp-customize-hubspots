@@ -484,7 +484,7 @@ function nextCell(r){ const n = nextLabel(r);
 function schedPop(btn, id){ const pop = $('#fPop'); closePops(pop); const br = btn.getBoundingClientRect(), fr = document.querySelector('.frame').getBoundingClientRect();
   pop.style.width = '220px'; pop.style.left = Math.min(br.left - fr.left, fr.width - 228) + 'px'; pop.style.top = (br.bottom - fr.top + 4) + 'px'; pop.onchange = null;
   pop.innerHTML = `<button class="mi" data-sc="MEETING"><span class="ms sm">event</span>Lên lịch cuộc họp</button><button class="mi" data-sc="TASK"><span class="ms sm">task_alt</span>Tạo task</button>`;
-  pop.onclick = e => { e.stopPropagation(); const b = e.target.closest('[data-sc]'); if (b) { pop.classList.remove('open'); HXC.composer('deal', id, b.dataset.sc, () => { renderAll(); toast('Đã lưu vào Deal và các bản ghi liên kết'); }); } };
+  pop.onclick = e => { e.stopPropagation(); const b = e.target.closest('[data-sc]'); if (b) { pop.classList.remove('open'); HXC.composer('deal', id, b.dataset.sc, () => renderAll(), b.dataset.sc === 'MEETING' ? { schedule:true } : {}); } };
   pop.classList.add('open'); }
 const XO = [['contact','Contacts'],['company','Companies']];
 function expandRow(r, span){ const t = st.exp[r.id], ol = XO.find(x => x[0] === t)[1], rel = HXC.related('deal', r.id, t);
@@ -589,7 +589,7 @@ $('#body').addEventListener('click', e => {
   const ex = e.target.closest('[data-exp]'); if (ex) { e.stopPropagation(); const id = ex.dataset.exp; if (st.exp[id]) { delete st.exp[id]; renderTable(); } else expandPop(ex, id); return; }
   const xs = e.target.closest('[data-xswitch]'); if (xs) { e.stopPropagation(); expandPop(xs, xs.dataset.xswitch); return; }
   const sc = e.target.closest('[data-sched]'); if (sc) { e.stopPropagation(); schedPop(sc, sc.dataset.sched); return; }
-  const kq = e.target.closest('[data-kq]'); if (kq) { e.stopPropagation(); HXC.composer('deal', kq.dataset.id, kq.dataset.kq, () => { renderAll(); toast('Đã lưu hoạt động'); }); return; }
+  const kq = e.target.closest('[data-kq]'); if (kq) { e.stopPropagation(); HXC.composer('deal', kq.dataset.id, kq.dataset.kq, () => renderAll()); return; }
   if (e.target.closest('.xrow')) return;
   if (e.target.closest('a[href]')) return;
   if (e.target.closest('#colBtn')) { e.stopPropagation(); $('#colPop').classList.contains('open') ? $('#colPop').classList.remove('open') : openColPop(); return; }

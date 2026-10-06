@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="vi" data-brand="crm">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design System HubSpot — HarnexAI CRM (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0..1,0&display=block" rel="stylesheet">
+<script>/* Chỉ hiện icon khi font Material Symbols đã tải xong, tránh lộ tên icon ("edit", "call"…) lúc tải lại trang */
+(function(){var d=document,n=0;function ok(){d.documentElement.classList.add('icons-ready')}
+function go(){if(!d.fonts||!d.fonts.load)return ok();d.fonts.load('20px "Material Symbols Outlined"').then(function(r){r&&r.length?ok():retry()},retry)}
+function retry(){if(n++<120)setTimeout(go,250)}
+d.readyState==='loading'?d.addEventListener('DOMContentLoaded',go):go()})();</script>
+<link rel="stylesheet" href="crm-shared.css">
+<style>
+/* ═══ Trang tham chiếu trực quan cho DESIGN-SYSTEM-HUBSPOT.md ═══
+   Mọi mẫu dưới đây dùng đúng class của prototype (crm-shared.css + CSS các màn crm-*.html).
+   Bảng token đọc giá trị thật bằng getComputedStyle ⇒ đổi "⚙ Giao diện" (gốc / HubSpot / tối) là thấy ngay. */
+.frame{overflow:auto}
+.frame>*{flex:none}
+.ds{display:grid;grid-template-columns:1fr;min-height:100%}
+@media(min-width:1100px){.ds{grid-template-columns:220px minmax(0,1fr)}}
+.toc{display:none;position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto;padding:20px 12px;border-right:1px solid var(--outline-variant)}
+@media(min-width:1100px){.toc{display:block}}
+.toc a{display:block;padding:6px 10px;border-radius:var(--radius-md);font-size:13px;color:var(--on-surface-variant)}
+.toc a:hover{background:var(--surface-2);color:var(--on-surface)}
+.toc a.on{background:var(--primary-container);color:var(--on-primary-container);font-weight:600}
+.toc b{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--on-surface-variant);padding:4px 10px 8px}
+.ct{padding:20px 16px 64px;max-width:1180px;min-width:0}
+@media(min-width:905px){.ct{padding:24px 32px 80px}}
+.hero h1{font-size:24px;font-weight:600}
+.hero p{color:var(--on-surface-variant);max-width:760px;margin-top:6px}
+.hero .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+section.s{padding-top:36px;scroll-margin-top:8px}
+section.s>h2{font-size:20px;font-weight:600;display:flex;align-items:baseline;gap:10px}
+section.s>h2 small{font-size:12px;font-weight:600;color:var(--on-surface-variant)}
+section.s>p.d{color:var(--on-surface-variant);font-size:13px;margin:4px 0 14px;max-width:820px}
+.box{border:1px solid var(--outline-variant);border-radius:var(--radius-lg);background:var(--surface);overflow:hidden}
+.box+.box{margin-top:12px}
+.bh{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--outline-variant);font-size:12px;color:var(--on-surface-variant);flex-wrap:wrap}
+.bh b{color:var(--on-surface);font-size:13px}
+.bh code,.spec code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;background:var(--surface-2);padding:1px 6px;border-radius:4px;color:var(--on-surface)}
+.bh .r{margin-left:auto}
+.bb{padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.bb.col{flex-direction:column;align-items:stretch}
+.bb.gray{background:var(--page-bg)}
+.spec{font-size:12.5px;color:var(--on-surface-variant);padding:10px 14px;border-top:1px solid var(--outline-variant);line-height:1.6}
+/* Token */
+.sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;padding:14px}
+.sw .t{border:1px solid var(--outline-variant);border-radius:var(--radius-md);overflow:hidden;font-size:12px}
+.sw .t i{display:block;height:44px;border-bottom:1px solid var(--outline-variant)}
+.sw .t div{padding:6px 8px;display:flex;flex-direction:column;gap:1px}
+.sw .t b{font-family:ui-monospace,monospace;font-size:11.5px}
+.sw .t span{color:var(--on-surface-variant);font-family:ui-monospace,monospace;font-size:11px}
+.tt{width:100%;border-collapse:collapse;font-size:13px}
+.tt th,.tt td{text-align:left;padding:8px 14px;border-bottom:1px solid var(--outline-variant);vertical-align:middle}
+.tt th{font-weight:500;color:var(--on-surface-variant);font-size:12.5px}
+.tt tr:last-child td{border-bottom:none}
+.radi{display:flex;gap:14px;flex-wrap:wrap;padding:16px}
+.radi div{width:88px;height:56px;border:1px solid var(--outline);background:var(--surface-2);display:grid;place-items:center;font-size:11.5px;text-align:center;color:var(--on-surface-variant)}
+/* Mẫu shell thu nhỏ */
+.mini{display:grid;grid-template-columns:120px 1fr;grid-template-rows:40px 180px;background:var(--canvas);border-radius:var(--radius-lg);overflow:hidden}
+.mini .tb{grid-column:1/-1;background:var(--shell-bg);border-bottom:1px solid var(--shell-line);display:flex;align-items:center;gap:8px;padding:0 10px;color:var(--shell-fg);font-size:12px;font-weight:700}
+.mini .tb .s{flex:1;max-width:260px;height:24px;border-radius:var(--btn-radius);background:var(--shell-search);border:1px solid var(--shell-line);color:var(--shell-muted);font-weight:400;display:flex;align-items:center;padding:0 10px;font-size:11px}
+.mini .sb{background:var(--shell-bg);padding:8px 6px;display:flex;flex-direction:column;gap:2px}
+.mini .sb span{height:24px;border-radius:6px;display:flex;align-items:center;padding:0 8px;font-size:11px;color:var(--shell-fg)}
+.mini .sb span.on{background:var(--shell-active);color:var(--shell-active-fg);font-weight:600}
+.mini .fr{margin:8px;background:var(--surface);border-radius:var(--frame-radius);padding:12px;font-size:12px;color:var(--on-surface-variant)}
+/* Danh sách: header, view tab, toolbar, quick filter */
+.ph{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ttl{display:flex;align-items:center;gap:2px;font-size:24px;font-weight:600;border-radius:var(--radius-md);padding:0 4px;margin-left:-4px}
+.ttl:hover{background:var(--surface-2)}
+.ph .count{font-size:13px;color:var(--on-surface-variant)}
+.ph .act{margin-left:auto;display:flex;gap:8px}
+.vtabs{display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid var(--outline-variant);width:100%}
+.vtab{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;font-weight:600;font-size:13px;color:var(--on-surface-variant);white-space:nowrap;border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
+.vtab:hover{background:var(--surface-variant)}
+.vtab[aria-selected="true"]{color:var(--on-surface);border-bottom-color:var(--on-surface);background:var(--surface-2)}
+.search{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;width:220px;max-width:100%;border:1px solid var(--outline);border-radius:var(--btn-radius);color:var(--on-surface-variant)}
+.search input{border:none;outline:none;background:none;flex:1;min-width:0;color:var(--on-surface);font-size:13px}
+.seg{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden}
+.seg button{height:30px;width:34px;display:grid;place-items:center;color:var(--on-surface-variant)}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--on-surface)}
+.segtxt{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden}
+.segtxt button{height:30px;padding:0 12px;font-size:12.5px;font-weight:600;color:var(--on-surface-variant)}
+.segtxt button[aria-pressed="true"]{background:var(--primary-container);color:var(--on-primary-container)}
+.qfbar{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.qf{display:inline-flex;align-items:center;gap:2px;height:28px;padding:0 6px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:600;color:var(--on-surface);white-space:nowrap}
+.qf:hover{background:var(--surface-2)} .qf.on{background:var(--primary-container);color:var(--on-primary-container)}
+.qsep{width:1px;height:18px;background:var(--outline-variant);margin:0 6px}
+.fclear{font-size:12px;font-weight:600;color:var(--link);margin-left:6px}
+/* Bảng */
+.tw{overflow:auto;border-top:1px solid var(--outline-variant)}
+table.lt{border-collapse:separate;border-spacing:0;min-width:100%}
+.lt th,.lt td{border-bottom:1px solid var(--outline-variant);text-align:left;white-space:nowrap;padding:0 12px;height:44px;max-width:300px;overflow:hidden;text-overflow:ellipsis}
+.box.compact .lt td{height:34px}
+.lt th{position:sticky;top:0;z-index:2;background:var(--surface);font-weight:500;font-size:13px;color:var(--on-surface-variant);cursor:pointer}
+.lt th:hover{color:var(--on-surface);background:var(--surface-variant)}
+.lt td{font-size:13.5px}
+.lt td.num,.lt th.num{text-align:right}
+.lt>tbody>tr:hover>td{background:var(--surface-2)}
+.lt>tbody>tr.sel>td{background:var(--primary-container)}
+.lt .cb{width:44px;min-width:44px;text-align:center;position:sticky;left:0;z-index:1;background:var(--surface)}
+.lt th.cb{z-index:3}
+.lt .nm{min-width:260px;position:sticky;left:44px;z-index:1;background:var(--surface);border-right:1px solid var(--outline-variant)}
+.lt th.nm{z-index:3}
+.lt input{accent-color:var(--primary)}
+.pri{display:flex;align-items:center;gap:8px;min-width:0}
+.pri a{font-weight:600;color:var(--link);overflow:hidden;text-overflow:ellipsis}
+.pri a:hover{text-decoration:underline}
+.xbtn{width:22px;height:22px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant);margin-left:-6px}
+.xbtn:hover{background:var(--surface-variant)}
+.pvb{display:none;height:26px;padding:0 8px;border-radius:var(--btn-radius);border:1px solid var(--outline);background:var(--surface);align-items:center;margin-left:auto;font-size:12px;font-weight:600}
+tr:hover .pvb,.pvb:focus-visible{display:inline-flex}
+.bulk{display:flex;align-items:center;gap:6px;padding:6px 16px;background:var(--primary-container);color:var(--on-primary-container);font-size:13px;font-weight:600}
+.foot{display:flex;align-items:center;gap:6px;padding:8px 16px;border-top:1px solid var(--outline-variant)}
+.foot .pillc{font-size:12px;font-weight:600;padding:3px 10px;border-radius:var(--radius-pill);background:var(--surface-2)}
+.foot .r{margin-left:auto;display:flex;gap:6px}
+/* Board */
+.kb{display:flex;gap:10px;overflow-x:auto;padding:12px 16px;align-items:flex-start}
+.kcol{flex:none;width:260px;background:var(--board-col,#F0F0F0);border-radius:var(--radius-lg);padding-bottom:8px}
+html[data-theme="dark"] .kcol{background:var(--surface-variant)}
+.kh{display:flex;align-items:center;gap:6px;padding:10px 10px 6px;font-size:13px;font-weight:600}
+.kh .n{font-size:12px;font-weight:700;color:var(--on-surface-variant)}
+.kcards{display:flex;flex-direction:column;gap:8px;padding:4px 8px}
+.kc{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-lg);padding:12px;display:flex;flex-direction:column;gap:5px;box-shadow:0 1px 2px rgba(0,0,0,.04);cursor:grab}
+.kc:hover{border-color:var(--outline);box-shadow:var(--shadow-2)}
+.kc a{font-weight:600;color:var(--link)}
+.kc .ln{display:flex;align-items:center;gap:6px;font-size:12px}
+.kc .ln .ms{font-size:15px;color:var(--on-surface-variant)}
+.kc .kf{display:flex;gap:6px;border-top:1px solid var(--outline-variant);padding-top:8px;margin-top:4px}
+.kc .kf button{width:26px;height:26px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant)}
+.kc .kf button:hover{background:var(--surface-2)}
+.kcards.drop{outline:2px dashed var(--primary);outline-offset:-4px;border-radius:var(--radius-md)}
+/* Record */
+.card{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-lg);width:320px;max-width:100%}
+.ch{display:flex;align-items:center;gap:6px;padding:12px 14px;font-weight:600}
+.ch .r{margin-left:auto;display:flex;gap:2px;align-items:center}
+.cb2{padding:0 14px 14px}
+.idt{display:flex;gap:12px;align-items:center;padding:12px 14px 4px}
+.idt .ic{width:48px;height:48px;border-radius:50%;background:var(--primary-container);color:var(--on-primary-container);display:grid;place-items:center;font-weight:700;font-size:16px}
+.idt h1{font-size:20px;font-weight:700;line-height:1.3}
+.sub{padding:0 14px 6px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.sub a{color:var(--link);font-weight:600}
+.qa{display:flex;justify-content:space-between;gap:4px;padding:10px 14px 14px}
+.qa button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;flex:1}
+.qa .o{width:36px;height:36px;border-radius:50%;border:1px solid var(--outline);display:grid;place-items:center}
+.qa button:hover .o{background:var(--surface-2)}
+.newb{display:inline-flex;align-items:center;height:16px;padding:0 6px;margin-left:6px;border-radius:var(--radius-pill);font-size:10px;font-weight:700;background:#E3F2FD;color:#0B5CAD;vertical-align:1px}
+.rtabs{display:flex;border-bottom:1px solid var(--outline-variant);width:100%}
+.rtab{height:48px;padding:0 14px;font-weight:600;color:var(--on-surface-variant);border-bottom:2px solid transparent}
+.rtab[aria-selected="true"]{color:var(--on-surface);border-bottom-color:var(--primary)}
+/* KPI & báo cáo */
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;width:100%}
+.kpi{border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:10px 12px;background:var(--surface)}
+.kpi .l{font-size:12px;color:var(--on-surface-variant);display:flex;align-items:center;gap:4px}
+.kpi .v{font-size:20px;font-weight:700;margin-top:2px}
+.kpi .s{font-size:11.5px;color:var(--on-surface-variant);margin-top:2px}
+.kpi.warn .v{color:var(--error)}
+.bar{display:flex;align-items:center;gap:8px}
+.bar .t{flex:1;height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:99px}
+.bar b{font-size:12.5px;min-width:38px;text-align:right}
+.rc{border:1px solid var(--outline-variant);border-radius:var(--radius-lg);padding:14px 16px;background:var(--surface);display:flex;flex-direction:column;gap:8px;width:320px;max-width:100%;position:relative}
+.rc h3{font-size:15px;font-weight:600;color:var(--link);display:flex;align-items:center;gap:6px}
+.rc .chips{display:flex;gap:6px;flex-wrap:wrap}
+.rc .big{font-size:40px;font-weight:700;color:var(--link);text-align:center;line-height:1.1;padding:10px 0 2px}
+.rc .dl{font-size:12.5px;color:var(--on-surface-variant);text-align:center}
+.rc-tb{position:absolute;top:10px;right:10px;display:flex;gap:2px;opacity:0;transition:opacity .12s;background:var(--surface)}
+.rc:hover .rc-tb,.rc:focus-within .rc-tb{opacity:1}
+.rc-tb button{width:28px;height:28px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant)}
+.rc-tb button:hover{background:var(--surface-2)}
+/* Popover mẫu đặt tĩnh */
+.pop.static{position:static;display:block;width:260px}
+.ac-empty{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:13px;color:var(--on-surface-variant);padding:10px 4px}
+.do{display:grid;grid-template-columns:1fr;gap:10px;width:100%}
+@media(min-width:760px){.do{grid-template-columns:1fr 1fr}}
+.do>div{border-radius:var(--radius-md);padding:10px 12px;font-size:13px}
+.do .y{background:var(--success-container)} .do .n{background:var(--error-container)}
+.do b{display:block;margin-bottom:4px}
+.fs2{width:min(420px,100%)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar" id="topbar"></header>
+  <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
+  <main class="main"><div class="frame" id="frame"><div class="ds">
+    <nav class="toc" id="toc" aria-label="Mục lục design system"><b>Design System</b></nav>
+    <div class="ct">
+      <div class="hero"><h1>Design System · theme HubSpot</h1>
+        <p>Tham chiếu trực quan cho <b>DESIGN-SYSTEM-HUBSPOT.md</b> — lớp theme <code>data-brand="crm"</code> đặt trên DESIGN-SYSTEM.md v3.3 của ERP. Mỗi mẫu dùng đúng class của prototype và ghi component React tương ứng trong <code>src/components/ui</code>. Bấm “⚙ Giao diện” góc trái dưới để so với giao diện gốc hoặc bật chế độ tối.</p>
+        <div class="row"><a class="btn btn--primary" href="DESIGN-SYSTEM-HUBSPOT.md"><span class="ms sm">description</span>Mở tài liệu .md</a><a class="btn btn--secondary" href="index.html"><span class="ms sm">home</span>Trang chủ prototype</a></div></div>
+
+      <section class="s" id="s-color" data-t="Màu sắc"><h2>Màu sắc <small>§2</small></h2><p class="d">Giá trị đọc trực tiếp từ CSS đang chạy — đổi theme / chế độ tối là thấy thay đổi. Một màu nhấn (teal), chữ xám than, viền xám trung tính.</p>
+        <div class="box"><div class="bh"><b>Nền tảng</b><code>--primary · --surface · --on-surface · --outline</code></div><div class="sw" id="swBase"></div></div>
+        <div class="box"><div class="bh"><b>Shell (topbar + sidebar)</b><code>--shell-*</code></div><div class="sw" id="swShell"></div></div>
+        <div class="box"><div class="bh"><b>Trạng thái</b><code>--success · --warning · --error (+ container)</code></div><div class="sw" id="swState"></div></div>
+        <div class="box"><div class="bh"><b>Phân loại — pill lựa chọn</b><code>--cat-1…7</code><span class="r">Chỉ dùng cho giá trị SELECT / STATUS</span></div><div class="bb" id="catRow"></div></div>
+      </section>
+
+      <section class="s" id="s-type" data-t="Typography"><h2>Typography <small>§3</small></h2><p class="d">Inter + Be Vietnam Pro, số tabular. Thay đổi lớn nhất: header bảng chữ thường 13/500 thay cho HOA 11px.</p>
+        <div class="box"><table class="tt"><thead><tr><th>Vai trò</th><th>Mẫu</th><th>Cỡ / đậm</th></tr></thead><tbody id="typeRows"></tbody></table></div>
+      </section>
+
+      <section class="s" id="s-space" data-t="Bo góc · Khoảng cách"><h2>Bo góc · Khoảng cách · Bóng <small>§4</small></h2><p class="d">Nút & ô tìm kiếm bo tròn hẳn; card 12px; frame 16px; pill lựa chọn và ô sửa tại chỗ 4px. Card không có bóng — tách bằng viền.</p>
+        <div class="box"><div class="radi"><div style="border-radius:4px">4px<br>pill · ô sửa</div><div style="border-radius:8px">8px<br>input · menu</div><div style="border-radius:12px">12px<br>card · modal</div><div style="border-radius:16px">16px<br>frame</div><div style="border-radius:999px">999px<br>nút</div></div>
+          <div class="spec">Padding trang danh sách <code>16px</code> · lưới card <code>12px</code> · padding card <code>14px</code> · header card <code>12px 14px</code> · khoảng trường form <code>14px</code> · Bóng: chỉ popover (<code>--shadow-2</code>), panel & modal (<code>--shadow-3</code>), thẻ board khi hover.</div></div>
+      </section>
+
+      <section class="s" id="s-shell" data-t="Khung ứng dụng"><h2>Khung ứng dụng <small>§5</small></h2><p class="d">Topbar 56px + sidebar tối, nội dung là frame trắng bo 16px cách 8px. Chính trang này đang dùng khung đó. Sidebar: 236px (≥1240) · rail 72px (905–1239) · drawer (&lt;905).</p>
+        <div class="box"><div class="bb"><div class="mini" style="width:100%"><div class="tb"><span class="brand-mark" style="width:22px;height:22px;font-size:11px">H</span>HarnexAI<span class="s">Tìm kiếm hoặc gõ lệnh…</span></div>
+          <div class="sb"><span>Trang chủ</span><span class="on">Contacts</span><span>Companies</span><span>Deals</span><span>Sales</span></div><div class="fr">Frame — <code>--surface</code>, <code>--frame-radius</code>, <code>--frame-gap</code></div></div></div>
+          <div class="spec">ERP: <code>features/shell/AppHeader.tsx</code> · <code>UnifiedSidebar.tsx</code> · <code>NavRail.tsx</code> · <code>SidebarDrawer.tsx</code> · <code>app/(app)/app-shell.tsx</code></div></div>
+      </section>
+
+      <section class="s" id="s-btn" data-t="Button"><h2>Button <small>§6.1 · Button.tsx</small></h2><p class="d">Cao 32px (sm 28px), chữ 13/600, bo pill. Tối đa một nút primary trong khung nhìn.</p>
+        <div class="box"><div class="bh"><b>Variant</b><code>primary · secondary · ghost · danger</code></div>
+          <div class="bb"><button class="btn btn--primary">Tạo contact</button><button class="btn btn--secondary">Huỷ</button><button class="btn btn--text">Thao tác<span class="ms xs">arrow_drop_down</span></button><button class="btn btn--danger">Xoá contact</button><button class="btn btn--primary" disabled>Đã khoá</button></div>
+          <div class="bh"><b>Kích thước & icon</b><code>size="sm" · iconOnly · split</code></div>
+          <div class="bb"><button class="btn btn--primary sm"><span class="ms xs">add</span>Thêm</button><button class="btn btn--secondary sm">Nhỏ</button><button class="btn btn--secondary btn--icon" aria-label="Làm mới" title="Làm mới"><span class="ms sm">refresh</span></button><button class="btn btn--text btn--icon" aria-label="Thêm tuỳ chọn" title="Thêm tuỳ chọn"><span class="ms sm">more_vert</span></button><button class="btn btn--secondary" id="splitDemo">Thêm deals<span class="ms sm">arrow_drop_down</span></button><a class="ac-all" href="#s-btn" style="color:var(--link);font-weight:600;font-size:13px">Xem tất cả →</a></div>
+          <div class="spec">Việc phải làm ở ERP: <code>SIZE.md</code> h-9 → <b>h-8</b>, <code>SIZE.sm</code> giữ h-7 nhưng chữ 12/600, <code>rounded-md</code> → <b><code>rounded-btn</code></b>, <code>danger</code> → nền đặc <code>--error</code>.</div></div>
+      </section>
+
+      <section class="s" id="s-list" data-t="Trang danh sách"><h2>Trang danh sách <small>§6.2–6.6 · Template T1</small></h2><p class="d">ObjectHeader → view tabs → toolbar → bộ lọc nhanh → bảng → footer. Rê chuột vào dòng để thấy nút “Xem trước”; tick checkbox để thấy thanh hàng loạt.</p>
+        <div class="box" id="listBox">
+          <div class="bb col" style="gap:10px;padding-bottom:0">
+            <div class="ph"><button class="ttl">Contacts<span class="ms">expand_more</span></button><span class="count">18 bản ghi</span><div class="act"><button class="btn btn--text btn--icon" aria-label="Tuỳ chọn"><span class="ms sm">more_vert</span></button><button class="btn btn--primary">Thêm contacts<span class="ms sm">arrow_drop_down</span></button></div></div>
+            <div class="vtabs" role="tablist"><button class="vtab" role="tab" aria-selected="true">Tất cả contacts</button><button class="vtab" role="tab" aria-selected="false">Contacts của tôi</button><button class="vtab" role="tab" aria-selected="false">Chưa có owner</button><button class="btn btn--text btn--icon sm" aria-label="Thêm view"><span class="ms xs">add</span></button></div>
+            <div class="ph"><label class="search"><span class="ms sm">search</span><input placeholder="Tìm kiếm" aria-label="Tìm kiếm"></label><button class="btn btn--secondary sm"><span class="ms xs">filter_list</span>Bộ lọc nâng cao</button><button class="btn btn--text sm">Sắp xếp<span class="ms xs">arrow_drop_down</span></button>
+              <div class="act"><span class="seg" role="group" aria-label="Chế độ xem"><button aria-pressed="true" aria-label="Bảng"><span class="ms sm">table_rows</span></button><button aria-pressed="false" aria-label="Board"><span class="ms sm">view_kanban</span></button></span><button class="btn btn--text btn--icon" aria-label="Cài đặt bảng" id="cmpBtn" title="Bật / tắt chế độ gọn"><span class="ms sm">settings</span></button></div></div>
+            <div class="qfbar"><button class="qf on" id="qfOwner">Owner: Minh Trần<span class="ms xs">arrow_drop_down</span></button><button class="qf">Ngày tạo<span class="ms xs">arrow_drop_down</span></button><button class="qf">Ngày hoạt động gần nhất<span class="ms xs">arrow_drop_down</span></button><button class="qf">Lead status<span class="ms xs">arrow_drop_down</span></button><button class="btn btn--text btn--icon sm" aria-label="Thêm bộ lọc nhanh"><span class="ms xs">add_circle</span></button><span class="qsep"></span><button class="qf">Bộ lọc nâng cao (0)</button><button class="fclear">Xoá tất cả</button></div>
+          </div>
+          <div class="bulk" id="bulk" hidden><span id="bulkN">Đã chọn 1</span><button class="btn btn--text sm"><span class="ms sm">person</span>Gán owner</button><button class="btn btn--text sm"><span class="ms sm">delete</span>Xoá</button></div>
+          <div class="tw" style="margin-top:10px"><table class="lt"><thead><tr><th class="cb"><input type="checkbox" aria-label="Chọn tất cả" id="ckAll"></th><th class="nm">Tên<span class="ms xs" style="vertical-align:-3px">arrow_downward</span></th><th>Email</th><th>Contact owner</th><th>Lead status</th><th class="num">Số deal</th><th style="width:44px"><span class="ms sm">add</span></th></tr></thead>
+            <tbody id="rows"></tbody></table></div>
+          <div class="foot"><span class="pillc">3 bản ghi</span><div class="r"><button class="btn btn--secondary btn--icon" aria-label="Làm mới"><span class="ms sm">refresh</span></button><button class="btn btn--secondary"><span class="ms sm">ios_share</span>Export</button></div></div>
+          <div class="spec">Header bảng <code>13/500</code> chữ thường nền trắng · dòng <code>44px</code> (gọn <code>34px</code>) · cột checkbox + cột tên dính trái, cột tên có viền phải · ô <code>13.5px</code>. ERP: <code>DataTable.tsx</code> · <code>RecordTableView.tsx</code> · <code>RecordFilterBar.tsx</code> · <code>SavedViewsMenu.tsx</code>.</div>
+        </div>
+      </section>
+
+      <section class="s" id="s-board" data-t="Board (Kanban)"><h2>Board (Kanban) <small>§6.7 · RecordKanbanView.tsx</small></h2><p class="d">Cột 280px nền xám nhạt, thẻ trắng bo 12px, bóng chỉ khi rê chuột; footer thẻ có 3 hành động nhanh.</p>
+        <div class="box"><div class="kb" id="kb"></div></div>
+      </section>
+
+      <section class="s" id="s-tags" data-t="Pill · Badge · Tag · Chip"><h2>Pill · Badge · Tag · Chip <small>§6.8</small></h2><p class="d">Bốn thứ khác nhau — không dùng lẫn.</p>
+        <div class="box"><div class="bh"><b>Pill lựa chọn</b><code>OptionPill</code><span class="r">giá trị SELECT/STATUS — màu theo thứ tự lựa chọn, bo 4px</span></div><div class="bb" id="pillRow"></div>
+          <div class="bh"><b>Badge trạng thái</b><code>Badge tone</code><span class="r">trạng thái hệ thống — nền container + chấm</span></div><div class="bb"><span class="chip">Đang mở</span><span class="chip won">Closed Won</span><span class="chip lost">Closed Lost</span><span class="chip muted">Nháp</span></div>
+          <div class="bh"><b>Tag</b><code>Chip variant="tag"</code></div><div class="bb"><span class="tag">Deals_Pipeline</span><span class="tag pk">Primary</span><span class="newb">Mới</span></div>
+          <div class="bh"><b>Chip lọc</b><code>Chip active</code></div><div class="bb"><button class="fchip2" style="background:var(--primary-container);color:var(--on-primary-container)">Tất cả hoạt động<span class="ms xs">arrow_drop_down</span></button><button class="fchip2">Tất cả người dùng<span class="ms xs">arrow_drop_down</span></button><span class="uchip"><span class="av">M</span>Minh Trần</span></div></div>
+      </section>
+
+      <section class="s" id="s-record" data-t="Trang chi tiết"><h2>Trang chi tiết bản ghi <small>§6.9 · Template T2</small></h2><p class="d">3 cột 320 / 1fr / 320 trên nền <code>--page-bg</code>. Thuộc tính bấm để sửa tại chỗ.</p>
+        <div class="box"><div class="bb gray" style="align-items:flex-start">
+          <section class="card"><div style="display:flex;justify-content:space-between;padding:10px 10px 0 8px"><a style="display:inline-flex;align-items:center;font-weight:600;font-size:14px" href="#s-record"><span class="ms sm">chevron_left</span>Contacts</a><button class="btn btn--text sm">Thao tác<span class="ms xs">arrow_drop_down</span></button></div>
+            <div class="idt"><span class="ic">TH</span><h1>Nguyễn Thị Hạnh</h1></div>
+            <div class="sub"><span>Giám đốc vận hành tại <a href="#s-record">Dược phẩm Thiên Phúc</a></span><a href="#s-record">hanh.nguyen@thienphuc.vn</a></div>
+            <div class="qa"></div></section>
+          <section class="card"><div class="ch"><span class="ms sm">expand_more</span>Thông tin chính<span class="r"><button class="btn btn--text sm">Thao tác<span class="ms xs">arrow_drop_down</span></button></span></div><div class="cb2"><div class="props" id="props"></div></div></section>
+          <section class="card" style="width:420px"><div class="rtabs" role="tablist"><button class="rtab" role="tab" aria-selected="true">Tổng quan</button><button class="rtab" role="tab" aria-selected="false">Hoạt động</button></div>
+            <div class="cb2" style="padding-top:14px"><div class="ta"><div class="ta-h"><span class="ms sm ic">call</span><b>Cuộc gọi</b> với Nguyễn Thị Hạnh<time>22/9/2026 16:00</time></div><div class="ta-b">Trao đổi yêu cầu tích hợp kho, hẹn gửi báo giá trước 25/9.</div></div>
+              <div class="ta sys" style="margin-top:10px"><div class="ta-h"><span class="ms sm ic">sync</span>Lifecycle stage: Lead → Opportunity<time>15/9/2026</time></div></div></div></section>
+          <section class="card"><div class="ch"><span class="ms sm">expand_more</span>Companies (1)<span class="r"><button class="btn btn--text sm"><span class="ms xs">add</span>Thêm</button></span></div><div class="cb2">
+            <div class="ac-it"><div class="ac-top"><a class="ac-name" href="#s-record">Dược phẩm Thiên Phúc</a><span class="tag pk">Primary</span><button class="btn btn--text btn--icon ac-more" aria-label="Thao tác"><span class="ms sm">more_horiz</span></button></div><div class="ac-ln"><span>Domain:</span> thienphucpharma.vn</div><div class="ac-ln"><span>Số điện thoại:</span> 028 4021 1481</div><button class="ac-lbl">Thêm nhãn liên kết</button></div>
+            <a class="ac-all" href="#s-record">Xem tất cả Companies liên kết<span class="ms xs">open_in_new</span></a></div></section>
+        </div><div class="spec">Mới cần viết ở ERP: <code>PropertyList</code> (thay danh sách trường tự viết trong <code>RecordDetailDrawer.tsx</code> / <code>RecordDetailPage.tsx</code>) · <code>AssociationCard</code> (trường RELATION) · <code>Timeline</code>.</div></div>
+      </section>
+
+      <section class="s" id="s-overlay" data-t="Panel · Modal · Menu"><h2>Panel · Modal · Menu · Toast <small>§6.10–6.14</small></h2><p class="d">Bấm để mở bản thật. Panel phải 460px, footer canh trái; modal 480px, footer có viền trên; menu có ô tìm kiếm.</p>
+        <div class="box"><div class="bb"><button class="btn btn--secondary" id="openPanel"><span class="ms sm">right_panel_open</span>Mở panel “Tạo contact”</button><button class="btn btn--secondary" id="openModal"><span class="ms sm">web_asset</span>Mở modal</button><button class="btn btn--secondary" id="openConfirm"><span class="ms sm">warning</span>Mở xác nhận xoá</button><button class="btn btn--secondary" id="openToast"><span class="ms sm">chat_info</span>Hiện toast</button></div>
+          <div class="bb" style="align-items:flex-start"><div class="pop static" role="menu"><label class="srch2" style="margin:2px 2px 6px;height:32px"><input placeholder="Tìm" aria-label="Tìm trong menu"><span class="ms sm">search</span></label><div class="hd">Hoạt động</div><button class="mi"><span class="ms sm">call</span>Ghi lại cuộc gọi</button><button class="mi"><span class="ms sm">event</span>Ghi lại cuộc họp</button><div class="sep"></div><button class="mi"><span class="ms sm">merge</span>Gộp<span style="margin-left:auto;font-size:10.5px;font-weight:700;color:var(--on-surface-variant)">Sắp có</span></button><button class="mi" style="color:var(--error)"><span class="ms sm">delete</span>Xoá</button></div>
+            <div class="selpop" style="position:static"><input placeholder="Tìm lựa chọn" aria-label="Tìm lựa chọn"><div class="opts" id="selOpts"></div><button class="clear">Xoá giá trị</button></div></div>
+          <div class="spec">ERP: <code>Drawer.tsx</code> (460, footer trái, dock 400 ≥1240px) · <code>Modal.tsx</code> (sm 480, header 17/700) · <code>ConfirmDialog.tsx</code> · <code>Menu.tsx</code> / <code>Popover.tsx</code> (position fixed, bỏ qua cuộn 400ms đầu) · <code>Combobox.tsx</code> (chọn lựa chọn dạng pill).</div></div>
+      </section>
+
+      <section class="s" id="s-form" data-t="Form"><h2>Form & trường nhập <small>§6.13 · Field.tsx</small></h2><p class="d">Nhãn 13/600, input 36px bo 8px, viền đủ tương phản (3:1), focus viền 2px màu nhấn.</p>
+        <div class="box"><div class="bb" style="align-items:flex-start;gap:24px"><form class="field-form fs2" onsubmit="return false">
+            <label><span>Email <span class="req">*</span></span><input class="in" style="border-color:#8F8F8F" placeholder="ten@congty.vn"></label>
+            <label>Lifecycle stage<select class="in" style="border-color:#8F8F8F"><option>Lead</option><option>Opportunity</option></select></label>
+            <label>Ghi chú<small>Không bắt buộc</small><textarea class="in" style="border-color:#8F8F8F"></textarea></label>
+            <label class="chk"><input type="checkbox" checked style="accent-color:var(--primary)">Hiện ở vùng “Trường bổ sung”</label>
+            <p class="err" role="alert">Nhập email hoặc họ tên của Contact</p></form>
+          <div class="assoc-sec fs2"><b>Liên kết Contact với</b><label class="field-form" style="gap:4px"><span style="font-size:13px;font-weight:600">Company</span><select class="in" style="border-color:#8F8F8F"><option>— Không —</option></select></label></div></div>
+          <div class="spec">Ô sửa tại chỗ (trong bảng / danh sách thuộc tính): cao <code>30px</code>, viền 1px <code>--primary</code>, bo <code>4px</code>. Enter lưu · Esc huỷ.</div></div>
+      </section>
+
+      <section class="s" id="s-kpi" data-t="KPI · Báo cáo"><h2>KPI · Card báo cáo <small>§6.16 · StatCard.tsx · KpiCard.tsx</small></h2><p class="d">Thẻ KPI nhỏ cho dải số liệu đầu trang; card báo cáo cho dashboard (rê chuột để thấy toolbar).</p>
+        <div class="box"><div class="bb gray" style="align-items:flex-start"><div class="kpis" style="max-width:720px">
+            <div class="kpi"><div class="l"><span class="ms xs">emoji_events</span>Doanh số thắng</div><div class="v">90 tr ₫</div><div class="s">Deal Closed Won trong kỳ</div></div>
+            <div class="kpi"><div class="l"><span class="ms xs">flag</span>Đạt chỉ tiêu</div><div class="v">27%</div><div class="s"><span class="bar"><span class="t"><i style="width:27%;background:var(--primary)"></i></span><b>27%</b></span></div></div>
+            <div class="kpi warn"><div class="l"><span class="ms xs">assignment_late</span>Task quá hạn</div><div class="v">2</div><div class="s">Chưa hoàn thành</div></div></div>
+          <div class="rc" tabindex="0"><div class="rc-tb"><button aria-label="Kéo để sắp xếp"><span class="ms sm">drag_indicator</span></button><button aria-label="Làm mới"><span class="ms sm">refresh</span></button><button aria-label="Thêm"><span class="ms sm">more_vert</span></button></div>
+            <h3>Contact mới<span class="ms xs" style="color:var(--on-surface-variant)">info</span></h3><div class="chips"><span class="tag">Tháng này</span><span class="tag">So với tháng trước</span></div><div class="big">12</div><div class="dl">▲ 20% so với kỳ trước</div></div></div>
+          <div class="spec">Thanh tiến độ: ≥100% <code>--success</code> · 50–99% <code>--warning</code> · &lt;50% <code>--primary</code>. Số KPI trên card báo cáo 40/700 màu <code>--link</code>, bấm để xem danh sách bản ghi.</div></div>
+      </section>
+
+      <section class="s" id="s-rules" data-t="Nên / Không nên"><h2>Nên / Không nên</h2><p class="d">Những lỗi hay gặp khi đổi một màn cũ sang theme.</p>
+        <div class="do">
+          <div class="y"><b>✓ Giá trị lựa chọn = pill màu</b>Giai đoạn, lifecycle, lead status dùng <code>OptionPill</code>.</div><div class="n"><b>✗ Dùng Badge trạng thái cho giá trị lựa chọn</b>Badge chỉ cho trạng thái hệ thống (task, workflow, Won/Lost).</div>
+          <div class="y"><b>✓ Sửa tại chỗ</b>Bấm thuộc tính / ô bảng để sửa; toast xác nhận.</div><div class="n"><b>✗ Mở trang “Chỉnh sửa” riêng</b>cho việc đổi 1 trường.</div>
+          <div class="y"><b>✓ Một nút primary</b>trong khung nhìn — còn lại secondary / ghost.</div><div class="n"><b>✗ Chữ tối trên shell</b>Trên topbar/sidebar chỉ dùng <code>--shell-*</code>.</div>
+          <div class="y"><b>✓ Xem nhanh bằng panel dock</b>từ bảng / board, không rời danh sách.</div><div class="n"><b>✗ Tự vẽ bảng / modal</b>Luôn qua <code>DataTable</code>, <code>Modal</code>, <code>Drawer</code>.</div>
+        </div>
+      </section>
+    </div>
+  </div></div></main>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel"></aside>
+<div class="modal-bg" id="modal"></div>
+<div class="demo" id="demo" role="group" aria-label="Điều khiển mockup"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="crm-shared.js"></script>
+<script>
+const { esc, toast, $ } = HX;
+HX.shell('ds');
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+/* ── Token: vẽ lại khi đổi theme / chế độ tối ── */
+const GROUPS = {
+  swBase: [['--primary','Nút chính, tab chọn, focus'],['--on-primary','Chữ trên primary'],['--primary-container','Bộ lọc bật, dòng chọn'],['--on-primary-container','Chữ trên container'],['--link','Link, tên bản ghi'],['--surface','Nền frame, card'],['--surface-variant','Hover, mục hệ thống'],['--surface-2','Hover nút, pill đếm'],['--page-bg','Nền sau card'],['--on-surface','Chữ chính'],['--on-surface-variant','Chữ phụ, nhãn'],['--outline','Viền nút phụ'],['--outline-variant','Viền card, kẻ bảng']],
+  swShell: [['--shell-bg','Nền topbar / sidebar'],['--shell-fg','Chữ, icon shell'],['--shell-muted','Placeholder'],['--shell-hover','Hover'],['--shell-active','Mục đang chọn'],['--shell-line','Vạch ngăn'],['--shell-search','Ô tìm kiếm'],['--canvas','Nền quanh frame']],
+  swState: [['--success','Thành công'],['--success-container',''],['--warning','Cảnh báo'],['--warning-container',''],['--error','Lỗi, quá hạn'],['--error-container','']],
+};
+function drawTokens() {
+  Object.entries(GROUPS).forEach(([id, arr]) => { $('#' + id).innerHTML = arr.map(([v, d]) => `<div class="t"><i style="background:var(${v})"></i><div><b>${v}</b><span>${esc(css(v) || '—')}</span>${d ? `<span style="font-family:inherit">${esc(d)}</span>` : ''}</div></div>`).join(''); });
+}
+drawTokens();
+new MutationObserver(drawTokens).observe(document.documentElement, { attributes:true, attributeFilter:['data-brand','data-theme'] });
+
+$('#catRow').innerHTML = ['','c2','c3','c4','c5','c6','c7'].map((c, i) => `<span class="pill ${c}">Lựa chọn ${i + 1}</span>`).join('') + '<span class="nil" style="font-size:12px">Lựa chọn thứ 8 quay về màu 1</span>';
+const STAGES = ['1. MQL Qualified','2. Discovery Call','3. Demo Scheduled','4. Proposal Sent','5. Closed Won','6. Closed Lost'];
+$('#pillRow').innerHTML = STAGES.map((s, i) => `<span class="pill ${i ? 'c' + (i + 1) : ''}">${s}</span>`).join('');
+$('#selOpts').innerHTML = STAGES.slice(0, 4).map((s, i) => `<button class="opt ${i === 1 ? 'cur' : ''}"><span class="pill ${i ? 'c' + (i + 1) : ''}">${s}</span></button>`).join('');
+
+/* ── Typography ── */
+const TYPE = [['Tiêu đề trang danh sách','Contacts','24px','600'],['Tên bản ghi','Nguyễn Thị Hạnh','20px','700'],['Tiêu đề panel','Tạo contact','18px','700'],['Tiêu đề modal','Chọn cột hiển thị','17px','700'],['Tiêu đề card báo cáo','Deals theo giai đoạn','15px','600'],['Tiêu đề card','Thông tin chính','14px','600'],['Nội dung','Khách cần triển khai BYOC.','14px','400'],['Ô bảng','hanh.nguyen@thienphuc.vn','13.5px','400'],['Header bảng','Ngày hoạt động gần nhất','13px','500'],['Nút','Thêm contacts','13px','600'],['Bộ lọc nhanh','Lead status ▾','12.5px','600'],['Nhãn thuộc tính','Contact owner','12px','400'],['Nhãn nhóm HOA','THUỘC TÍNH TUỲ CHỈNH','11px','700']];
+$('#typeRows').innerHTML = TYPE.map(([r, s, z, w]) => `<tr><td class="nil">${r}</td><td style="font-size:${z};font-weight:${w};${r === 'Tiêu đề card báo cáo' ? 'color:var(--link);' : ''}${r.includes('Header') || r.includes('Nhãn') ? 'color:var(--on-surface-variant);' : ''}${r.includes('HOA') ? 'letter-spacing:.04em;' : ''}">${s}</td><td><code style="font-size:11.5px">${z} / ${w}</code></td></tr>`).join('');
+
+/* ── Bảng ── */
+const ROWS = [['Nguyễn Thị Hạnh','hanh.nguyen@thienphuc.vn','Minh Trần','Có deal',1,3],['Trần Quốc Bảo','bao.tran@thienphuc.vn','Minh Trần','Đang mở',1,0],['Lê Thu Hà','ha.le@bienxanh.vn','Lan Lê','Mới',0,2]];
+const LS = ['Mới','Đang mở','Đang xử lý','Có deal'];
+$('#rows').innerHTML = ROWS.map(([n, e, o, ls, d, c]) => `<tr><td class="cb"><input type="checkbox" aria-label="Chọn ${n}"></td><td class="nm"><div class="pri"><button class="xbtn" aria-label="Mở rộng"><span class="ms xs">chevron_right</span></button><span class="av sm">${n.split(' ').slice(-2).map(w => w[0]).join('')}</span><a href="#s-list">${n}</a><button class="pvb">Xem trước</button></div></td>
+  <td>${e}</td><td><span class="uchip"><span class="av">${o.split(' ').pop()[0]}</span>${o}</span></td><td><span class="pill ${['','c2','c3','c4'][LS.indexOf(ls)]}">${ls}</span></td><td class="num">${d}</td><td></td></tr>`).join('');
+const syncBulk = () => { const n = document.querySelectorAll('#rows input:checked').length; $('#bulk').hidden = !n; $('#bulkN').textContent = `Đã chọn ${n}`;
+  document.querySelectorAll('#rows tr').forEach(tr => tr.classList.toggle('sel', tr.querySelector('input').checked)); };
+$('#rows').onchange = syncBulk;
+$('#ckAll').onchange = e => { document.querySelectorAll('#rows input').forEach(i => i.checked = e.target.checked); syncBulk(); };
+$('#cmpBtn').onclick = () => { $('#listBox').classList.toggle('compact'); toast($('#listBox').classList.contains('compact') ? 'Chế độ gọn: dòng 34px' : 'Chế độ thường: dòng 44px'); };
+document.querySelectorAll('.vtab').forEach(t => t.onclick = () => document.querySelectorAll('.vtab').forEach(x => x.setAttribute('aria-selected', x === t)));
+document.querySelectorAll('.rtab').forEach(t => t.onclick = () => document.querySelectorAll('.rtab').forEach(x => x.setAttribute('aria-selected', x === t)));
+
+/* ── Board ── */
+const COLS = [['2. Discovery Call','c2',[['Nha khoa Nụ Cười Việt','18.000.000 ₫','30/9/2026']]],['3. Demo Scheduled','c3',[['In ấn Phương Đông','32.000.000 ₫','18/10/2026'],['Thời trang Mộc Lan','32.000.000 ₫','20/10/2026']]],['5. Closed Won','c5',[['Cơ khí Đại Phong','72.000.000 ₫','5/9/2026','won']]]];
+$('#kb').innerHTML = COLS.map(([t, c, cards]) => `<div class="kcol"><div class="kh"><span class="pill ${c}">${t}</span><span class="n">${cards.length}</span></div><div class="kcards">${cards.map(([n, v, d, w]) => `<div class="kc" draggable="true"><a href="#s-board">${n}</a>${w ? '<span class="chip won" style="align-self:flex-start">Closed Won</span>' : ''}<div class="ln"><span class="ms">payments</span>${v}</div><div class="ln"><span class="ms">event</span>Chốt ${d}</div><div class="kf"><button aria-label="Ghi chú"><span class="ms xs">edit_note</span></button><button aria-label="Task"><span class="ms xs">task_alt</span></button><button aria-label="Gọi"><span class="ms xs">call</span></button></div></div>`).join('')}</div></div>`).join('');
+let drag = null;
+$('#kb').addEventListener('dragstart', e => { drag = e.target.closest('.kc'); drag && (drag.style.opacity = .5); });
+$('#kb').addEventListener('dragend', () => { drag && (drag.style.opacity = ''); document.querySelectorAll('.kcards').forEach(k => k.classList.remove('drop')); });
+$('#kb').addEventListener('dragover', e => { const k = e.target.closest('.kcards'); if (!k) return; e.preventDefault(); document.querySelectorAll('.kcards').forEach(x => x.classList.toggle('drop', x === k)); });
+$('#kb').addEventListener('drop', e => { const k = e.target.closest('.kcards'); if (k && drag) { e.preventDefault(); k.appendChild(drag); toast('Đã chuyển giai đoạn (mockup)'); } });
+
+/* ── Record ── */
+const QA = [['edit_note','Ghi chú'],['mail','Email'],['call','Gọi'],['task_alt','Task'],['event','Họp'],['more_horiz','Thêm']].map(([i, l]) => `<button><span class="o"><span class="ms sm">${i}</span></span>${l}</button>`).join('');
+document.querySelector('.qa').innerHTML = QA;
+const PROPS = [['Contact owner','<span class="uchip"><span class="av">M</span>Minh Trần</span>'],['Số điện thoại','0912 345 678'],['Lifecycle stage','<span class="pill c5">Opportunity</span>'],['Lead status','<span class="pill c4">Có deal</span>'],['Kênh liên hệ ưa thích<span class="newb">Mới</span>','<span class="pill">Zalo</span>']];
+$('#props').innerHTML = PROPS.map(([l, v]) => `<div class="prop"><label>${l}</label><div class="v">${v}</div></div>`).join('');
+$('#props').onclick = e => { const p = e.target.closest('.prop'); if (!p || p.querySelector('.ed')) return; const v = p.querySelector('.v'), old = v.innerHTML; v.innerHTML = `<input class="ed" value="${esc(v.textContent)}" aria-label="Sửa giá trị">`; const i = v.querySelector('input'); i.focus(); i.select();
+  const done = save => { v.innerHTML = save ? esc(i.value) : old; if (save) toast(`Đã lưu “${p.querySelector('label').childNodes[0].textContent}”`); };
+  i.onkeydown = k => { if (k.key === 'Enter') done(true); if (k.key === 'Escape') done(false); }; i.onblur = () => done(true); };
+
+/* ── Lớp phủ ── */
+$('#openPanel').onclick = () => { const p = $('#panel');
+  p.innerHTML = `<div class="pn-h"><h2>Tạo contact</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
+    <form class="pn-b field-form" onsubmit="return false"><label><span>Email <span class="req">*</span></span><input class="in"></label><label>Tên<input class="in"></label><label>Contact owner<select class="in"><option>Phương Nguyễn</option></select></label>
+      <div class="assoc-sec"><b>Liên kết Contact với</b><label>Company<select class="in"><option>— Không —</option></select></label></div></form>
+    <div class="pn-f"><button class="btn btn--primary" data-pclose>Tạo</button><button class="btn btn--secondary" data-pclose>Tạo và thêm tiếp</button><button class="btn btn--text" data-pclose>Huỷ</button></div>`;
+  p.onclick = e => { if (e.target.closest('[data-pclose]')) HX.closePanel(); };
+  p.classList.add('open'); document.body.classList.add('panel-open'); };
+$('#openModal').onclick = () => HX.modal(`<div class="modal" role="dialog" aria-modal="true" aria-label="Đổi tên view"><div class="mh">Đổi tên view<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
+  <div class="mb field-form"><label>Tên view<input class="in" value="Contacts của tôi"></label></div><div class="mf"><button class="btn btn--secondary" data-close>Huỷ</button><button class="btn btn--primary" data-close>Lưu</button></div></div>`);
+$('#openConfirm').onclick = () => HX.confirmBox('Xoá contact', 'Xoá “Nguyễn Thị Hạnh”? Liên kết với bản ghi khác sẽ bị gỡ. Không thể hoàn tác.', 'Xoá contact', () => toast('Đã xoá (mockup)'));
+$('#openToast').onclick = () => toast('Đã lưu “Lead status”');
+$('#splitDemo').onclick = () => toast('Nút tách: mở menu Tạo mới / Nhập / Tạo từ mẫu');
+
+/* ── Mục lục & đánh dấu mục đang xem ── */
+const secs = [...document.querySelectorAll('section.s')];
+$('#toc').insertAdjacentHTML('beforeend', secs.map(s => `<a href="#${s.id}" data-id="${s.id}">${s.dataset.t}</a>`).join(''));
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) document.querySelectorAll('#toc a').forEach(a => a.classList.toggle('on', a.dataset.id === e.target.id)); }), { root: $('#frame'), rootMargin:'0px 0px -70% 0px' });
+secs.forEach(s => io.observe(s));
+</script>
+</body>
+</html>

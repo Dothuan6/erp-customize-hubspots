@@ -56,6 +56,8 @@ body{font-family:var(--font-sans);background:var(--canvas);color:var(--on-surfac
   -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 .ms{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;font-size:20px;line-height:1;display:inline-block;
   font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;user-select:none;flex:none;overflow:hidden;max-width:1.2em}
+/* Icon ẩn (vẫn giữ chỗ) cho tới khi font tải xong — class icons-ready do script ở <head> gắn */
+html:not(.icons-ready) .ms{visibility:hidden;width:1em}
 .ms.sm{font-size:18px}.ms.xs{font-size:16px}
 button,input,select,textarea{font:inherit;color:inherit}
 button{background:none;border:none;cursor:pointer}
@@ -508,3 +510,22 @@ body.lie-open{overflow:hidden}
 
 .lie-t td.nmc{min-width:260px}
 .lie-t{min-width:1000px}
+
+/* ═══ Leads (06/10/2026) ═══ */
+/* StageBar — thanh giai đoạn của Lead pipeline: các bước nối nhau, bấm để chuyển giai đoạn */
+.sb{display:flex;gap:4px;width:100%}
+.sb-s{flex:1;min-width:0;height:32px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 10px;border-radius:var(--radius-sm);background:var(--surface-2);color:var(--on-surface-variant);font-size:12.5px;font-weight:600}
+.sb-s .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-s:hover{background:var(--surface-variant);color:var(--on-surface)}
+.sb-s.done{background:var(--primary-container);color:var(--on-primary-container)}
+.sb-s.on{background:var(--primary);color:var(--on-primary)}
+.sb-s.on.bad{background:var(--error);color:#fff}
+.sb-s:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.sb.sm .sb-s{height:26px;font-size:11.5px;padding:0 6px}
+.sb.sm .sb-s .ms{display:none}
+.sb-note{display:flex;align-items:flex-start;gap:6px;margin-top:10px;font-size:13px;color:var(--on-surface-variant)}
+.sb-note .ms{flex:none;margin-top:1px}
+.sb-note.ok{color:var(--on-surface)} .sb-note.ok>.ms{color:var(--success)}
+.sb-note.bad{color:var(--on-surface)} .sb-note.bad>.ms{color:var(--error)}
+.av.lead{border-radius:6px;background:var(--surface-2);color:var(--on-surface-variant);border:1px solid var(--outline-variant)}
+.ltl{display:flex;flex-direction:column;gap:10px}

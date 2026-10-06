@@ -206,7 +206,8 @@ function HXList(T) {
   /* ── Sự kiện ── */
   $('#objName').textContent = O.plural;
   $('#addBtn').innerHTML = `Thêm ${O.plural.toLowerCase()}<span class="ms xs">arrow_drop_down</span>`;
-  $('#objPop').innerHTML = `<div class="hd">Đối tượng</div>` + ['contact','company','deal'].map(k => `<a class="mi" href="${HXC.OBJ[k].list}" ${k === T ? 'style="font-weight:700"' : ''}><span class="ms sm" style="${k === T ? '' : 'visibility:hidden'}">check</span>${HXC.OBJ[k].plural}</a>`).join('');
+  $('#objPop').innerHTML = `<div class="hd">Đối tượng</div>` + ['contact','company','deal'].map(k => `<a class="mi" href="${HXC.OBJ[k].list}" ${k === T ? 'style="font-weight:700"' : ''}><span class="ms sm" style="${k === T ? '' : 'visibility:hidden'}">check</span>${HXC.OBJ[k].plural}</a>`).join('')
+    + `<a class="mi" href="crm-leads-hubspot.html"><span class="ms sm" style="visibility:hidden">check</span>Leads</a>`;
   $('#vtabs').onclick = e => { const v = e.target.closest('[data-view]'); if (v) { st.view = v.dataset.view; st.sel.clear(); draw(); } };
   $('#q').oninput = e => { st.q = e.target.value.trim().toLowerCase(); draw(); };
   $('#qf').addEventListener('click', e => {

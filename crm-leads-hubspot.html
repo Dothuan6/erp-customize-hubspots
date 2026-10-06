@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Companies — HarnexAI CRM (mockup)</title>
+<title>Leads — HarnexAI CRM (mockup)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@ function retry(){if(n++<120)setTimeout(go,250)}
 d.readyState==='loading'?d.addEventListener('DOMContentLoaded',go):go()})();</script>
 <link rel="stylesheet" href="crm-shared.css">
 <style>
-/* Danh sách Contacts / Companies — clone trang danh sách HubSpot (header ⌄ · views · Search/Filter/Sort · Board/Table · ⚙ · ⌃ · quick filters popover · mở rộng dòng) */
+/* Danh sách Leads — cùng khung trang danh sách Contacts / Companies (header ⌄ · views · Search/Filter/Sort · Board/Table · ⚙ · ⌃ · quick filters popover · mở rộng dòng) */
 .frame{position:relative}
 .ph{display:flex;align-items:center;gap:8px;padding:16px 16px 0;flex-wrap:wrap}
 .ttl{display:flex;align-items:center;gap:2px;font-size:24px;font-weight:600;border-radius:var(--radius-md);padding:0 4px;margin-left:-4px}
@@ -25,6 +25,7 @@ d.readyState==='loading'?d.addEventListener('DOMContentLoaded',go):go()})();</sc
 .vtabs{display:flex;align-items:flex-end;gap:2px;padding:8px 16px 0;border-bottom:1px solid var(--outline-variant);overflow-x:auto}
 .vtab{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;font-weight:600;font-size:13px;color:var(--on-surface-variant);white-space:nowrap;border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
 .vtab:hover{background:var(--surface-variant)}
+.vtab .vn{font-size:11px;font-weight:700;padding:1px 6px;border-radius:var(--radius-pill);background:var(--surface-2);color:var(--on-surface-variant)}
 .vtab[aria-selected="true"]{color:var(--on-surface);border-bottom-color:var(--on-surface);background:var(--surface-2)}
 .tools{display:flex;align-items:center;gap:8px;padding:12px 16px 0;flex-wrap:wrap}
 .search{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;width:220px;max-width:100%;border:1px solid var(--outline);border-radius:var(--btn-radius);color:var(--on-surface-variant)}
@@ -153,13 +154,12 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
   <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
   <main class="main"><div class="frame">
     <div class="ph">
-      <div style="position:relative"><button class="ttl" id="objBtn" aria-haspopup="menu"><span id="objName"></span><span class="ms">expand_more</span></button><div class="pop" id="objPop" role="menu" style="top:42px;left:0"></div></div>
+      <div style="position:relative"><button class="ttl" id="objBtn" aria-haspopup="menu"><span id="objName">Leads</span><span class="ms">expand_more</span></button><div class="pop" id="objPop" role="menu" style="top:42px;left:0"></div></div>
       <span class="count" id="count"></span>
       <div class="ph-act">
         <button class="btn btn--secondary btn--icon" id="moreBtn" aria-label="Thêm thao tác"><span class="ms sm">more_vert</span></button>
-        <div class="pop" id="morePop" role="menu" style="top:38px;right:150px"><button class="mi" data-imp><span class="ms sm">upload_file</span>Import</button><button class="mi" data-toast="Mockup: xuất danh sách"><span class="ms sm">ios_share</span>Export</button><button class="mi" data-toast="Quản lý trường của collection này (như trang Quản lý trường của Deals)"><span class="ms sm">tune</span>Chỉnh sửa thuộc tính</button></div>
-        <button class="btn btn--primary" id="addBtn" aria-haspopup="menu"></button>
-        <div class="pop" id="addPop" role="menu" style="top:38px;right:0"><button class="mi" data-new><span class="ms sm">add</span>Tạo mới</button><button class="mi" data-imp><span class="ms sm">upload_file</span>Import</button></div>
+        <div class="pop" id="morePop" role="menu" style="top:38px;right:150px"><button class="mi" data-imp><span class="ms sm">upload_file</span>Import</button><button class="mi" data-toast="Mockup: xuất danh sách"><span class="ms sm">ios_share</span>Export</button><button class="mi" data-toast="Quản lý trường của collection này (như trang Quản lý trường của Deals)"><span class="ms sm">tune</span>Chỉnh sửa thuộc tính</button><button class="mi" data-toast="Cấu hình giai đoạn của Lead pipeline (Cài đặt › Đối tượng › Leads)"><span class="ms sm">linear_scale</span>Chỉnh sửa giai đoạn</button></div>
+        <button class="btn btn--primary" id="addBtn"><span class="ms sm">add</span>Tạo lead</button>
       </div>
     </div>
     <div class="vtabs" role="tablist" id="vtabs"></div>
@@ -172,19 +172,17 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
           <button data-mode="BOARD" title="Board" aria-label="Board"><span class="ms sm">view_kanban</span></button>
           <button data-mode="TABLE" title="Bảng" aria-label="Bảng"><span class="ms sm">table_rows</span></button>
         </div>
-        <button class="btn btn--secondary btn--icon" id="setBtn" title="Cài đặt view" aria-label="Cài đặt view"><span class="ms sm">settings</span></button>
         <button class="btn btn--secondary btn--icon" id="colBtn2" title="Thu gọn thanh lọc" aria-label="Thu gọn thanh lọc"><span class="ms sm" id="colIc">expand_less</span></button>
       </div>
     </div>
     <div class="qfbar" id="qf"></div>
-    <div class="bulk" id="bulk"><span id="bulkN"></span><button class="btn btn--text sm" id="bulkOwner"><span class="ms sm">person</span>Gán owner</button><button class="btn btn--text sm" id="bulkDel"><span class="ms sm">delete</span>Xoá</button><button class="btn btn--text sm" id="bulkCancel">Huỷ</button></div>
+    <div class="bulk" id="bulk"><span id="bulkN"></span><button class="btn btn--text sm" id="bulkOwner"><span class="ms sm">person</span>Gán owner</button><button class="btn btn--text sm" id="bulkStage"><span class="ms sm">linear_scale</span>Đổi giai đoạn</button><button class="btn btn--text sm" id="bulkDel"><span class="ms sm">delete</span>Xoá</button><button class="btn btn--text sm" id="bulkCancel">Huỷ</button></div>
     <div class="body" id="body"></div>
     <div class="foot"><span class="pillc" id="footCount"></span>
       <div class="r">
         <button class="btn btn--secondary btn--icon" id="refresh" title="Làm mới" aria-label="Làm mới"><span class="ms sm">refresh</span></button>
         <button class="btn btn--secondary" id="exportBtn"><span class="ms sm">ios_share</span>Export</button>
         <button class="btn btn--secondary btn--icon" id="resetBtn" title="Khôi phục view" aria-label="Khôi phục view"><span class="ms sm">undo</span></button>
-        <button class="btn btn--secondary btn--icon" id="cloneBtn" title="Nhân bản view" aria-label="Nhân bản view"><span class="ms sm">content_copy</span></button>
       </div>
     </div>
     <div class="pop" id="pop"></div>
@@ -197,7 +195,7 @@ html[data-theme="dark"] .kcol{background:var(--surface-variant)}
 <div class="toast" id="toast" role="status"></div>
 <script src="crm-shared.js"></script>
 <script src="crm-objects.js"></script>
-<script src="crm-list.js"></script>
-<script>HXList('company');</script>
+<script src="crm-leads.js"></script>
+<script>HXLeadList();</script>
 </body>
 </html>

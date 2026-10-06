@@ -253,7 +253,7 @@ const HX = (() => {
   /* ── Shell: topbar + sidebar đúng menu ERP ── */
   // "Deals" = collection Deals_Pipeline đã được "Ghim vào sidebar" (chức năng có sẵn của ERP)
   // Contacts / Companies / Deals = collection đã "Ghim vào sidebar" (chức năng có sẵn của ERP); Báo cáo = dashboard giai đoạn 2
-  const NAV = [['forum','Cowork'],['home','Trang chủ'],['task_alt','Việc của tôi'],['sep'],['person','Contacts','contacts','crm-contacts-hubspot.html'],['domain','Companies','companies','crm-companies-hubspot.html'],
+  const NAV = [['forum','Cowork'],['home','Trang chủ'],['task_alt','Việc của tôi'],['sep'],['person','Contacts','contacts','crm-contacts-hubspot.html'],['domain','Companies','companies','crm-companies-hubspot.html'],['filter_alt','Leads','leads','crm-leads-hubspot.html'],
     ['handshake','Deals','deals','crm-giao-dich-hubspot.html'],['badge','Sales','sales','crm-sales-hubspot.html'],['schema','Sơ đồ quan hệ','schema','crm-quan-he-hubspot.html'],['sep'],['table_chart','Dữ liệu'],['account_tree','Workflow'],['description','Biểu mẫu'],['image','Media'],['bar_chart','Báo cáo','reports','crm-bao-cao-hubspot.html']];
   function shell(cur = 'deals') {
     $('#topbar').innerHTML = `

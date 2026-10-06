@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>CRM-08-sales</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+  body{font-family:Arial,sans-serif;font-size:11pt;max-width:900px;margin:24px auto;color:#222}
+  table{border-collapse:collapse;width:100%;margin:8px 0}
+  td,th{border:1px solid #999;padding:5px 7px;vertical-align:top;text-align:left;font-size:10.5pt}
+  th{background:#eef1f4}
+  code,pre{font-family:Consolas,monospace;font-size:9.5pt}
+  pre{background:#f5f5f5;padding:8px;white-space:pre-wrap}
+  h1{font-size:20pt}h2{font-size:15pt}h3{font-size:12.5pt}
+  </style>
+</head>
+<body>
+<h1 id="crm-08--sales">CRM-08 — Sales</h1>
+<h1 id="product-requirement-document">Product Requirement Document</h1>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Project Owner</strong></td>
+<td>TTS</td>
+<td><strong>Update at</strong></td>
+<td>02-10-2026</td>
+</tr>
+<tr class="even">
+<td><strong>Created by</strong></td>
+<td>TTS (qua Claude)</td>
+<td><strong>Project</strong></td>
+<td>CRM theo UX HubSpot — HarnexAI ERP</td>
+</tr>
+<tr class="odd">
+<td><strong>Version</strong></td>
+<td>2.0</td>
+<td><strong>Features</strong></td>
+<td>S-01 → S-19 (trang Sales)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CONTENT</strong></p>
+<ul>
+<li>USER STORIES</li>
+<li>OVERVIEW FLOW</li>
+<li>USE CASE DESCRIPTION
+<ul>
+<li>UC-1: Xem danh sách và bảng xếp hạng sale</li>
+<li>UC-2: Xuất CSV bảng xếp hạng</li>
+<li>UC-3: Thêm sale</li>
+<li>UC-4: Xem trang chi tiết sale</li>
+<li>UC-5: Sửa thông tin sale</li>
+<li>UC-6: Chuyển giao bản ghi</li>
+<li>UC-7: Đánh dấu đã nghỉ / đang làm việc</li>
+</ul></li>
+<li>BUSINESS RULE</li>
+<li>ACCEPTANCE CRITERIA</li>
+<li>PHỤ LỤC</li>
+</ul>
+<p><strong>VERSION HISTORY</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th><strong>Ver</strong></th>
+<th><strong>Author</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Updated at</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2.0</td>
+<td>TTS (qua Claude)</td>
+<td>Viết lại theo mẫu PRD: user story, use case, business rule,
+acceptance criteria. Nội dung giữ như bản 1.1</td>
+<td>02-10-2026</td>
+</tr>
+<tr class="even">
+<td>1.1</td>
+<td>TTS (qua Claude)</td>
+<td>Sửa theo review đợt 4</td>
+<td>01-10-2026</td>
+</tr>
+<tr class="odd">
+<td>1.0</td>
+<td>TTS (qua Claude)</td>
+<td>Bản đầu</td>
+<td>01-10-2026</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="user-stories">USER STORIES</h1>
+<p>US-SALES-01: Là quản lý kinh doanh, tôi muốn xem bảng xếp hạng sale
+theo tháng, quý, năm để biết ai đang đạt chỉ tiêu. (S-01, S-04 →
+S-08)</p>
+<p>US-SALES-02: Là quản lý kinh doanh, tôi muốn xuất bảng xếp hạng ra
+CSV để đưa vào báo cáo riêng. (S-09)</p>
+<p>US-SALES-03: Là quản lý kinh doanh, tôi muốn thêm một sale mới để
+người đó nhận được contact, công ty và deal. (S-02, S-03, S-10)</p>
+<p>US-SALES-04: Là quản lý kinh doanh, tôi muốn mở trang của một sale để
+xem hiệu suất, pipeline, việc cần làm và các bản ghi người đó phụ trách.
+(S-11, S-13 → S-17)</p>
+<p>US-SALES-05: Là quản lý kinh doanh, tôi muốn sửa thông tin và chỉ
+tiêu của sale ngay trên trang chi tiết. (S-12)</p>
+<p>US-SALES-06: Là quản lý kinh doanh, tôi muốn chuyển toàn bộ bản ghi
+của một sale sang người khác khi người đó nghỉ hoặc đổi việc. (S-18)</p>
+<p>US-SALES-07: Là quản lý kinh doanh, tôi muốn đánh dấu một sale đã
+nghỉ để không ai giao thêm khách cho người đó. (S-19)</p>
+<h1 id="overview-flow">OVERVIEW FLOW</h1>
+<table>
+<thead>
+<tr class="header">
+<th><strong>Bước</strong></th>
+<th><strong>Tác nhân</strong></th>
+<th><strong>Mô tả</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Người dùng</td>
+<td>Bấm "Sales" trên sidebar.</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Hệ thống</td>
+<td>Hiện danh sách sale: tab theo team, ô tìm, nút chọn kỳ, dải KPI và
+bảng xếp hạng.</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Người dùng</td>
+<td>Chọn kỳ (Tháng này, Quý này, Năm nay), lọc theo tab hoặc ô tìm.</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Hệ thống</td>
+<td>Tính lại chỉ số của từng sale trên máy chủ và cập nhật dải KPI,
+bảng.</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Người dùng</td>
+<td>Bấm một dòng để mở trang chi tiết sale.</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Hệ thống</td>
+<td>Hiện thông tin sale, hiệu suất, pipeline, việc cần làm, hoạt động
+gần đây và bản ghi sở hữu.</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Người dùng</td>
+<td>Khi cần: thêm sale, sửa thông tin, chuyển giao bản ghi, đánh dấu đã
+nghỉ.</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Hệ thống</td>
+<td>Lưu thay đổi. Sale mới hiện ngay trong ô chọn owner. Sale đã nghỉ
+biến khỏi ô chọn owner.</td>
+</tr>
+</tbody>
+</table>
+<h1 id="use-case-description">USE CASE DESCRIPTION</h1>
+<h2
+id="uc-1-xem-danh-sách-và-bảng-xếp-hạng-sale-s-01-s-04-s-05-s-06-s-07-s-08">UC-1:
+Xem danh sách và bảng xếp hạng sale (S-01, S-04, S-05, S-06, S-07,
+S-08)</h2>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Actor</strong></td>
+<td>Người dùng đọc được collection <code>NhanVien</code></td>
+</tr>
+<tr class="even">
+<td><strong>Trigger</strong></td>
+<td>Bấm mục "Sales" trên sidebar (ngay sau "Deals", biểu tượng
+<code>badge</code>)</td>
+</tr>
+<tr class="odd">
+<td><strong>Pre-condition</strong></td>
+<td>Có ít nhất một nhân viên được đánh dấu "Thuộc đội kinh doanh"
+(<code>is_sales = true</code>)</td>
+</tr>
+<tr class="even">
+<td><strong>Main Flow</strong></td>
+<td>1. Hệ thống mở
+<code>/crm/sales?view=all&amp;period=month</code>.<br>2. Hệ thống hiện
+header: tiêu đề "Sales", số sale trong tab đang mở ("12 sale"), nút
+"Xuất CSV" và nút chính "Thêm sale".<br>3. Hệ thống hiện hàng tab: "Tất
+cả sales", "Của tôi", và một tab cho mỗi Team đang có sale.<br>4. Hệ
+thống hiện ô "Tìm tên, email, team" và nút chọn kỳ "Tháng này · Quý này
+· Năm nay", cạnh đó ghi khoảng ngày, ví dụ "01/10 – 31/10/2026".<br>5.
+Hệ thống gọi báo cáo <code>sales_scorecard</code> cho các sale đang hiện
+và kỳ đang chọn.<br>6. Hệ thống hiện dải 5 thẻ KPI tổng và bảng xếp hạng
+(cột theo Phụ lục A), mặc định sắp theo Doanh số thắng giảm dần.<br>7.
+Người dùng đổi tab, gõ ô tìm, đổi kỳ hoặc bấm tiêu đề cột để sắp
+xếp.<br>8. Hệ thống tải lại dải KPI và bảng theo lựa chọn mới.<br>9.
+Người dùng bấm một dòng để mở trang chi tiết (UC-4).</td>
+</tr>
+<tr class="odd">
+<td><strong>Post-condition</strong></td>
+<td>Kỳ, tab và cột sắp xếp được nhớ theo người dùng, đổi máy vẫn giữ. Ô
+tìm không nhớ.</td>
+</tr>
+<tr class="even">
+<td><strong>Exception Flow</strong></td>
+<td>3a. Tài khoản chưa gắn với nhân viên nào → không có tab "Của
+tôi".<br>3b. Team không có sale nào → không có tab của team đó.<br>6a.
+Không có sale nào khớp → bảng ghi "Không có sale phù hợp."<br>6b. Đang
+tải → skeleton 8 dòng.<br>6c. Lỗi tải → "Không tải được bảng xếp hạng."
+và nút "Thử lại".<br>2a. Người không có quyền tạo <code>NhanVien</code>
+→ không thấy nút "Thêm sale".</td>
+</tr>
+</tbody>
+</table>
+<h2 id="uc-2-xuất-csv-bảng-xếp-hạng-s-09">UC-2: Xuất CSV bảng xếp hạng
+(S-09)</h2>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Actor</strong></td>
+<td>Người dùng có quyền <code>record.export</code> trên
+<code>NhanVien</code></td>
+</tr>
+<tr class="even">
+<td><strong>Trigger</strong></td>
+<td>Bấm "Xuất CSV" ở header danh sách</td>
+</tr>
+<tr class="odd">
+<td><strong>Pre-condition</strong></td>
+<td>Bảng xếp hạng đã tải xong</td>
+</tr>
+<tr class="even">
+<td><strong>Main Flow</strong></td>
+<td>1. Người dùng bấm "Xuất CSV".<br>2. FE gọi
+<code>POST /api/v1/reports/named/sales_scorecard/export.csv</code> với
+đúng danh sách sale và kỳ đang hiện.<br>3. Máy chủ tạo tệp, ghi nhật ký
+xuất dữ liệu.<br>4. Trình duyệt tải tệp
+<code>sales-{month/quarter/year}-{dd-mm-yyyy}.csv</code>.</td>
+</tr>
+<tr class="odd">
+<td><strong>Post-condition</strong></td>
+<td>Tệp có các cột của bảng theo thứ tự đang hiện, thêm cột Email. Số
+tiền là số nguyên không có dấu ngăn cách, phần trăm là số. Mở bằng Excel
+đọc đúng tiếng Việt.</td>
+</tr>
+<tr class="even">
+<td><strong>Exception Flow</strong></td>
+<td>1a. Không có quyền <code>record.export</code> → không có nút "Xuất
+CSV".</td>
+</tr>
+</tbody>
+</table>
+<h2 id="uc-3-thêm-sale-s-02-s-03-s-10">UC-3: Thêm sale (S-02, S-03,
+S-10)</h2>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Actor</strong></td>
+<td>Người dùng có quyền tạo và sửa bản ghi <code>NhanVien</code></td>
+</tr>
+<tr class="even">
+<td><strong>Trigger</strong></td>
+<td>Bấm "Thêm sale" ở header danh sách</td>
+</tr>
+<tr class="odd">
+<td><strong>Pre-condition</strong></td>
+<td>Không có</td>
+</tr>
+<tr class="even">
+<td><strong>Main Flow</strong></td>
+<td>1. Hệ thống mở panel phải "Thêm sale" có hai tab: "Chọn nhân viên có
+sẵn" và "Tạo nhân viên mới".<br>2. Trường hợp chọn nhân viên có
+sẵn:<br>2.1. Người dùng tìm và chọn một nhân viên đang làm việc chưa
+thuộc đội kinh doanh.<br>2.2. Hệ thống hiện thêm các ô Team, Vai trò,
+Chỉ tiêu tháng.<br>2.3. Người dùng điền và bấm "Thêm".<br>2.4. Hệ thống
+đặt <code>is_sales = true</code> và lưu các ô vừa điền.<br>3. Trường hợp
+tạo nhân viên mới:<br>3.1. Người dùng điền form (các ô theo Phụ lục A)
+và bấm "Tạo".<br>3.2. Hệ thống tạo bản ghi <code>NhanVien</code> với
+<code>is_sales = true</code>.<br>4. Hệ thống đóng panel, hiện toast "Đã
+thêm sale “{tên}”" và tải lại bảng.</td>
+</tr>
+<tr class="odd">
+<td><strong>Post-condition</strong></td>
+<td>Sale mới có trong danh sách Sales. Nếu đang làm việc, sale hiện ngay
+trong ô chọn Contact owner, Company owner và Sale phụ trách của
+Deal.</td>
+</tr>
+<tr class="even">
+<td><strong>Exception Flow</strong></td>
+<td>3.1a. Thiếu họ tên hoặc email → "Nhập họ tên và email của
+sale".<br>3.1b. Trùng tên với nhân viên đang làm việc khác → "Đã có nhân
+viên đang làm việc tên “{tên}”", không tạo.<br>3.1c. Trùng email hoặc
+tài khoản đăng nhập đã gắn nhân viên khác → hiện lỗi của máy chủ dưới ô
+tương ứng.</td>
+</tr>
+</tbody>
+</table>
+<h2
+id="uc-4-xem-trang-chi-tiết-sale-s-11-s-13-s-14-s-15-s-16-s-17">UC-4:
+Xem trang chi tiết sale (S-11, S-13, S-14, S-15, S-16, S-17)</h2>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Actor</strong></td>
+<td>Người dùng đọc được <code>NhanVien</code></td>
+</tr>
+<tr class="even">
+<td><strong>Trigger</strong></td>
+<td>Bấm một dòng trong bảng xếp hạng, hoặc mở
+<code>/crm/sales/&lt;id nhân viên&gt;?period=month</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Pre-condition</strong></td>
+<td>Nhân viên tồn tại</td>
+</tr>
+<tr class="even">
+<td><strong>Main Flow</strong></td>
+<td>1. Hệ thống hiện trang ba cột (trái, giữa, phải).<br>2. Cột trái,
+thẻ định danh: link "‹ Sales", nút "Thao tác ▾", avatar chữ cái, họ tên,
+dòng "{Vai trò} · {Team}", email, số điện thoại và bốn nút nhanh Email,
+Gọi, Deals, Báo cáo.<br>3. Cột trái, card "Thông tin sale" (UC-5).<br>4.
+Cột giữa, card "Hiệu suất": nút chọn kỳ và 6 thẻ chỉ số (Phụ lục
+A).<br>5. Cột giữa, card "Pipeline theo giai đoạn": mỗi giai đoạn một
+dòng gồm tên giai đoạn, thanh so sánh, "{số deal} · {tổng
+Amount}".<br>6. Cột giữa, card "Việc cần làm ({n})": task chưa xong của
+sale và cuộc họp sắp tới do sale tạo, tối đa 8 mục.<br>7. Cột giữa, card
+"Hoạt động gần đây": 6 hoạt động đã diễn ra mới nhất của sale.<br>8. Cột
+phải, ba card "Deals", "Companies", "Contacts": mỗi card tối đa 6 dòng
+và link "Xem tất cả".<br>9. Người dùng bấm số ở thẻ Doanh số thắng,
+Pipeline đang mở hoặc Task quá hạn để xem danh sách bản ghi tạo nên con
+số đó.</td>
+</tr>
+<tr class="odd">
+<td><strong>Post-condition</strong></td>
+<td>Không thay đổi dữ liệu. Kỳ đang chọn dùng chung với danh sách
+Sales.</td>
+</tr>
+<tr class="even">
+<td><strong>Exception Flow</strong></td>
+<td>2a. Sale không có email → nút Email vô hiệu. Không có số điện thoại
+→ nút Gọi vô hiệu.<br>6a. Không có việc → "Không có việc cần
+làm."<br>6b. Hơn 8 mục → nút "Xem thêm {n}" mở rộng ngay trong
+card.<br>7a. Chưa có hoạt động → "Chưa có hoạt động nào."<br>8a. Card
+không có bản ghi → "Chưa sở hữu {deal / công ty / contact} nào."<br>8b.
+Hơn 6 bản ghi → dòng "+{n} bản ghi khác".</td>
+</tr>
+</tbody>
+</table>
+<h2 id="uc-5-sửa-thông-tin-sale-s-12">UC-5: Sửa thông tin sale
+(S-12)</h2>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Actor</strong></td>
+<td>Người dùng có quyền sửa <code>NhanVien</code></td>
+</tr>
+<tr class="even">
+<td><strong>Trigger</strong></td>
+<td>Bấm vào một giá trị trong card "Thông tin sale"</td>
+</tr>
+<tr class="odd">
+<td><strong>Pre-condition</strong></td>
+<td>Đang ở trang chi tiết sale</td>
+</tr>
+<tr class="even">
+<td><strong>Main Flow</strong></td>
+<td>1. Hệ thống cho sửa tại chỗ các trường: Họ và tên, Email, Số điện
+thoại, Team, Vai trò, Chỉ tiêu tháng, Trạng thái, Ngày vào làm, Tài
+khoản đăng nhập, Thuộc đội kinh doanh.<br>2. Người dùng sửa một giá trị
+và lưu.<br>3. Hệ thống kiểm tra và lưu.<br>4. Nếu đổi Họ và tên: hệ
+thống hiện toast "Đã đổi tên. Mọi bản ghi do {tên mới} phụ trách hiện
+tên mới."<br>5. Nếu đổi Trạng thái sang "Đã nghỉ": chạy UC-7.<br>6. Nếu
+bỏ tick "Thuộc đội kinh doanh": hệ thống hỏi "{Tên} sẽ không còn trong
+danh sách Sales và ô chọn owner. Bản ghi đang sở hữu giữ nguyên." Người
+dùng đồng ý thì lưu và quay về danh sách.</td>
+</tr>
+<tr class="odd">
+<td><strong>Post-condition</strong></td>
+<td>Thông tin mới được lưu. Mọi nơi hiển thị owner tự hiện tên mới vì
+owner là liên kết tới nhân viên, không phải chữ.</td>
+</tr>
+<tr class="even">
+<td><strong>Exception Flow</strong></td>
+<td>2a. Họ và tên để trống → "Tên không được để trống".<br>2b. Trùng tên
+nhân viên đang làm việc khác → "Đã có nhân viên đang làm việc tên
+“{tên}”", giữ giá trị cũ.<br>1a. Không có quyền sửa → card chỉ đọc.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="uc-6-chuyển-giao-bản-ghi-s-18">UC-6: Chuyển giao bản ghi
+(S-18)</h2>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Actor</strong></td>
+<td>Người dùng có quyền ghi trên các collection được chuyển</td>
+</tr>
+<tr class="even">
+<td><strong>Trigger</strong></td>
+<td>Chọn "Thao tác ▾ → Chuyển giao bản ghi" ở trang chi tiết sale</td>
+</tr>
+<tr class="odd">
+<td><strong>Pre-condition</strong></td>
+<td>Sale đang phụ trách ít nhất một bản ghi</td>
+</tr>
+<tr class="even">
+<td><strong>Main Flow</strong></td>
+<td>1. Hệ thống mở hộp thoại "Chuyển giao bản ghi của {tên}".<br>2. Hệ
+thống hiện bốn mục có ô tick, mặc định tick hết, kèm số lượng: Contacts
+({n}), Companies ({n}), Deals đang mở ({n}), Task chưa xong ({n}).<br>3.
+Hệ thống ghi chú: "Deal đã đóng giữ nguyên Sale phụ trách để không đổi
+doanh số đã ghi nhận."<br>4. Người dùng chọn người nhận ở ô "Chuyển cho"
+(chỉ sale đang làm việc, không gồm chính người này).<br>5. Người dùng
+bấm "Chuyển giao".<br>6. Máy chủ tạo một job chạy nền đổi owner hàng
+loạt. Hộp thoại đóng, thanh tiến độ hiện ở góc màn hình.<br>7. Job xong:
+hệ thống hiện toast và gửi thông báo "Đã chuyển {n} bản ghi của {tên cũ}
+cho {tên mới}", trang chi tiết tải lại.</td>
+</tr>
+<tr class="odd">
+<td><strong>Post-condition</strong></td>
+<td>Các bản ghi đã chọn có owner mới. Task có người thực hiện mới. Deal
+đã đóng vẫn của sale cũ. Mọi thay đổi chung một mã thao tác hàng
+loạt.</td>
+</tr>
+<tr class="even">
+<td><strong>Exception Flow</strong></td>
+<td>2a. Có bản ghi người dùng không có quyền sửa → hộp cảnh báo "{n} bản
+ghi bạn không có quyền sửa sẽ được giữ nguyên."<br>5a. Chưa chọn người
+nhận hoặc không tick mục nào → nút "Chuyển giao" vô hiệu.<br>7a. Sale cũ
+vẫn "Đang làm việc" → toast có thêm nút "Đánh dấu đã nghỉ".<br>6a. Số
+đếm lúc mở hộp thoại khác lúc chạy → kết quả cuối theo job.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="uc-7-đánh-dấu-đã-nghỉ--đang-làm-việc-s-19">UC-7: Đánh dấu đã
+nghỉ / đang làm việc (S-19)</h2>
+<table>
+<tbody>
+<tr class="odd">
+<td><strong>Actor</strong></td>
+<td>Người dùng có quyền sửa <code>NhanVien</code></td>
+</tr>
+<tr class="even">
+<td><strong>Trigger</strong></td>
+<td>Chọn "Thao tác ▾ → Đánh dấu đã nghỉ" (hoặc "Đánh dấu đang làm
+việc"), hoặc đổi Trạng thái trong card "Thông tin sale"</td>
+</tr>
+<tr class="odd">
+<td><strong>Pre-condition</strong></td>
+<td>Đang ở trang chi tiết sale</td>
+</tr>
+<tr class="even">
+<td><strong>Main Flow</strong></td>
+<td>1. Hệ thống đếm bản ghi sale còn phụ trách: contact, công ty, deal
+đang mở, task chưa xong.<br>2. Nếu còn bản ghi: hệ thống hỏi "{Tên} còn
+phụ trách {a} contact, {b} công ty, {c} deal đang mở, {d} task chưa
+xong. Nên chuyển giao trước khi đánh dấu đã nghỉ." với ba nút "Chuyển
+giao trước", "Vẫn đánh dấu đã nghỉ", "Huỷ".<br>3. Nếu không còn bản ghi:
+hệ thống hỏi "Đánh dấu {tên} đã nghỉ?".<br>4. Người dùng xác nhận.<br>5.
+Hệ thống đặt Trạng thái thành "Đã nghỉ".</td>
+</tr>
+<tr class="odd">
+<td><strong>Post-condition</strong></td>
+<td>Sale biến khỏi ô chọn owner. Dòng của sale trong danh sách mờ đi, có
+nhãn "Đã nghỉ", không có hạng. Bản ghi vẫn thuộc sale hiện tên kèm nhãn
+trạng thái. Tài khoản đăng nhập không bị khoá.</td>
+</tr>
+<tr class="even">
+<td><strong>Exception Flow</strong></td>
+<td>2a. Chọn "Chuyển giao trước" → mở UC-6.<br>Đánh dấu đang làm việc:
+hộp xác nhận ngắn, đặt Trạng thái "Đang làm việc"; sale trở lại ô chọn
+owner và có hạng.<br>Tạm nghỉ: đặt bằng cách sửa Trạng thái ở UC-5,
+không hỏi gì; sale tạm nghỉ không có trong ô chọn owner nhưng vẫn giữ
+bản ghi.</td>
+</tr>
+</tbody>
+</table>
+<h1 id="business-rule">BUSINESS RULE</h1>
+<table>
+<thead>
+<tr class="header">
+<th><strong>BR</strong></th>
+<th><strong>Mô tả</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>BR-01</td>
+<td><strong>Sale là nhân viên, không phải collection mới</strong><br>-
+Sale là bản ghi của collection <code>NhanVien</code> đang có, có
+<code>is_sales = true</code> ("Thuộc đội kinh doanh").<br>-
+<code>NhanVien</code> dùng chung cho cả ERP (có kế toán, kỹ thuật), nên
+cần cờ này để tách đội kinh doanh.<br>- Khi chuyển dữ liệu, script đặt
+<code>is_sales = true</code> cho nhân viên khớp với Sale phụ trách của
+deal cũ và nhân viên có Team hoặc Vai trò; còn lại quản trị đánh dấu
+tay.</td>
+</tr>
+<tr class="even">
+<td>BR-02</td>
+<td><strong>Ô chọn owner</strong><br>- Ô chọn Contact owner, Company
+owner, Sale phụ trách chỉ liệt kê nhân viên <code>is_sales = true</code>
+và đang làm việc.<br>- Ô chọn Người thực hiện của task liệt kê mọi nhân
+viên đang làm việc, không cần <code>is_sales</code>.<br>- Sale vừa thêm
+hiện ngay trong các ô này.</td>
+</tr>
+<tr class="odd">
+<td>BR-03</td>
+<td><strong>Tab và tìm kiếm</strong><br>- Sale "Tạm nghỉ", "Đã nghỉ" có
+trong mọi tab, dòng mờ, có nhãn trạng thái cạnh tên.<br>- Tab đang chọn
+ghi vào URL (<code>view=all</code>, <code>me</code> hoặc tên team).<br>-
+Ô tìm lọc theo Họ và tên, Email, Team; gửi sau khi ngừng gõ 300 ms; máy
+chủ so khớp không phân biệt hoa thường và bỏ dấu (gõ "tran" ra
+"Trần").</td>
+</tr>
+<tr class="even">
+<td>BR-04</td>
+<td><strong>Kỳ</strong><br>- Ba kỳ: Tháng này, Quý này, Năm nay, theo
+giờ Việt Nam.<br>- Chỉ tiêu kỳ = chỉ tiêu tháng × số tháng của kỳ (1, 3,
+12). Chưa đặt chỉ tiêu tháng thì không có chỉ tiêu kỳ.<br>- Chỉ tiêu kỳ
+không trừ phần tháng trước ngày vào làm (xem câu hỏi Q3).</td>
+</tr>
+<tr class="odd">
+<td>BR-05</td>
+<td><strong>Chỉ số tính ở máy chủ</strong><br>- Mọi chỉ số tính theo
+owner hiện tại của bản ghi, công thức ở Phụ lục A.<br>- Doanh số thắng,
+số deal thắng, thua, tỷ lệ thắng tính theo ngày đóng
+(<code>closed_at</code>) trong kỳ.<br>- Số contact, công ty, deal đang
+mở, pipeline, dự báo không theo kỳ.<br>- Hoạt động 30 ngày luôn tính 29
+ngày trước tới hết hôm nay; chỉ đếm ghi chú, cuộc gọi, cuộc họp đã diễn
+ra.<br>- Task quá hạn là task chưa xong đã qua giờ hạn (tính theo giờ,
+không theo ngày).<br>- Số liệu chỉ tính trên bản ghi người xem đọc được
+(xem câu hỏi Q1).</td>
+</tr>
+<tr class="even">
+<td>BR-06</td>
+<td><strong>Dải KPI tổng</strong><br>- Tính trên các sale đang hiện sau
+khi lọc tab và ô tìm.<br>- Thẻ "Đạt chỉ tiêu" = tổng doanh số thắng ÷
+tổng chỉ tiêu kỳ, cả tử số và mẫu số chỉ lấy sale có chỉ tiêu. Không ai
+có chỉ tiêu thì hiện "—".<br>- Thẻ "Task quá hạn" đổi sang kiểu cảnh báo
+khi lớn hơn 0.<br>- Số tiền dạng rút gọn ("1,2 tỷ ₫", "610 tr ₫"), rê
+chuột hiện số đầy đủ.</td>
+</tr>
+<tr class="odd">
+<td>BR-07</td>
+<td><strong>Hạng</strong><br>- Máy chủ xếp các sale đang làm việc theo
+Doanh số thắng giảm dần; bằng nhau thì theo giá trị pipeline giảm
+dần.<br>- Hạng tính trên toàn bộ sale đang làm việc, không đổi khi lọc
+tab, tìm kiếm hay sắp xếp cột.<br>- Sale tạm nghỉ, đã nghỉ không có hạng
+("—").<br>- Hạng 1 có huy hiệu nổi bật khi Doanh số thắng lớn hơn
+0.</td>
+</tr>
+<tr class="even">
+<td>BR-08</td>
+<td><strong>Pipeline theo giai đoạn (trang chi tiết)</strong><br>- Bốn
+giai đoạn đang mở tính deal hiện đang ở giai đoạn đó.<br>- Closed Won,
+Closed Lost chỉ tính deal có ngày đóng trong kỳ đang chọn.<br>- Thanh
+dài theo tổng Amount, so với dòng lớn nhất.<br>- Bấm một dòng mở danh
+sách Deals lọc Sale phụ trách và giai đoạn đó (Won, Lost thêm bộ lọc
+ngày đóng trong kỳ).</td>
+</tr>
+<tr class="odd">
+<td>BR-09</td>
+<td><strong>Việc cần làm (trang chi tiết)</strong><br>- Thứ tự: task quá
+hạn trước (hạn cũ nhất trước), rồi các mục còn lại theo hạn hoặc giờ bắt
+đầu tăng dần.<br>- Task đã qua giờ hạn: "Hạn {dd/mm HH:mm} · Quá hạn"
+màu lỗi, kể cả khi hạn là đầu giờ hôm nay.<br>- Task hạn trong hôm nay,
+chưa tới giờ: "Hôm nay {HH:mm}" đậm.<br>- Task hạn từ ngày mai: "Hạn
+{dd/mm}". Sau đó "· Ưu tiên {mức}".<br>- Cuộc họp ghi "{dd/mm
+HH:mm}".</td>
+</tr>
+<tr class="even">
+<td>BR-10</td>
+<td><strong>Card bản ghi sở hữu (trang chi tiết)</strong><br>- Thứ tự
+card: Deals, Companies, Contacts. Header "{Đối tượng} ({tổng})".<br>-
+Deals: deal đang mở trước (Ngày dự kiến chốt tăng dần), rồi deal đóng
+gần nhất. Dòng: "{Mã Deal} — {Tên Deal}" và "{Amount} · {giai
+đoạn}".<br>- Companies: tên và Lifecycle stage. Contacts: họ tên và chức
+danh (không có thì Lifecycle stage).<br>- "Xem tất cả" mở danh sách lọc
+owner là sale này.</td>
+</tr>
+<tr class="odd">
+<td>BR-11</td>
+<td><strong>Đổi tên sale</strong><br>- Không cập nhật hàng loạt owner:
+owner là liên kết nên mọi nơi tự hiện tên mới.<br>- Riêng trường chữ cũ
+<code>sale_ph_tr_ch</code> của Deals, trong thời gian chuyển tiếp, được
+máy chủ đồng bộ theo tên mới (xem F03-S5, phần đổi tên ở trường văn bản
+cũ).</td>
+</tr>
+<tr class="even">
+<td>BR-12</td>
+<td><strong>Chuyển giao</strong><br>- Chuyển được bốn loại: contact,
+công ty, deal đang mở, task chưa xong.<br>- Deal đã đóng không đổi
+owner, để doanh số và tỷ lệ thắng trong quá khứ vẫn tính cho đúng
+người.<br>- Người nhận phải là sale đang làm việc và khác người
+chuyển.<br>- Bản ghi người thực hiện không có quyền sửa bị bỏ qua.</td>
+</tr>
+<tr class="odd">
+<td>BR-13</td>
+<td><strong>Xoá nhân viên</strong><br>- Mục "Xoá" trong "Thao tác ▾" chỉ
+hiện khi không còn bản ghi nào trỏ tới nhân viên.<br>- Nhân viên nghỉ
+việc thì đánh dấu "Đã nghỉ", không xoá.</td>
+</tr>
+<tr class="even">
+<td>BR-14</td>
+<td><strong>Quyền</strong><br>- Xem danh sách, chi tiết: đọc được
+<code>NhanVien</code>.<br>- Thêm sale, sửa thông tin, đổi trạng thái:
+quyền tạo, sửa <code>NhanVien</code>.<br>- Xuất CSV:
+<code>record.export</code> trên <code>NhanVien</code>.<br>- Chuyển giao:
+quyền ghi trên các collection được chuyển.<br>- Xoá nhân viên:
+<code>record.delete</code> trên <code>NhanVien</code> và không còn bản
+ghi trỏ tới.</td>
+</tr>
+</tbody>
+</table>
+<h1 id="acceptance-criteria">ACCEPTANCE CRITERIA</h1>
+<p>AC-1: Menu và header (S-01, S-04)</p>
+<ul>
+<li>Người đọc được <code>NhanVien</code> thấy "Sales" ngay sau "Deals"
+trên sidebar.</li>
+<li>Tab Tất cả có 12 sale thì header ghi "Sales", "12 sale", có nút
+"Xuất CSV" và "Thêm sale".</li>
+</ul>
+<p>AC-2: Chỉ nhân viên kinh doanh (S-02, S-03)</p>
+<ul>
+<li><code>NhanVien</code> có 15 người, 12 người
+<code>is_sales = true</code> → danh sách Sales có 12 sale.</li>
+<li>Ô chọn Contact owner chỉ có những người đang làm việc trong 12 người
+đó.</li>
+<li>Ô Người thực hiện của task có cả 3 người còn lại nếu họ đang làm
+việc.</li>
+<li>Vừa thêm sale "Võ Thị Hoa" đang làm việc → mở panel tạo Contact thấy
+"Võ Thị Hoa" trong ô Contact owner.</li>
+</ul>
+<p>AC-3: Tab theo team (S-05)</p>
+<ul>
+<li>Có sale ở "Sales HCM" và "Key Account", không ai ở "Sales HN" → hàng
+tab là "Tất cả sales · Của tôi · Sales HCM · Key Account".</li>
+<li>Tài khoản chưa gắn nhân viên → không có tab "Của tôi".</li>
+</ul>
+<p>AC-4: Tìm kiếm và chọn kỳ (S-06)</p>
+<ul>
+<li>Gõ "tran" ra các sale họ Trần; gõ "hcm" ra sale thuộc Team Sales
+HCM.</li>
+<li>Ngày 01/10/2026 chọn "Quý này" → cạnh nút ghi "01/10 –
+31/12/2026".</li>
+<li>Mở danh sách trên máy khác vẫn là "Quý này".</li>
+</ul>
+<p>AC-5: Dải KPI theo danh sách đang lọc (S-07)</p>
+<ul>
+<li>Tab "Sales HCM" có Minh (thắng 610 tr, chỉ tiêu 500 tr) và Lan
+(thắng 240 tr, chưa đặt chỉ tiêu), kỳ Tháng này.</li>
+<li>Doanh số thắng hiện 850 tr ₫.</li>
+<li>Đạt chỉ tiêu hiện 122%, dòng phụ "Chỉ tiêu kỳ: 500 tr ₫" (Lan không
+có chỉ tiêu nên không tính vào cả tử và mẫu).</li>
+</ul>
+<p>AC-6: Bảng xếp hạng (S-08)</p>
+<ul>
+<li>Ba sale đang làm việc thắng 610 tr, 240 tr, 0 → thứ tự theo Doanh số
+thắng giảm dần, hạng 1 · 2 · 3, hạng 1 có huy hiệu nổi bật.</li>
+<li>Bấm tiêu đề "Tỷ lệ thắng" thì bảng sắp lại, hạng không đổi.</li>
+<li>Minh có chỉ tiêu tháng 500.000.000 ₫, chọn "Quý này" → cột Chỉ tiêu
+là 1,5 tỷ ₫.</li>
+<li>Sale chưa có deal đóng trong kỳ → Tỷ lệ thắng "—". Chỉ tiêu tháng
+bằng 0 hoặc trống → "Chưa đặt chỉ tiêu".</li>
+</ul>
+<p>AC-7: Xuất CSV (S-09)</p>
+<ul>
+<li>Tab Sales HCM, kỳ Tháng này, ngày 01/10/2026 → tải
+<code>sales-month-01-10-2026.csv</code> chỉ gồm sale của Sales HCM.</li>
+<li>Mở bằng Excel đúng tiếng Việt.</li>
+<li>Không có <code>record.export</code> trên <code>NhanVien</code> →
+không có nút.</li>
+</ul>
+<p>AC-8: Thêm sale (S-10)</p>
+<ul>
+<li>Chọn "Trần Thị Mai" (đang làm việc, chưa thuộc đội kinh doanh), Team
+Sales HN, bấm "Thêm" → Mai có trong danh sách Sales, không có bản ghi
+nhân viên mới.</li>
+<li>Tạo nhân viên mới tên "Minh Trần" khi đã có nhân viên đang làm việc
+cùng tên → báo "Đã có nhân viên đang làm việc tên “Minh Trần”", không
+tạo.</li>
+</ul>
+<p>AC-9: Thẻ định danh và nút nhanh (S-11)</p>
+<ul>
+<li>Bấm "Deals" → mở danh sách Deals lọc Sale phụ trách là sale
+này.</li>
+<li>Bấm "Báo cáo" → mở dashboard "Tổng quan pipeline" lọc Sale phụ trách
+là sale này.</li>
+<li>Nhân viên còn bản ghi → menu "Thao tác ▾" không có mục Xoá.</li>
+</ul>
+<p>AC-10: Sửa thông tin và đổi tên (S-12)</p>
+<ul>
+<li>Đổi "Minh Trần" thành "Trần Văn Minh" → toast "Đã đổi tên. Mọi bản
+ghi do Trần Văn Minh phụ trách hiện tên mới."; mở một contact của Minh
+thấy owner "Trần Văn Minh".</li>
+<li>Khi còn đồng bộ <code>sale_ph_tr_ch</code>, các deal của Minh có
+<code>sale_ph_tr_ch</code> mới.</li>
+<li>Bỏ tick "Thuộc đội kinh doanh" → hỏi xác nhận; lưu thì về danh sách
+và người đó không còn trong danh sách.</li>
+<li>Người chỉ đọc <code>NhanVien</code> → card chỉ đọc, không có "Thêm
+sale", "Chuyển giao".</li>
+</ul>
+<p>AC-11: KPI hiệu suất (S-13)</p>
+<ul>
+<li>Minh có 4 deal thắng 610 tr và 2 deal thua có ngày đóng trong tháng,
+9 deal đang mở tổng 1,24 tỷ, dự báo 412 tr.</li>
+<li>Doanh số thắng 610 tr ₫ "4 deal Closed Won".</li>
+<li>Tỷ lệ thắng 67% "4 thắng · 2 thua trong kỳ".</li>
+<li>Pipeline đang mở 1,24 tỷ ₫ "9 deal · dự báo 412 tr ₫".</li>
+</ul>
+<p>AC-12: Pipeline theo giai đoạn (S-14)</p>
+<ul>
+<li>Minh có 3 deal ở "2. Discovery Call" tổng 300 tr → bấm dòng đó mở
+danh sách Deals lọc Sale phụ trách Minh và giai đoạn đó, có 3 deal.</li>
+</ul>
+<p>AC-13: Việc cần làm (S-15)</p>
+<ul>
+<li>Minh có task hạn 25/09 17:00, task hạn 01/10 08:00, task hạn 01/10
+17:00, cuộc họp 02/10 10:00; xem lúc 09:00 ngày 01/10/2026.</li>
+<li>Thứ tự: task 25/09 ("Quá hạn") · task 01/10 08:00 ("Quá hạn") · task
+01/10 17:00 ("Hôm nay 17:00") · cuộc họp 02/10 10:00.</li>
+<li>Thẻ Task quá hạn ở card Hiệu suất là 2.</li>
+</ul>
+<p>AC-14: Hoạt động gần đây (S-16)</p>
+<ul>
+<li>Minh có 10 hoạt động đã diễn ra và 1 cuộc họp hẹn tuần sau → card có
+6 hoạt động mới nhất đã diễn ra, không có cuộc họp tuần sau.</li>
+</ul>
+<p>AC-15: Card bản ghi sở hữu (S-17)</p>
+<ul>
+<li>Minh sở hữu 42 contact → header "Contacts (42)", 6 dòng và "+36 bản
+ghi khác".</li>
+<li>"Xem tất cả" mở danh sách Contacts lọc owner Minh.</li>
+</ul>
+<p>AC-16: Chuyển giao (S-18)</p>
+<ul>
+<li>Minh có 42 contact, 17 company, 9 deal đang mở, 6 task chưa xong →
+hộp thoại hiện đúng bốn số đó.</li>
+<li>Chuyển cả bốn mục cho Lan Lê → sau khi job xong, Minh còn 0 contact,
+0 company và chỉ còn deal đã đóng.</li>
+<li>Bỏ tick "Task chưa xong" → task giữ người thực hiện cũ.</li>
+<li>Danh sách người nhận không có chính Minh và không có người không
+đang làm việc.</li>
+<li>Toast có nút "Đánh dấu đã nghỉ".</li>
+</ul>
+<p>AC-17: Đánh dấu đã nghỉ (S-19)</p>
+<ul>
+<li>Minh còn 9 deal đang mở → hộp thoại nêu số bản ghi còn phụ trách với
+ba nút.</li>
+<li>Chọn "Vẫn đánh dấu đã nghỉ" → dòng Minh mờ, nhãn "Đã nghỉ", không có
+hạng, không còn trong ô chọn owner.</li>
+<li>Đánh dấu đang làm việc cho người đã nghỉ → trở lại ô chọn owner, có
+hạng.</li>
+</ul>
+<p>AC-18: Màn hẹp và tốc độ</p>
+<ul>
+<li>Màn 390 px: bảng cuộn ngang, cột Sale dính trái; trang chi tiết một
+cột.</li>
+<li>30 sale, kỳ Năm nay: bảng hiện xong dưới 2 giây.</li>
+</ul>
+<h1 id="phụ-lục">PHỤ LỤC</h1>
+<h2 id="a-màn-hình-và-dữ-liệu-hiển-thị">A. Màn hình và dữ liệu hiển
+thị</h2>
+<p><strong>Dải KPI tổng (5 thẻ)</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Thẻ</th>
+<th>Giá trị</th>
+<th>Dòng phụ</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Doanh số thắng</td>
+<td>Tổng <code>wonAmount</code></td>
+<td>"Deal Closed Won có ngày đóng trong kỳ"</td>
+</tr>
+<tr class="even">
+<td>Đạt chỉ tiêu</td>
+<td>Theo BR-06</td>
+<td>"Chỉ tiêu kỳ: {tổng chỉ tiêu}"</td>
+</tr>
+<tr class="odd">
+<td>Pipeline đang mở</td>
+<td>Tổng <code>pipeline</code></td>
+<td>"{tổng openDeals} deal · dự báo {tổng forecast}"</td>
+</tr>
+<tr class="even">
+<td>Hoạt động 30 ngày</td>
+<td>Tổng <code>activities30d</code></td>
+<td>"Ghi chú · cuộc gọi · cuộc họp"</td>
+</tr>
+<tr class="odd">
+<td>Task quá hạn</td>
+<td>Tổng <code>overdueTasks</code></td>
+<td>"Chưa hoàn thành, đã quá hạn"</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cột bảng xếp hạng</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Cột</th>
+<th>Ghi chú</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sale</td>
+<td>Dính trái. Huy hiệu hạng, avatar chữ cái, họ tên, nhãn trạng thái
+nếu không phải Đang làm việc</td>
+</tr>
+<tr class="even">
+<td>Team · Vai trò</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Contacts · Companies · Deal đang mở</td>
+<td>Số, canh phải</td>
+</tr>
+<tr class="even">
+<td>Giá trị pipeline · Dự báo (theo tỷ lệ)</td>
+<td>Tiền rút gọn</td>
+</tr>
+<tr class="odd">
+<td>Doanh số thắng</td>
+<td>In đậm</td>
+</tr>
+<tr class="even">
+<td>Chỉ tiêu</td>
+<td>"—" khi chưa đặt</td>
+</tr>
+<tr class="odd">
+<td>% đạt chỉ tiêu</td>
+<td>Thanh tiến độ và phần trăm. Từ 100%: màu thành công; 50–99%: cảnh
+báo; dưới 50%: lỗi; chưa đặt: chữ "Chưa đặt chỉ tiêu"</td>
+</tr>
+<tr class="even">
+<td>Tỷ lệ thắng</td>
+<td>Phần trăm; "—" khi kỳ chưa có deal đóng</td>
+</tr>
+<tr class="odd">
+<td>Hoạt động 30 ngày</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Task quá hạn</td>
+<td>Số khác 0 hiện nhãn màu lỗi</td>
+</tr>
+</tbody>
+</table>
+<p>Footer bảng: "{n} sale" và chữ nhỏ "Chỉ tiêu kỳ = chỉ tiêu tháng × số
+tháng của kỳ. Bấm tên cột để sắp xếp, bấm dòng để xem chi tiết."</p>
+<p><strong>Card Hiệu suất (6 thẻ, trang chi tiết)</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Thẻ</th>
+<th>Giá trị</th>
+<th>Dòng phụ</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Doanh số thắng</td>
+<td><code>wonAmount</code></td>
+<td>"{wonCount} deal Closed Won"</td>
+</tr>
+<tr class="even">
+<td>Chỉ tiêu kỳ</td>
+<td><code>quota</code> hoặc "—"</td>
+<td>Thanh % đạt như bảng xếp hạng</td>
+</tr>
+<tr class="odd">
+<td>Pipeline đang mở</td>
+<td><code>pipeline</code></td>
+<td>"{openDeals} deal · dự báo {forecast}"</td>
+</tr>
+<tr class="even">
+<td>Tỷ lệ thắng</td>
+<td><code>winRate</code> hoặc "—"</td>
+<td>"{wonCount} thắng · {lostCount} thua trong kỳ"</td>
+</tr>
+<tr class="odd">
+<td>Hoạt động 30 ngày</td>
+<td><code>activities30d</code></td>
+<td>"Ghi chú · cuộc gọi · cuộc họp"</td>
+</tr>
+<tr class="even">
+<td>Task quá hạn</td>
+<td><code>overdueTasks</code></td>
+<td>"{openTasks} task chưa xong"; kiểu cảnh báo khi lớn hơn 0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bốn nút nhanh ở thẻ định danh</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Nút</th>
+<th>Hành vi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Email</td>
+<td>Mở ứng dụng thư của máy (<code>mailto:</code>)</td>
+</tr>
+<tr class="even">
+<td>Gọi</td>
+<td>Mở <code>tel:</code></td>
+</tr>
+<tr class="odd">
+<td>Deals</td>
+<td>Mở danh sách Deals lọc Sale phụ trách là sale này</td>
+</tr>
+<tr class="even">
+<td>Báo cáo</td>
+<td>Mở dashboard "Tổng quan pipeline" (CRM-07) lọc Sale phụ trách là
+sale này</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Form "Tạo nhân viên mới"</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Ô</th>
+<th>Ràng buộc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Họ và tên *</td>
+<td>Không trùng tên nhân viên đang làm việc khác</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Email *</td>
+<td>Đúng định dạng, duy nhất</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Số điện thoại</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Team</td>
+<td>Danh mục D-TEAM</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Vai trò</td>
+<td>Danh mục D-ROLE</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Chỉ tiêu tháng</td>
+<td>Tiền, từ 0 trở lên, gợi ý "VD: 100000000"</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Trạng thái</td>
+<td>Danh mục D-WORKSTATUS, mặc định Đang làm việc</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Ngày vào làm</td>
+<td>Mặc định hôm nay</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Tài khoản đăng nhập</td>
+<td>Chọn tài khoản ERP, không bắt buộc; mỗi tài khoản gắn tối đa một
+nhân viên</td>
+</tr>
+</tbody>
+</table>
+<p>Chú thích dưới form: "Sale mới hiện ngay trong ô chọn Contact owner,
+Company owner và Sale phụ trách của Deal."</p>
+<p><strong>Công thức chỉ số</strong></p>
+<p>"Deal đang mở", Won, Lost theo CRM-00. Amount là
+<code>t_ng_cash_in_d_ki_n</code>, trống tính 0.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Chỉ số</th>
+<th>Công thức</th>
+<th>Theo kỳ</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>contacts</code>, <code>companies</code></td>
+<td>Số contact, công ty có <code>owner_id</code> là nhân viên</td>
+<td>Không</td>
+</tr>
+<tr class="even">
+<td><code>openDeals</code></td>
+<td>Số deal đang mở của nhân viên</td>
+<td>Không</td>
+</tr>
+<tr class="odd">
+<td><code>pipeline</code></td>
+<td>Tổng Amount của deal đang mở</td>
+<td>Không</td>
+</tr>
+<tr class="even">
+<td><code>forecast</code></td>
+<td>Tổng (Amount × Tỷ lệ thành công ÷ 100) của deal đang mở; tỷ lệ trống
+tính 0</td>
+<td>Không</td>
+</tr>
+<tr class="odd">
+<td><code>wonAmount</code>, <code>wonCount</code></td>
+<td>Tổng Amount, số deal Won có <code>closed_at</code> trong kỳ</td>
+<td>Có</td>
+</tr>
+<tr class="even">
+<td><code>lostCount</code></td>
+<td>Số deal Lost có <code>closed_at</code> trong kỳ</td>
+<td>Có</td>
+</tr>
+<tr class="odd">
+<td><code>winRate</code></td>
+<td><code>wonCount</code> ÷ (<code>wonCount</code> +
+<code>lostCount</code>) × 100, làm tròn; trống khi mẫu bằng 0</td>
+<td>Có</td>
+</tr>
+<tr class="even">
+<td><code>quota</code></td>
+<td><code>monthly_quota</code> × số tháng của kỳ; trống khi chưa đặt chỉ
+tiêu tháng</td>
+<td>Có</td>
+</tr>
+<tr class="odd">
+<td><code>quotaPct</code></td>
+<td><code>wonAmount</code> ÷ <code>quota</code> × 100, làm tròn; trống
+khi <code>quota</code> trống hoặc bằng 0</td>
+<td>Có</td>
+</tr>
+<tr class="even">
+<td><code>activities30d</code></td>
+<td>Số ghi chú, cuộc gọi, cuộc họp đã diễn ra trong 30 ngày qua do nhân
+viên thực hiện</td>
+<td>Không</td>
+</tr>
+<tr class="odd">
+<td><code>openTasks</code></td>
+<td>Số task chưa xong có người thực hiện là nhân viên</td>
+<td>Không</td>
+</tr>
+<tr class="even">
+<td><code>overdueTasks</code></td>
+<td>Số task chưa xong đã qua giờ hạn</td>
+<td>Không</td>
+</tr>
+</tbody>
+</table>
+<h2 id="b-dữ-liệu">B. Dữ liệu</h2>
+<p>Collection <code>NhanVien</code> (đặc tả ở CRM-00) dùng các trường:
+Họ và tên, Email, Số điện thoại, Tài khoản đăng nhập
+(<code>tai_khoan</code>), Team (<code>sales_team</code>), Vai trò
+(<code>sales_role</code>), Chỉ tiêu tháng (<code>monthly_quota</code>),
+Trạng thái (<code>work_status</code>), Ngày vào làm.</p>
+<p>Trường thêm cho spec này:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Key</th>
+<th>Tên hiển thị</th>
+<th>Kiểu</th>
+<th>Ghi chú</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>is_sales</code></td>
+<td>Thuộc đội kinh doanh</td>
+<td>Hộp kiểm</td>
+<td>Mặc định <code>false</code></td>
+</tr>
+</tbody>
+</table>
+<p>Lựa chọn kỳ, tab, cột sắp xếp nhớ theo người dùng ở khoá
+<code>crm.sales.list</code> với giá trị
+<code>{ "period", "view", "sort" }</code> (F03-S4, trạng thái giao diện
+theo người dùng).</p>
+<h2 id="c-api">C. API</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Việc</th>
+<th>API</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Chỉ số của các sale</td>
+<td><code>POST /api/v1/reports/named/sales_scorecard</code> (F14-S1),
+gửi danh sách nhân viên và kỳ; trả các chỉ số ở Phụ lục A,
+<code>rank</code> và mã drill</td>
+</tr>
+<tr class="even">
+<td>Xuất CSV</td>
+<td><code>POST /api/v1/reports/named/sales_scorecard/export.csv</code>
+(F14-S1)</td>
+</tr>
+<tr class="odd">
+<td>Tìm sale</td>
+<td>API danh sách <code>NhanVien</code>, lấy id khớp rồi gửi vào
+<code>sales_scorecard</code></td>
+</tr>
+<tr class="even">
+<td>Việc cần làm</td>
+<td>API danh sách <code>crm_activities</code> lọc theo người thực hiện,
+loại, trạng thái (API "Việc của tôi" chỉ dùng cho chính mình nên không
+dùng ở đây)</td>
+</tr>
+<tr class="odd">
+<td>Hoạt động gần đây</td>
+<td>Truy vấn F14-S1 trên <code>crm_activities</code> (đếm, lọc người
+thực hiện là sale, theo thời điểm đã diễn ra, mọi thời gian), lấy mã
+drill rồi gọi drill với
+<code>sort=$happenedAt:desc&amp;limit=6</code></td>
+</tr>
+<tr class="even">
+<td>Xem danh sách bản ghi của một con số</td>
+<td>Drill của F14-S1 bằng mã <code>drill</code> trong
+<code>sales_scorecard</code></td>
+</tr>
+<tr class="odd">
+<td>Chuyển giao</td>
+<td>Xem trước số lượng và thực hiện theo F03-S5, phần chuyển giao bản
+ghi</td>
+</tr>
+<tr class="even">
+<td>Card bản ghi sở hữu</td>
+<td>API liên kết của F03-S1 theo trường <code>owner_id</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="d-lệch-so-với-sheet--prototype">D. Lệch so với sheet /
+prototype</h2>
+<ul>
+<li>S-02 không tạo collection "Sale" mới; sale là <code>NhanVien</code>
+có <code>is_sales</code> (BR-01).</li>
+<li>S-12 "đổi tên thì cập nhật owner ở mọi bản ghi": không cần, vì owner
+là liên kết (BR-11).</li>
+<li>S-06 "nhớ lựa chọn trong trình duyệt": đổi thành nhớ theo người
+dùng.</li>
+<li>S-09, S-10, S-14 → S-17, S-19 sheet ghi "Chỉ FE" nhưng cần máy chủ
+(xuất tệp có kiểm quyền, ghi cờ <code>is_sales</code>, đọc theo nhân
+viên, đếm bản ghi còn phụ trách). Đề nghị sửa cột Phạm vi thành "FE +
+BE".</li>
+<li>S-18 chuyển giao thêm task chưa xong, vì task giao cho người đã nghỉ
+sẽ không ai làm.</li>
+<li>Prototype tính doanh số theo Ngày dự kiến chốt; bản thật tính theo
+ngày đóng. Prototype chuyển cả deal đã đóng; bản thật giữ nguyên.</li>
+</ul>
+<p><strong>Ngoài phạm vi:</strong> dự báo doanh số theo phương pháp
+khác; chỉ tiêu khác nhau theo từng tháng; hoa hồng; quản lý team (team
+là danh mục).</p>
+<h2 id="e-câu-hỏi-còn-mở">E. Câu hỏi còn mở</h2>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Câu hỏi</th>
+<th>Hỏi ai</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Q1</td>
+<td>Ai xem được trang Sales: mọi sale hay chỉ quản lý? Nếu mọi sale, vai
+trò Sales có được đọc mọi Contact, Company, Deal không (để số liệu của
+người khác đúng)?</td>
+<td>Khách</td>
+</tr>
+<tr class="even">
+<td>Q2</td>
+<td>Thêm cờ <code>is_sales</code> vào <code>NhanVien</code> có ảnh hưởng
+phần khác của ERP đang dùng <code>NhanVien</code> không?</td>
+<td>BE / khách</td>
+</tr>
+<tr class="odd">
+<td>Q3</td>
+<td>Chỉ tiêu kỳ có cần trừ phần trước ngày vào làm hoặc thời gian tạm
+nghỉ không?</td>
+<td>Khách</td>
+</tr>
+<tr class="even">
+<td>Q4</td>
+<td>Dự báo chỉ theo Tỷ lệ thành công của từng deal đã đủ chưa, hay cần
+dự báo theo giai đoạn?</td>
+<td>Khách</td>
+</tr>
+</tbody>
+</table>
+<h2 id="f-tài-liệu-liên-quan">F. Tài liệu liên quan</h2>
+<ul>
+<li>Prototype: <code>crm-sales-hubspot.html</code> (danh sách),
+<code>crm-sales-hubspot.html?id=s1</code> (chi tiết)</li>
+<li>Dữ liệu: <code>CRM-00-mo-hinh-du-lieu-chuyen-doi.md</code></li>
+<li>Spec nền: <code>F14-S1-api-tong-hop-bao-cao.md</code>,
+<code>F03-S5-thao-tac-hang-loat.md</code>,
+<code>F03-S4-truong-tuy-chinh-cau-hinh-hien-thi.md</code>,
+<code>F03-S1-lien-ket-ban-ghi.md</code></li>
+<li>Màn liên quan:
+<code>CRM-01-khung-danh-sach-trang-chi-tiet.md</code>,
+<code>CRM-07-bao-cao.md</code></li>
+<li>Design system: <code>DESIGN-SYSTEM-HUBSPOT.md</code> (bảng dữ liệu,
+trang chi tiết, thẻ số liệu)</li>
+<li>Đối chiếu HubSpot: <code>DOI-CHIEU-CHUC-NANG.md</code> phần
+Sales</li>
+</ul>
+</body>
+</html>

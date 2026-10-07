@@ -414,9 +414,10 @@ function reassign(s, anchor) {
 const TABS = [['summary','Tổng quan'],['team','Đội sale'],['leads','Leads'],['deals','Deals'],['tasks','Tasks'],['schedule','Lịch'],['feed','Feed'],['forecast','Dự báo',3]];
 const TAB = TABS.some(t => t[0] === qs.get('tab')) ? qs.get('tab') : 'summary';
 const WKEY = 'hx-crm-ws-ui-v2'; // v2: mặc định xem Tất cả sales, muốn xem riêng ai thì chọn
-const ws = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem(WKEY) || '{}'); } catch {} return { who: o.who || '*', shut: o.shut || {}, tf:'all', gf:'all' }; })();
+const ws = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem(WKEY) || '{}'); } catch {} return { who: qs.get('who') || '*', shut: o.shut || {}, tf:'all', gf:'all' }; })(); // "xem theo" KHÔNG lưu lại: mỗi lần vào Sales đều là Tất cả sales; chọn riêng ai thì chỉ giữ qua ?who= khi chuyển tab
 if (ws.who !== '*' && !HXC.saleByName(ws.who)) ws.who = '*';
-const saveWs = () => { try { localStorage.setItem(WKEY, JSON.stringify({ who: ws.who, shut: ws.shut })); } catch {} };
+const saveWs = () => { try { localStorage.setItem(WKEY, JSON.stringify({ shut: ws.shut })); } catch {} };
+const tabUrl = k => `?tab=${k}${ws.who === '*' ? '' : '&who=' + encodeURIComponent(ws.who)}`;
 const mine = n => ws.who === '*' || n === ws.who;
 const todayS = NOW.toISOString().slice(0, 10), tomorrowS = new Date(+NOW + 864e5).toISOString().slice(0, 10), nowIso = NOW.toISOString();
 const dmy = s => s ? s.slice(0, 10).split('-').reverse().join('/') : '';
@@ -425,7 +426,7 @@ const recLink = a => refOf(a).replace(/^ · /, '');
 function wsHead(actions = '') {
   return `<div class="ph"><h1 class="ttl">Sales</h1>${TAB === 'team' ? '' : `<span class="wsep"></span><button class="who" id="whoBtn" aria-haspopup="menu" title="Xem theo sale">${esc(ws.who === '*' ? 'Tất cả sales' : ws.who)}<span class="ms sm">expand_more</span></button>`}
       <div class="ph-act">${actions}</div></div>
-    <div class="vtabs" role="tablist" aria-label="Sales workspace">${TABS.map(([k, l, ph]) => `<a class="vtab" role="tab" aria-selected="${TAB === k}" href="?tab=${k}">${l}${ph ? `<span class="soonb" title="Dựng ở phần ${ph} của kế hoạch">P${ph}</span>` : ''}</a>`).join('')}</div>`;
+    <div class="vtabs" role="tablist" aria-label="Sales workspace">${TABS.map(([k, l, ph]) => `<a class="vtab" role="tab" aria-selected="${TAB === k}" href="${tabUrl(k)}">${l}${ph ? `<span class="soonb" title="Dựng ở phần ${ph} của kế hoạch">P${ph}</span>` : ''}</a>`).join('')}</div>`;
 }
 const wcard = (id, icon, title, right, body) => `<section class="wc ${ws.shut[id] ? 'shut' : ''}" data-wc="${id}"><div class="wc-h"><button class="tgc" data-wtg="${id}" aria-expanded="${!ws.shut[id]}" aria-label="Thu gọn / mở rộng ${esc(title)}"><span class="ms sm">expand_more</span></button><h2><span class="ms sm">${icon}</span>${title}</h2><span class="r">${right || ''}</span></div><div class="wc-b">${body}</div></section>`;
 function wsData() {
@@ -464,7 +465,7 @@ function drawSummary() {
       ${wcard('tasks', 'task_alt', ws.who === '*' ? 'Task của đội' : 'Task của bạn', `<button class="btn btn--primary sm" id="wsStart" ${tl.length ? '' : 'disabled'}><span class="ms xs">play_arrow</span>Bắt đầu ${tl.length} task</button>`,
         `<div class="tcnt" role="group" aria-label="Lọc task theo hạn">${TF.map(([k, l, c]) => `<button data-tf="${k}" aria-pressed="${ws.tf === k}" class="${c && D.grp[k].length ? c : ''}"><b>${D.grp[k].length}</b><span>${l}</span></button>`).join('')}</div>
         <div class="wl">${tl.slice(0, 8).map(taskRow).join('') || `<div class="wempty"><span class="ms">task_alt</span>${ws.tf === 'all' ? 'Không còn task nào đang mở.' : 'Không có task trong nhóm này.'}</div>`}</div>
-        ${tl.length > 8 ? `<a class="wmore" href="?tab=tasks">Xem tất cả ${tl.length} task</a>` : ''}`)}
+        ${tl.length > 8 ? `<a class="wmore" href="${tabUrl('tasks')}">Xem tất cả ${tl.length} task</a>` : ''}`)}
       ${wcard('guide', 'bolt', 'Hành động gợi ý', `<span class="segtxt" role="group" aria-label="Loại hành động">${[['all','Tất cả'],['deal','Deal'],['pro','Tìm khách']].map(([k, l]) => `<button data-gf="${k}" aria-pressed="${ws.gf === k}">${l}</button>`).join('')}</span>`,
         `<div class="wl">${al.slice(0, 8).map(x => `<div class="wi"><span class="ms sm">${x.i}</span><div class="x"><b>${esc(x.t)}</b><small>${x.s}</small></div><a class="btn btn--secondary sm" href="${x.href}">${x.go}</a></div>`).join('') || `<div class="wempty"><span class="ms">verified</span>Không có gợi ý nào. Mọi deal và lead đều đang được chăm sóc.</div>`}</div>${al.length > 8 ? `<span class="nil" style="font-size:12px">Còn ${al.length - 8} gợi ý khác.</span>` : ''}`)}
       ${wcard('follow', 'event_available', 'Follow-up sau cuộc họp', `<span class="nil" style="font-size:12px">14 ngày gần đây</span>`,
@@ -474,9 +475,9 @@ function drawSummary() {
       ${wcard('sched', 'calendar_today', `Lịch hôm nay · ${dmy(todayS)}`, '',
         `<div class="wl">${D.todayEv.map(e => `<div class="wi"><span class="tm">${e.at ? hm(e.at) : 'Cả ngày'}</span><div class="x"><b>${esc(e.t)}</b><small>${recLink(e.a)}</small></div><span class="ms sm">${e.i}</span></div>`).join('') || `<div class="wempty"><span class="ms">event_note</span>Hôm nay chưa có cuộc họp hay task nào.</div>`}</div>
         ${D.nextMeet.length ? `<div class="wl" style="margin-top:6px"><div class="nil" style="font-size:12px;font-weight:700;padding:6px 0 0">SẮP TỚI</div>${D.nextMeet.slice(0, 3).map(m => `<div class="wi"><span class="tm">${dmy(m.at).slice(0, 5)}</span><div class="x"><b>${esc(m.title || 'Cuộc họp')}</b><small>${hm(m.at)}${recLink(m) ? ' · ' + recLink(m) : ''}</small></div></div>`).join('')}</div>` : ''}
-        <a class="wmore" href="?tab=schedule">Mở lịch đầy đủ</a>`)}
+        <a class="wmore" href="${tabUrl('schedule')}">Mở lịch đầy đủ</a>`)}
       ${wcard('feed', 'dynamic_feed', 'Feed hoạt động', '',
-        `<div class="wl">${D.feed.slice(0, 6).map(f => `<div class="wi"><span class="ms sm">${IC[f.type] || 'sync'}</span><div class="x"><b>${esc(f.title || TN[f.type] || 'Cập nhật')}</b><small>${esc((f.body || '').slice(0, 90))}${(f.body || '').length > 90 ? '…' : ''}</small><small>${dmy(f.at)} ${hm(f.at)}${ws.who === '*' ? ' · ' + esc(f.by || '') : ''}${refOf(f)}</small></div></div>`).join('') || `<div class="wempty"><span class="ms">dynamic_feed</span>Chưa có hoạt động.</div>`}</div><a class="wmore" href="?tab=feed">Xem toàn bộ feed</a>`)}
+        `<div class="wl">${D.feed.slice(0, 6).map(f => `<div class="wi"><span class="ms sm">${IC[f.type] || 'sync'}</span><div class="x"><b>${esc(f.title || TN[f.type] || 'Cập nhật')}</b><small>${esc((f.body || '').slice(0, 90))}${(f.body || '').length > 90 ? '…' : ''}</small><small>${dmy(f.at)} ${hm(f.at)}${ws.who === '*' ? ' · ' + esc(f.by || '') : ''}${refOf(f)}</small></div></div>`).join('') || `<div class="wempty"><span class="ms">dynamic_feed</span>Chưa có hoạt động.</div>`}</div><a class="wmore" href="${tabUrl('feed')}">Xem toàn bộ feed</a>`)}
     </div></div></div>`;
 }
 /* ═══ SALES WORKSPACE — phần 2: Tasks · Lịch · Feed · Leads · Deals (07/10/2026) ═══ */
@@ -670,7 +671,7 @@ document.addEventListener('click', e => {
   if (qs.get('id')) return;
   const wb = e.target.closest('#whoBtn'); if (wb) { e.stopImmediatePropagation(); openFp(wb, `<div class="hd">Xem theo</div>${[['*', 'Tất cả sales'], [HXC.ME, 'Tôi (' + HXC.ME + ')'], ...HXC.sales().filter(s => s.values.name !== HXC.ME).map(s => [s.values.name, s.values.name])].map(([v, l]) => `<button class="mi" data-who="${esc(v)}"><span class="ms sm" style="${v === ws.who ? '' : 'visibility:hidden'}">check</span>${esc(l)}</button>`).join('')}`, 280);
     const r = wb.getBoundingClientRect(); fp.style.left = Math.max(8, r.left) + 'px'; return; }
-  const w = e.target.closest('[data-who]'); if (w) { ws.who = w.dataset.who; saveWs(); closeFp(); draw(); return; }
+  const w = e.target.closest('[data-who]'); if (w) { ws.who = w.dataset.who; history.replaceState(null, '', tabUrl(TAB)); closeFp(); draw(); return; }
   const tg = e.target.closest('[data-wtg]'); if (tg) { ws.shut[tg.dataset.wtg] = !ws.shut[tg.dataset.wtg]; saveWs(); draw(); return; }
   const tf = e.target.closest('[data-tf]'); if (tf) { ws.tf = ws.tf === tf.dataset.tf ? 'all' : tf.dataset.tf; draw(); return; }
   const gf = e.target.closest('[data-gf]'); if (gf) { ws.gf = gf.dataset.gf; draw(); return; }

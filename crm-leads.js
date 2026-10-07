@@ -117,8 +117,8 @@ const HXL = (() => {
   /* ── Hiển thị ── */
   const dShort = s => { const d = new Date(s); return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
   const nil = '<span class="nil">--</span>';
-  const contactLink = l => { const c = contactOf(l); return c ? `<span class="obj"><span class="av xs">${esc(HXC.initials(HXC.fullName(c)))}</span><a class="lk b" href="${HXC.url('contact', c.id)}">${esc(HXC.fullName(c))}</a></span>` : nil; };
-  const companyLink = l => { const c = companyOf(l); return c ? `<span class="obj"><span class="av sq xs">${esc(HXC.initials(c.values.name))}</span><a class="lk b" href="${HXC.url('company', c.id)}">${esc(c.values.name)}</a></span>` : nil; };
+  const contactLink = l => { const c = contactOf(l); return c ? `<a class="lk b" href="${HXC.url('contact', c.id)}">${esc(HXC.fullName(c))}</a>` : nil; };
+  const companyLink = l => { const c = companyOf(l); return c ? `<a class="lk b" href="${HXC.url('company', c.id)}">${esc(c.values.name)}</a>` : nil; };
   const dealLink = l => { const d = dealOf(l); return d ? `<a class="lk b" href="${HXC.url('deal', d.id)}">${esc(HX.title(d))}</a>` : nil; };
   // Thanh giai đoạn (StageBar): 3 bước mở + bước kết thúc. Bấm một bước để chuyển giai đoạn.
   function stageBar(l, compact) {

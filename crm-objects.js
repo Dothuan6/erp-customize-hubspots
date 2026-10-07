@@ -172,13 +172,12 @@ const HXC = (() => {
 
   /* ── Phần 7: Sales (nhân viên kinh doanh = owner của Contact / Company / Deal) ── */
   // BE: collection "NhanVien" của ERP (đã có) + thêm cột Team, Vai trò, Chỉ tiêu tháng. Tên sale = giá trị của Contact owner / Company owner / "Sale phụ trách".
-  const TEAMS = ['Sales HCM','Sales HN','Key Account'];
+  const TEAMS = []; // Sale không chia team theo khu vực (07/10/2026). Danh sách sale lấy từ thành viên có sẵn trên hệ thống (NhanVien).
   const ROLES = ['Sales Executive','Trưởng nhóm','Sales Manager','Account Manager'];
   const SALE_FIELDS = [
     {key:'name', name:'Họ và tên', type:'TEXT'},
     {key:'email', name:'Email', type:'TEXT'},
     {key:'phone', name:'Số điện thoại', type:'TEXT'},
-    {key:'team', name:'Team', type:'SELECT', choices:TEAMS},
     {key:'role', name:'Vai trò', type:'SELECT', choices:ROLES},
     {key:'quota', name:'Chỉ tiêu tháng (₫)', type:'NUMBER'},
     {key:'status', name:'Trạng thái', type:'SELECT', choices:['Đang làm việc','Tạm nghỉ','Đã nghỉ']},
@@ -186,13 +185,13 @@ const HXC = (() => {
   ];
   if (!db.sales) {
     db.sales = [
-      { id:'s1', createdAt: iso('2024-03-01'), values:{ name:'Minh Trần', email:'minh.tran@harnex.ai', phone:'0901 234 567', team:'Sales HCM', role:'Trưởng nhóm', quota:150000000, status:'Đang làm việc', joined:'2024-03-01' } },
-      { id:'s2', createdAt: iso('2025-01-06'), values:{ name:'Lan Lê', email:'lan.le@harnex.ai', phone:'0912 345 678', team:'Sales HCM', role:'Sales Executive', quota:80000000, status:'Đang làm việc', joined:'2025-01-06' } },
-      { id:'s3', createdAt: iso('2023-08-14'), values:{ name:'Phương Nguyễn', email:'phuong.nguyen@harnex.ai', phone:'0987 654 321', team:'Sales HN', role:'Sales Manager', quota:100000000, status:'Đang làm việc', joined:'2023-08-14' } },
+      { id:'s1', createdAt: iso('2024-03-01'), values:{ name:'Minh Trần', email:'minh.tran@harnex.ai', phone:'0901 234 567', role:'Trưởng nhóm', quota:150000000, status:'Đang làm việc', joined:'2024-03-01' } },
+      { id:'s2', createdAt: iso('2025-01-06'), values:{ name:'Lan Lê', email:'lan.le@harnex.ai', phone:'0912 345 678', role:'Sales Executive', quota:80000000, status:'Đang làm việc', joined:'2025-01-06' } },
+      { id:'s3', createdAt: iso('2023-08-14'), values:{ name:'Phương Nguyễn', email:'phuong.nguyen@harnex.ai', phone:'0987 654 321', role:'Sales Manager', quota:100000000, status:'Đang làm việc', joined:'2023-08-14' } },
     ];
     persist();
   }
-  db.sales.forEach(s => { if (!USERS.includes(s.values.name)) USERS.push(s.values.name); });
+  db.sales.forEach(s => { if ('team' in s.values) { delete s.values.team; persist(); } if (!USERS.includes(s.values.name)) USERS.push(s.values.name); });
 
   /* ── Phần 7: Trường bổ sung (thuộc tính tuỳ chỉnh) ── */
   // db.cf = trường tự tạo của Contact / Company (Deal dùng Quản lý trường ERP: HX.api.addField). db.extra = key hiển thị trong vùng "Trường bổ sung".
@@ -883,7 +882,7 @@ const HXC = (() => {
   const saleByName = n => db.sales.find(s => s.values.name === n);
   const saleUrl = n => { const s = saleByName(n); return s ? `crm-sales-hubspot.html?id=${s.id}` : null; };
   function createSale(values) {
-    const s = { id:'s' + Date.now().toString(36), createdAt:new Date().toISOString(), values:{ status:'Đang làm việc', ...values } };
+    const s = { id:'s' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), createdAt:new Date().toISOString(), values:{ status:'Đang làm việc', ...values } };
     db.sales.push(s); if (!USERS.includes(s.values.name)) USERS.push(s.values.name); persist(); return s;
   }
   function updateSale(id, key, value) {

@@ -2,7 +2,7 @@
 
 > **Phạm vi:** đồng bộ giao diện **toàn bộ web ERP hiện tại** (erp.tuoitresoft.com, mã nguồn `systemdesign/`) với prototype hướng HubSpot (repo `erp-customize-hubspots`).
 > **Quan hệ với file gốc:** đây là **lớp theme** nằm trên `systemdesign/systemdesign/DESIGN-SYSTEM.md` (v3.3). File gốc vẫn là nguồn-sự-thật cho kiến trúc (component-first §1bis, token 3 tầng §2, breakpoint §7.2, z-index §7.5, trợ năng §12bis, quy ước code §13). File này **chỉ ghi đè giá trị và bổ sung mẫu** — mục nào không nhắc ở đây thì giữ nguyên như file gốc.
-> **Phiên bản 1.7** · 07/10/2026 · Trạng thái: 🟡 Đề xuất — chờ team FE duyệt
+> **Phiên bản 1.8** · 07/10/2026 · Trạng thái: 🟡 Đề xuất — chờ team FE duyệt
 > **Xem trực quan:** `design-system.html` trong repo prototype (mở cùng các màn `crm-*.html` để so).
 > **Nguyên tắc dự án không đổi:** *chức năng = 100% ERP · giao diện & UX = theo HubSpot.* Theme này không thêm/bớt chức năng nào.
 
@@ -588,6 +588,21 @@ Tab chưa dựng hiển thị nhãn `.soonb` cạnh tên tab; nhãn này chỉ c
 | Hàng đợi task | Modal `sm` (§6.11): nhãn "Task i / n", thanh tiến độ 6px `--primary`, tiêu đề 17/700, hạn · ưu tiên · người nhận, liên kết bản ghi mở tab mới; chân: Dừng (text) · Bỏ qua (secondary) · Hoàn thành & tiếp (primary) |
 | Bảng trong thẻ `.ws-tw` | dùng DataTable §6.6, dòng 44px, không cố định cột; thanh lọc `.ws-bar` phía trên, chân `.ws-foot` 12px |
 
+### 6.22 Chỉ tiêu (Goals) của Sales workspace (mới, bản 1.8) (`.gf` · `.gtag` · `.gcell` · `.gcard` · `.wzs` · `.gtpl`)
+
+Bám theo Reporting › Goals của HubSpot. Tên tab, tên bộ lọc, tên bước và tên thẻ giữ tiếng Anh như HubSpot.
+
+| Phần | Đặc tả |
+| --- | --- |
+| Bộ lọc dạng ô chọn `.gf` | nhãn 11.5/600 `--on-surface-variant` nằm trên `<select>` cao 32px, bo `--radius-md`, rộng 150–220px; xếp ngang trong `.ws-bar`, canh đáy |
+| Nhãn trạng thái `.gtag` | viên 22px bo `--radius-pill`, 12/600: Đang diễn ra (`--primary-container`), Đã đạt `.ok` (`--success-container` / `--success`), Không đạt `.bad` (`--error-container` / `--error`), Sắp tới `.mut` (`--surface-2`) |
+| Ô thực tế / chỉ tiêu `.gcell` | canh phải, hai dòng: thực tế 13.5/600, dưới là "/ chỉ tiêu" 11.5px `--on-surface-variant`. Thực tế đổi màu `--success` khi đạt, `--error` khi kỳ đã hết mà chưa đạt; có chú giải ở chân bảng |
+| Thẻ số liệu `.gcard` | viền `--outline-variant`, bo `--radius-md`, padding 12×14; tiêu đề 13/600 `--on-surface-variant`; số lớn `.gbig` 24/700 kèm "/ chỉ tiêu" 14px; thanh tiến độ dùng `.bar` có sẵn |
+| Actual versus user goals | dùng hàng `.stg .row` có sẵn: thanh = thực tế, vạch đứng 2px `--on-surface` = chỉ tiêu, cột phải "thực tế / chỉ tiêu" |
+| Bước của trình tạo `.wzs` | dãy "số trong vòng tròn 22px + tên bước" 13/600; bước hiện tại vòng `--primary`, bước đã qua `--primary-container` |
+| Ô chọn mẫu `.gtpl` | lưới `auto-fill minmax(210px,1fr)`; mỗi ô là `<button>` viền `--outline-variant`, biểu tượng 24px `--primary`, tên 14/700, mô tả 12px; đang chọn viền 2px `--primary`, `aria-pressed` |
+| Bảng nhập chỉ tiêu | DataTable có cột tick, cột tên dính trái; ô nhập `.gin` rộng 96px cao 30px canh phải; thanh trên có "Apply targets", "Apply pipelines", "Import … targets" |
+
 ---
 
 ## 7. Mẫu trang (template)
@@ -607,7 +622,7 @@ Mọi màn ERP phải rơi vào **một trong bốn template** dưới đây. Kh
 ```
 Nguồn tham chiếu: `crm-contacts-hubspot.html`, `crm-companies-hubspot.html`, `crm-leads-hubspot.html`, `crm-giao-dich-hubspot.html`, `crm-sales-hubspot.html`.
 
-**Kiểu hiển thị mặc định (bản 1.5):** năm trang danh sách CRM (Contacts, Companies, Leads, Deals, Sales) mở lần đầu ở **Board**; nút chuyển Board / Bảng nằm bên phải Toolbar. Cột của board: Contacts và Companies theo Lifecycle stage, Leads theo Giai đoạn lead, Deals theo Giai Đoạn Pipeline, Sales theo Team (kéo thẻ = đổi team). View đã lưu có kiểu riêng thì mở theo kiểu của view đó.
+**Kiểu hiển thị mặc định (bản 1.5):** năm trang danh sách CRM (Contacts, Companies, Leads, Deals, Sales) mở lần đầu ở **Board**; nút chuyển Board / Bảng nằm bên phải Toolbar. Cột của board: Contacts và Companies theo Lifecycle stage, Leads theo Giai đoạn lead, Deals theo Giai Đoạn Pipeline, Đội sale theo Trạng thái của sale (kéo thẻ = đổi trạng thái; hệ thống không chia team). View đã lưu có kiểu riêng thì mở theo kiểu của view đó.
 
 ### 7.2 T2 — Trang chi tiết bản ghi (Record)
 
@@ -757,6 +772,7 @@ Theo RULE 2b của dự án — mọi lệch/bổ sung phải ghi vào file gố
 | §8.22 Tổng hợp | Bổ sung component mới (bản 1.4) | `StageBar` — thanh giai đoạn bấm được cho Lead pipeline (§6.19). Nguồn: prototype `crm-leads.js` |
 | §8.22 Tổng hợp | Bổ sung component mới (bản 1.6) | `WorkspaceCard` — thẻ thu gọn của Sales workspace, kèm ô đếm lọc và dòng việc (§6.20). Nguồn: prototype `crm-sales-hubspot.html` |
 | §8.22 Tổng hợp | Bổ sung mẫu mới (bản 1.7) | Lịch `.cal` (Ngày / Tuần / Tháng) và hàng đợi task trong Modal (§6.21). Nguồn: prototype `crm-sales-hubspot.html` |
+| §8.22 Tổng hợp | Bổ sung mẫu mới (bản 1.8) | Các mẫu của tab Chỉ tiêu (§6.22). Nguồn: prototype `crm-sales-hubspot.html` |
 
 ---
 
@@ -764,6 +780,7 @@ Theo RULE 2b của dự án — mọi lệch/bổ sung phải ghi vào file gố
 
 | Phiên bản | Ngày | Nội dung | Tác giả |
 | --- | --- | --- | --- |
+| 1.8 | 07/10/2026 | §6.22: các mẫu của tab Chỉ tiêu (Goals): bộ lọc ô chọn, nhãn trạng thái, ô thực tế / chỉ tiêu, thẻ số liệu, bước trình tạo, ô chọn mẫu; §7.1: board Sales đổi từ Team sang Trạng thái; thêm dòng vào §12 | Claude (Cowork) cho TTS |
 | 1.7 | 07/10/2026 | §6.21: lịch Ngày / Tuần / Tháng và hàng đợi task của Sales workspace; thêm dòng vào §12 | Claude (Cowork) cho TTS |
 | 1.6 | 07/10/2026 | §6.20: thêm `WorkspaceCard` (thẻ thu gọn, ô đếm, dòng việc) cho tab Tổng quan của Sales workspace; thêm dòng vào §12 | Claude (Cowork) cho TTS |
 | 1.5 | 07/10/2026 | §7.1: trang danh sách CRM mặc định mở ở Board; thêm board theo Team cho trang Sales (dùng lại `.kb .kcol .kc` của §6.7, không thêm component) | Claude (Cowork) cho TTS |

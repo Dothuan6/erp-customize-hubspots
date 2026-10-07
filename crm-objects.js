@@ -171,7 +171,7 @@ const HXC = (() => {
   if (!load()) persist();
 
   /* ── Phần 7: Sales (nhân viên kinh doanh = owner của Contact / Company / Deal) ── */
-  // BE: collection "NhanVien" của ERP (đã có) + thêm cột Team, Vai trò, Chỉ tiêu tháng. Tên sale = giá trị của Contact owner / Company owner / "Sale phụ trách".
+  // BE: collection "NhanVien" của ERP (đã có) + thêm cột Vai trò (không dùng Team, không dùng chỉ tiêu). Tên sale = giá trị của Contact owner / Company owner / "Sale phụ trách".
   const TEAMS = []; // Sale không chia team theo khu vực (07/10/2026). Danh sách sale lấy từ thành viên có sẵn trên hệ thống (NhanVien).
   const ROLES = ['Sales Executive','Trưởng nhóm','Sales Manager','Account Manager'];
   const SALE_FIELDS = [
@@ -179,19 +179,18 @@ const HXC = (() => {
     {key:'email', name:'Email', type:'TEXT'},
     {key:'phone', name:'Số điện thoại', type:'TEXT'},
     {key:'role', name:'Vai trò', type:'SELECT', choices:ROLES},
-    {key:'quota', name:'Chỉ tiêu tháng (₫)', type:'NUMBER'},
     {key:'status', name:'Trạng thái', type:'SELECT', choices:['Đang làm việc','Tạm nghỉ','Đã nghỉ']},
     {key:'joined', name:'Ngày vào làm', type:'DATE'},
   ];
   if (!db.sales) {
     db.sales = [
-      { id:'s1', createdAt: iso('2024-03-01'), values:{ name:'Minh Trần', email:'minh.tran@harnex.ai', phone:'0901 234 567', role:'Trưởng nhóm', quota:150000000, status:'Đang làm việc', joined:'2024-03-01' } },
-      { id:'s2', createdAt: iso('2025-01-06'), values:{ name:'Lan Lê', email:'lan.le@harnex.ai', phone:'0912 345 678', role:'Sales Executive', quota:80000000, status:'Đang làm việc', joined:'2025-01-06' } },
-      { id:'s3', createdAt: iso('2023-08-14'), values:{ name:'Phương Nguyễn', email:'phuong.nguyen@harnex.ai', phone:'0987 654 321', role:'Sales Manager', quota:100000000, status:'Đang làm việc', joined:'2023-08-14' } },
+      { id:'s1', createdAt: iso('2024-03-01'), values:{ name:'Minh Trần', email:'minh.tran@harnex.ai', phone:'0901 234 567', role:'Trưởng nhóm', status:'Đang làm việc', joined:'2024-03-01' } },
+      { id:'s2', createdAt: iso('2025-01-06'), values:{ name:'Lan Lê', email:'lan.le@harnex.ai', phone:'0912 345 678', role:'Sales Executive', status:'Đang làm việc', joined:'2025-01-06' } },
+      { id:'s3', createdAt: iso('2023-08-14'), values:{ name:'Phương Nguyễn', email:'phuong.nguyen@harnex.ai', phone:'0987 654 321', role:'Sales Manager', status:'Đang làm việc', joined:'2023-08-14' } },
     ];
     persist();
   }
-  db.sales.forEach(s => { if ('team' in s.values) { delete s.values.team; persist(); } if (!USERS.includes(s.values.name)) USERS.push(s.values.name); });
+  db.sales.forEach(s => { if ('team' in s.values || 'quota' in s.values) { delete s.values.team; delete s.values.quota; persist(); } if (!USERS.includes(s.values.name)) USERS.push(s.values.name); });
 
   /* ── Phần 7: Trường bổ sung (thuộc tính tuỳ chỉnh) ── */
   // db.cf = trường tự tạo của Contact / Company (Deal dùng Quản lý trường ERP: HX.api.addField). db.extra = key hiển thị trong vùng "Trường bổ sung".
@@ -402,7 +401,6 @@ const HXC = (() => {
         const co = fromT === 'company' ? from : fromT === 'contact' ? assoc.companyOfContact(fromId) : null;
         $('#aaB', p).innerHTML = `<form class="field-form" id="adF">
           <label>Tên Deal <span class="req">*</span><input class="in" id="ad_name" value="${esc((co ? co.values.name : titleOf(fromT, from)) + ' - New Deal')}"></label>
-          <label>Pipeline <span class="req">*</span><select class="in" disabled><option>Deals_Pipeline</option></select></label>
           <label>Giai Đoạn Pipeline <span class="req">*</span><select class="in" id="ad_stage">${STAGES.map(s => `<option>${esc(s)}</option>`).join('')}</select></label>
           <label>Tổng Cash-In Dự Kiến (Amount)<input class="in" id="ad_amt" type="number" min="0"></label>
           <label>Ngày Dự Kiến Chốt<input class="in" id="ad_close" type="date"></label>
@@ -903,14 +901,12 @@ const HXC = (() => {
     const acts = [...db.activities].filter(a => a.by === name || a.assignee === name);
     const today = TODAY.toISOString().slice(0, 10);
     const tasks = db.activities.filter(a => a.type === 'TASK' && (a.assignee || a.by) === name && !a.done);
-    const q = Number((saleByName(name) || { values:{} }).values.quota) || 0;
-    const months = Math.max(1, Math.round((+to - +from) / (30.44 * 864e5)));
     const wonSum = won.reduce((s, d) => s + cash(d), 0);
     return {
       contacts: db.contacts.filter(c => c.values.owner === name), companies: db.companies.filter(c => c.values.owner === name),
       deals: ds, open, won, lost, pipeline: open.reduce((s, d) => s + cash(d), 0),
       forecast: open.reduce((s, d) => s + cash(d) * (Number(d.values.t_l_th_nh_c_ng) || 0) / 100, 0),
-      wonSum, quota: q * months, pct: q ? Math.round(wonSum / (q * months) * 100) : null,
+      wonSum,
       winRate: won.length + lost.length ? Math.round(won.length / (won.length + lost.length) * 100) : null,
       acts30: acts.filter(a => a.type !== 'TASK' && +new Date(a.at) > +TODAY - 30 * 864e5 && a.at <= TODAY.toISOString()).length,
       tasks, overdue: tasks.filter(a => a.due && a.due < today), dueToday: tasks.filter(a => a.due === today),

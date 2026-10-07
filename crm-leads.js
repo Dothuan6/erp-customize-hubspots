@@ -153,7 +153,6 @@ const HXL = (() => {
     modal(`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="cvT"><div class="mh" id="cvT">Lead đạt — tạo Deal<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
       <div class="mb"><form class="field-form" id="cvF">
         <label>Tên Deal <span class="req">*</span><input class="in" id="cv_name" value="${esc(co ? co.values.name : l.values.name)}"></label>
-        <label>Pipeline<select class="in" disabled><option>Deals_Pipeline</option></select></label>
         <label>Giai Đoạn Pipeline <span class="req">*</span><select class="in" id="cv_stage">${HX.STAGES.filter(s => ![S.WON, S.LOST].includes(s)).map(s => `<option>${esc(s)}</option>`).join('')}</select></label>
         <label>Tổng Cash-In Dự Kiến (Amount)<input class="in" id="cv_amt" type="number" min="0"></label>
         <label>Ngày Dự Kiến Chốt<input class="in" id="cv_close" type="date"></label>
@@ -183,7 +182,6 @@ const HXL = (() => {
           <label>Contact<select class="in" id="lf_contact"><option value="">— Không —</option>${contacts.map(c => `<option value="${c.id}" ${c.id === opts.contact ? 'selected' : ''}>${esc(S.fullName(c))}${c.values.email ? ' · ' + esc(c.values.email) : ''}</option>`).join('')}</select></label>
           <label>Company<select class="in" id="lf_company"><option value="">— Không —</option>${companies.map(c => `<option value="${c.id}" ${c.id === opts.company ? 'selected' : ''}>${esc(c.values.name)}</option>`).join('')}</select></label></div>
         <label for="lf_name">Tên lead <span class="req">*</span><input class="in" id="lf_name" placeholder="Tự điền theo contact / công ty"></label>
-        <label>Pipeline<select class="in" disabled><option>Lead pipeline</option></select></label>
         <label>Giai đoạn lead <span class="req">*</span>${sel('lf_stage', OPEN, 'Mới')}</label>
         <label>Lead owner<select class="in" id="lf_owner"><option value="">— Chưa có owner —</option>${USERS.map(u => `<option ${u === ME ? 'selected' : ''}>${esc(u)}</option>`).join('')}</select></label>
         <label>Nhãn lead${sel('lf_label', LABELS)}</label>

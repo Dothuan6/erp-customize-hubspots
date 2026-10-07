@@ -199,7 +199,7 @@ $('#flow').innerHTML = [
   ['Sale nhận lead', 'Sale tạo / được giao Contact (owner) và gắn Company chính. Company có owner riêng (thường là cùng sale).'],
   ['Mở cơ hội', 'Tạo Deal từ Contact / Company: Deal tự liên kết Company + Contact (nhãn “Người quyết định”), Sale phụ trách = owner.'],
   ['Chăm sóc & báo giá', 'Ghi hoạt động (gọi, họp, task) — mỗi hoạt động gắn cùng lúc Contact, Company, Deal. Thêm line item từ thư viện sản phẩm.'],
-  ['Chốt & đo lường', 'Deal Closed Won → Contact/Company thành Customer. Doanh số, pipeline, % chỉ tiêu của Sale tính từ các Deal này (trang Sales, Báo cáo).'],
+  ['Chốt & đo lường', 'Deal Closed Won → Contact/Company thành Customer. Doanh số và pipeline của Sale tính từ các Deal này (trang Sales, Báo cáo).'],
 ].map(([t, d], i) => `<div class="fs"><b><span class="n">${i + 1}</span>${t}</b><p>${d}</p></div>`).join('');
 $('#rt').innerHTML = E.map((e, i) => `<tr data-e="${i}"><td><b>${esc(N[e.a].name)} ↔ ${esc(N[e.b].name)}</b><div class="nil" style="font-size:12px">${esc(e.name)}</div></td><td><span class="card-n">${e.card}</span></td><td><code>${esc(e.field)}</code></td><td>${esc(e.ui)}</td><td>${esc(e.del)}</td><td style="text-align:right;font-weight:700">${e.n}</td></tr>`).join('');
 $('#rt').onclick = e => { const tr = e.target.closest('tr[data-e]'); if (tr) edgePanel(+tr.dataset.e); };

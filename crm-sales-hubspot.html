@@ -140,46 +140,6 @@ d.readyState==='loading'?d.addEventListener('DOMContentLoaded',go):go()})();</sc
 .mb-i:hover{background:var(--surface-2)} .mb-i.dis{opacity:.6}
 .mb-i input{accent-color:var(--primary);margin-top:3px}
 .mb-i .x{flex:1;min-width:0;display:flex;flex-direction:column} .mb-i small{font-size:12px;color:var(--on-surface-variant)}
-/* Sales Workspace phần 3: Chỉ tiêu (Goals) */
-.gfs{align-items:flex-end}
-.gf{display:flex;flex-direction:column;gap:3px;font-size:11.5px;font-weight:600;color:var(--on-surface-variant)}
-.gf select{height:32px;min-width:150px;max-width:220px;border:1px solid var(--outline);border-radius:var(--radius-md);padding:0 8px;background:var(--surface);color:var(--on-surface);font-size:13px;font-weight:500}
-.gtag{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:var(--radius-pill);font-size:12px;font-weight:600;background:var(--primary-container);color:var(--on-primary-container);white-space:nowrap}
-.gtag.ok{background:var(--success-container);color:var(--success)} .gtag.bad{background:var(--error-container);color:var(--error)} .gtag.mut{background:var(--surface-2);color:var(--on-surface-variant)}
-.gcell b{display:block;font-weight:600} .gcell small{display:block;font-size:11.5px;color:var(--on-surface-variant)}
-.gcell.achieved b{color:var(--success)} .gcell.missed b{color:var(--error)}
-.gleg{display:inline-flex;align-items:center;gap:6px} .gleg i{width:9px;height:9px;border-radius:50%;margin-left:8px;background:var(--on-surface)} .gleg i.achieved{background:var(--success)} .gleg i.missed{background:var(--error)}
-.ws-tw .gteam td{background:var(--surface-2)} .ws-tw .gteam .nmcol{background:var(--surface-2)}
-.ginfo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;padding:0 14px 14px}
-@media(min-width:900px){.ginfo{grid-template-columns:repeat(6,minmax(0,1fr))}}
-.ginfo div{display:flex;flex-direction:column;gap:2px;min-width:0} .ginfo span{font-size:12px;color:var(--on-surface-variant)} .ginfo b{font-size:13.5px;font-weight:600;overflow-wrap:anywhere}
-.gsum{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
-@media(min-width:900px){.gsum{grid-template-columns:2fr 1fr 1fr 1fr}}
-.gtwo{display:grid;grid-template-columns:1fr;gap:12px} @media(min-width:900px){.gtwo{grid-template-columns:3fr 2fr}}
-.gcard{border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:12px 14px;min-width:0}
-.gcard h3{font-size:13px;font-weight:600;color:var(--on-surface-variant);margin-bottom:6px}
-.gcard p{font-size:12px;margin-top:6px}
-.gbig{font-size:24px;font-weight:700;line-height:1.2;margin-bottom:6px} .gbig small{font-size:14px;font-weight:500;color:var(--on-surface-variant)} .gbig.ok{color:var(--success)} .gbig.bad{color:var(--error)}
-.gcard .stg .row .t{position:relative;overflow:visible} .gcard .stg .row .t em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--on-surface);border-radius:1px}
-.gcard .stg .row .t i.ok{background:#00A884} .gcard .stg .row .t i.mid{background:#F5A623}
-@media(max-width:600px){.gcard .stg .row{grid-template-columns:96px 1fr;row-gap:2px} .gcard .stg .row .n{grid-column:1/-1;text-align:left}}
-/* Trình tạo goal */
-.wzs{display:flex;gap:8px;padding:0 14px 12px;flex-wrap:wrap}
-.wzs span{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--on-surface-variant);padding-right:14px}
-.wzs b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--surface-2);font-size:12px}
-.wzs .on{color:var(--on-surface)} .wzs .on b{background:var(--primary);color:var(--on-primary)} .wzs .done b{background:var(--primary-container);color:var(--on-primary-container)}
-.gtpl{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
-.gtpl button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border:1px solid var(--outline-variant);border-radius:var(--radius-md);text-align:left;min-height:104px}
-.gtpl button:hover{background:var(--surface-2)} .gtpl button[aria-pressed="true"]{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary) inset}
-.gtpl .ms{font-size:24px;max-width:none;color:var(--primary)} .gtpl b{font-size:14px} .gtpl small{font-size:12px;color:var(--on-surface-variant)}
-.gpick{display:grid;grid-template-columns:1fr;gap:12px} @media(min-width:760px){.gpick{grid-template-columns:160px 1fr}}
-.gcat button{width:100%;text-align:left;height:34px;padding:0 12px;border-radius:var(--radius-sm);font-weight:600;font-size:13px} .gcat button[aria-pressed="true"]{background:var(--primary-container);color:var(--on-primary-container)}
-.gform{max-width:560px} .gform .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.gfs2{border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:8px 12px 10px;display:flex;flex-direction:column;gap:6px} .gfs2 legend{font-size:13px;font-weight:600;padding:0 4px}
-.field-form label.chk{font-weight:500}
-.gin{width:96px;height:30px;border:1px solid var(--outline);border-radius:var(--radius-sm);padding:0 6px;text-align:right;background:var(--surface);color:var(--on-surface)}
-.gin:focus{outline:2px solid var(--primary);outline-offset:-1px;border-color:transparent}
-.gtt td{height:48px}
 /* Board Đội sale theo Trạng thái (mặc định) */
 .seg{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden;margin-left:auto}
 .seg button{height:30px;width:34px;display:grid;place-items:center;color:var(--on-surface-variant)}
@@ -308,8 +268,6 @@ const RANGES = [['month','Tháng này'],['quarter','Quý này'],['year','Năm na
 function range(k) { const y = NOW.getFullYear(), m = NOW.getMonth();
   return k === 'month' ? [new Date(y, m, 1), new Date(y, m + 1, 1)] : k === 'quarter' ? [new Date(y, m - m % 3, 1), new Date(y, m - m % 3 + 3, 1)] : [new Date(y, 0, 1), new Date(y + 1, 0, 1)]; }
 const rgLabel = k => { const [a, b] = range(k); const e = new Date(+b - 864e5); return `${a.getDate()}/${a.getMonth() + 1} – ${e.getDate()}/${e.getMonth() + 1}/${e.getFullYear()}`; };
-const barCls = p => p == null ? '' : p >= 100 ? 'ok' : p >= 50 ? 'mid' : 'low';
-const bar = p => p == null ? '<span class="nil">Chưa đặt chỉ tiêu</span>' : `<span class="bar"><span class="t"><i class="${barCls(p)}" style="width:${Math.min(100, p)}%"></i></span><b>${p}%</b></span>`;
 const st = (() => { try { return { rg:'month', view:'all', q:'', sort:{ k:'wonSum', dir:'desc' }, ...JSON.parse(localStorage.getItem('hx-crm-sales-ui') || '{}'), q:'' }; } catch { return { rg:'month', view:'all', q:'', sort:{ k:'wonSum', dir:'desc' } }; } })();
 const saveSt = () => { try { localStorage.setItem('hx-crm-sales-ui', JSON.stringify({ rg:st.rg, view:st.view, sort:st.sort })); } catch {} };
 let MODE = 'BOARD'; // Kiểu hiển thị danh sách: mặc định Board (Kanban) theo Team mỗi lần vào trang
@@ -334,18 +292,18 @@ function salePanel() {
   $('#mbQ', p).oninput = e => { q = e.target.value.trim().toLowerCase(); $('#mbL', p).innerHTML = rowsH(); };
   p.onchange = e => { const n = e.target.dataset.mb; if (n) { e.target.checked ? pick.add(n) : pick.delete(n); sync(); } };
   p.onclick = e => { if (e.target.closest('[data-pclose]')) HX.closePanel();
-    if (e.target.closest('#mbAdd') && pick.size) { MEMBERS.filter(m => pick.has(m[0])).forEach(m => HXC.createSale({ name:m[0], email:m[1], phone:m[2], role:'Sales Executive', quota:null, joined:NOW.toISOString().slice(0, 10) })); const n = pick.size; HX.closePanel(); toast(`Đã thêm ${n} thành viên vào Đội sale`); draw(); } };
+    if (e.target.closest('#mbAdd') && pick.size) { MEMBERS.filter(m => pick.has(m[0])).forEach(m => HXC.createSale({ name:m[0], email:m[1], phone:m[2], role:'Sales Executive', joined:NOW.toISOString().slice(0, 10) })); const n = pick.size; HX.closePanel(); toast(`Đã thêm ${n} thành viên vào Đội sale`); draw(); } };
   p.onkeydown = null; p.classList.add('open'); document.body.classList.add('panel-open'); document.body.classList.remove('dock'); $('#mbQ', p).focus();
 }
 
 /* ═══ DANH SÁCH ═══ */
 const COLS = [
   ['role','Vai trò'],['contacts','Contacts','n'],['companies','Companies','n'],['open','Deal đang mở','n'],['pipeline','Giá trị pipeline','n'],['forecast','Dự báo (theo tỷ lệ)','n'],
-  ['wonSum','Doanh số thắng','n'],['quota','Chỉ tiêu','n'],['pct','% đạt chỉ tiêu'],['winRate','Tỷ lệ thắng','n'],['acts30','Hoạt động 30 ngày','n'],['overdue','Task quá hạn','n']];
+  ['wonSum','Doanh số thắng','n'],['winRate','Tỷ lệ thắng','n'],['acts30','Hoạt động 30 ngày','n'],['overdue','Task quá hạn','n']];
 function rows() {
   const [a, b] = range(st.rg);
   return HXC.sales().map(s => { const x = HXC.saleStats(s.values.name, a, b);
-    return { s, x, status:s.values.status || 'Đang làm việc', role:s.values.role, contacts:x.contacts.length, companies:x.companies.length, open:x.open.length, pipeline:x.pipeline, forecast:x.forecast, wonSum:x.wonSum, quota:x.quota, pct:x.pct ?? -1, winRate:x.winRate ?? -1, acts30:x.acts30, overdue:x.overdue.length, name:s.values.name }; });
+    return { s, x, status:s.values.status || 'Đang làm việc', role:s.values.role, contacts:x.contacts.length, companies:x.companies.length, open:x.open.length, pipeline:x.pipeline, forecast:x.forecast, wonSum:x.wonSum, winRate:x.winRate ?? -1, acts30:x.acts30, overdue:x.overdue.length, name:s.values.name }; });
 }
 function drawList() {
   document.title = 'Đội sale — Sales — HarnexAI CRM (mockup)';
@@ -360,9 +318,9 @@ function drawList() {
     ${MODE === 'BOARD' ? `<div class="body brd">${boardHtml(list, rank)}</div>` : `<div class="body"><table class="lt"><thead><tr><th class="nmcol" data-sort="name">Sale${srt('name')}</th>${COLS.map(([k, l, n]) => `<th class="${n ? 'num' : ''}" data-sort="${k}">${l}${srt(k)}</th>`).join('')}</tr></thead>
       <tbody>${list.map(r => `<tr data-id="${r.s.id}" class="${r.s.values.status && r.s.values.status !== 'Đang làm việc' ? 'st-off' : ''}"><td class="nmcol"><div class="pri"><span class="rk ${rank.get(r.s.id) === 1 && r.wonSum ? 'g1' : ''}" title="Hạng theo doanh số thắng">${rank.get(r.s.id)}</span><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.s.values.email || '')}</small></div></div></td>
         <td>${esc(r.role || '—')}</td><td class="num">${r.contacts}</td><td class="num">${r.companies}</td><td class="num">${r.open}</td><td class="num">${short(r.pipeline)}</td><td class="num">${short(r.forecast)}</td>
-        <td class="num"><b>${short(r.wonSum)}</b></td><td class="num">${r.quota ? short(r.quota) : '—'}</td><td>${bar(r.x.pct)}</td><td class="num">${r.x.winRate == null ? '—' : r.x.winRate + '%'}</td><td class="num">${r.acts30}</td><td class="num">${r.overdue ? `<span class="od">${r.overdue}</span>` : 0}</td></tr>`).join('')
+        <td class="num"><b>${short(r.wonSum)}</b></td><td class="num">${r.x.winRate == null ? '—' : r.x.winRate + '%'}</td><td class="num">${r.acts30}</td><td class="num">${r.overdue ? `<span class="od">${r.overdue}</span>` : 0}</td></tr>`).join('')
         || `<tr><td colspan="${COLS.length + 1}" class="empty">Không có sale phù hợp.</td></tr>`}</tbody></table></div>`}
-    <div class="foot"><span class="pillc">${list.length} sale</span><span>Chỉ tiêu kỳ = chỉ tiêu tháng × số tháng của kỳ. ${MODE === 'BOARD' ? 'Kéo thẻ sang cột khác để đổi trạng thái, bấm thẻ để xem chi tiết.' : 'Bấm tên cột để sắp xếp, bấm dòng để xem chi tiết.'}</span></div>`;
+    <div class="foot"><span class="pillc">${list.length} sale</span><span>${MODE === 'BOARD' ? 'Kéo thẻ sang cột khác để đổi trạng thái, bấm thẻ để xem chi tiết.' : 'Bấm tên cột để sắp xếp, bấm dòng để xem chi tiết.'}</span></div>`;
 }
 const srt = k => st.sort.k === k ? `<span class="ms xs srt">${st.sort.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>` : '';
 function boardHtml(list, rank) {
@@ -370,13 +328,13 @@ function boardHtml(list, rank) {
   return `<div class="kb">${teams.map(t => { const items = list.filter(r => r.status === t);
     return `<section class="kcol"><div class="kh">${esc(t)}<span class="n">${items.length}</span><span class="sm2">${short(items.reduce((s, r) => s + r.wonSum, 0))}</span></div><div class="kcards" data-drop="${esc(t)}">${items.map(r => `<article class="kc ${r.s.values.status && r.s.values.status !== 'Đang làm việc' ? 'st-off' : ''}" draggable="true" data-card="${r.s.id}">
       <div class="pri"><span class="rk ${rank.get(r.s.id) === 1 && r.wonSum ? 'g1' : ''}" title="Hạng theo doanh số thắng">${rank.get(r.s.id)}</span><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.role || '')}</small></div></div>
-      <div class="ln"><span>Doanh số thắng</span><b>${short(r.wonSum)}</b></div>${bar(r.x.pct)}
+      <div class="ln"><span>Doanh số thắng</span><b>${short(r.wonSum)}</b></div>
       <div class="ln"><span>Deal đang mở</span><b>${r.open} · ${short(r.pipeline)}</b></div>
       <div class="ln"><span>Hoạt động 30 ngày</span><b>${r.acts30}</b></div>${r.overdue ? `<div class="ln"><span>Task quá hạn</span><b class="od">${r.overdue}</b></div>` : ''}</article>`).join('') || '<div class="kempty">Không có sale</div>'}</div></section>`; }).join('')}</div>`;
 }
 function exportCsv() {
   const list = rows(), head = ['Sale','Email', ...COLS.map(c => c[1])];
-  const csv = [head, ...list.map(r => [r.name, r.s.values.email, r.role, r.contacts, r.companies, r.open, r.pipeline, Math.round(r.forecast), r.wonSum, r.quota, r.x.pct ?? '', r.x.winRate ?? '', r.acts30, r.overdue])].map(a => a.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const csv = [head, ...list.map(r => [r.name, r.s.values.email, r.role, r.contacts, r.companies, r.open, r.pipeline, Math.round(r.forecast), r.wonSum, r.x.winRate ?? '', r.acts30, r.overdue])].map(a => a.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type:'text/csv' })); a.download = `sales-${st.rg}.csv`; a.click(); toast('Đã xuất CSV');
 }
 
@@ -404,7 +362,6 @@ function drawDetail(s) {
       <section class="card"><div class="ch">Hiệu suất</div><div class="cb"><div class="perf-rg">${rgSeg()}</div>
         <div class="dk">
           <div class="kpi"><div class="l">Doanh số thắng</div><div class="v">${short(x.wonSum)}</div><div class="s">${x.won.length} deal Closed Won</div></div>
-          <div class="kpi"><div class="l">Chỉ tiêu kỳ</div><div class="v">${x.quota ? short(x.quota) : '—'}</div><div class="s">${bar(x.pct)}</div></div>
           <div class="kpi"><div class="l">Pipeline đang mở</div><div class="v">${short(x.pipeline)}</div><div class="s">${x.open.length} deal · dự báo ${short(x.forecast)}</div></div>
           <div class="kpi"><div class="l">Tỷ lệ thắng</div><div class="v">${x.winRate == null ? '—' : x.winRate + '%'}</div><div class="s">${x.won.length} thắng · ${x.lost.length} thua trong kỳ</div></div>
           <div class="kpi"><div class="l">Hoạt động 30 ngày</div><div class="v">${x.acts30}</div><div class="s">Ghi chú · cuộc gọi · cuộc họp</div></div>
@@ -431,7 +388,7 @@ function card(t, label, arr, fn) {
 }
 function drawSaleProps(s) {
   const box = $('#sp');
-  box.innerHTML = HXC.SALE_FIELDS.map(f => `<div class="prop" data-k="${f.key}"><label>${esc(f.name)}</label><div class="v">${f.key === 'quota' && s.values.quota ? esc(HXC.money(s.values.quota)) : display(s.values[f.key], f)}</div></div>`).join('');
+  box.innerHTML = HXC.SALE_FIELDS.map(f => `<div class="prop" data-k="${f.key}"><label>${esc(f.name)}</label><div class="v">${display(s.values[f.key], f)}</div></div>`).join('');
   box.onclick = e => { const pr = e.target.closest('.prop'); if (!pr || pr.querySelector('.ed,.selcell')) return;
     const f = HXC.SALE_FIELDS.find(x => x.key === pr.dataset.k);
     pr.querySelector('.v').replaceChildren(HX.editor(f, s.values[f.key], nv => {
@@ -452,9 +409,9 @@ function reassign(s, anchor) {
 
 /* ═══ SALES WORKSPACE (07/10/2026) — theo "Sales workspace" của HubSpot ═══
    ?tab=summary (mặc định) | leads | deals | tasks | schedule | feed | goals | forecast | team
-   Đã dựng: phần 1 (khung tab + Tổng quan + Đội sale) và phần 2 (Tasks · Lịch · Feed · Leads · Deals). Chỉ tiêu, Dự báo dựng ở phần 3–4 của kế hoạch.
+   Đã dựng: phần 1 (khung tab + Tổng quan + Đội sale) và phần 2 (Tasks · Lịch · Feed · Leads · Deals). Tab Chỉ tiêu (Goals) đã gỡ theo yêu cầu, không dùng chỉ tiêu. Dự báo dựng ở phần sau.
    "Xem theo": một sale (mặc định là tôi) hoặc tất cả sales — dành cho quản lý. */
-const TABS = [['summary','Tổng quan'],['team','Đội sale'],['leads','Leads'],['deals','Deals'],['tasks','Tasks'],['schedule','Lịch'],['feed','Feed'],['goals','Chỉ tiêu'],['forecast','Dự báo',4]];
+const TABS = [['summary','Tổng quan'],['team','Đội sale'],['leads','Leads'],['deals','Deals'],['tasks','Tasks'],['schedule','Lịch'],['feed','Feed'],['forecast','Dự báo',3]];
 const TAB = TABS.some(t => t[0] === qs.get('tab')) ? qs.get('tab') : 'summary';
 const WKEY = 'hx-crm-ws-ui-v2'; // v2: mặc định xem Tất cả sales, muốn xem riêng ai thì chọn
 const ws = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem(WKEY) || '{}'); } catch {} return { who: o.who || '*', shut: o.shut || {}, tf:'all', gf:'all' }; })();
@@ -685,211 +642,10 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.sct; if (k) { sc[k] = e.target.checked; drawSchedule(); } });
 
-/* ═══ SALES WORKSPACE — phần 3: Chỉ tiêu (Goals) — theo Reporting › Goals của HubSpot (07/10/2026) ═══
-   Trang Goals: 3 tab Goals overview · Team performance · User performance; bộ lọc Goal templates · Goal name · Total progress breakdown · Teams · Users · Pipelines · Display options.
-   Tạo goal: Create goal → Create from template → chọn mẫu Sales (Deals created · Calls made · Revenue · Meetings booked) → Setup → Performance → Notifications.
-   Trang goal: thông tin đầu trang + tab Summary (Total progress · Actual versus user goals · Leaderboard · User goals in progress / achieved / missed) và User performance. */
-const GTPL = { revenue:['payments','Revenue','Doanh số từ deal Closed Won, tính theo ngày chốt'], deals:['handshake','Deals created','Số deal tạo mới, tính theo ngày tạo'], calls:['call','Calls made','Số cuộc gọi đã ghi nhận'], meetings:['event','Meetings booked','Số cuộc họp đã đặt'] };
-const GDUR = { weekly:'Weekly', monthly:'Monthly', quarterly:'Quarterly', yearly:'Yearly', custom:'Custom' };
-const GCON = { users:'Individual users', teams:'Team goals only', teams_users:'Teams with individual user targets' };
-const GNOTI = [['50','Đạt 50% chỉ tiêu'],['75','Đạt 75% chỉ tiêu'],['100','Đạt chỉ tiêu'],['over','Vượt chỉ tiêu'],['miss','Kết thúc kỳ mà chưa đạt']];
-const GST = { progress:['Đang diễn ra',''], achieved:['Đã đạt','ok'], missed:['Không đạt','bad'], upcoming:['Sắp tới','mut'] };
-const GKEY = 'hx-crm-goals-v1', GY = NOW.getFullYear(), PIPE = 'Deals_Pipeline';
-const d0 = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
-const HAS_TEAMS = HXC.TEAMS.length > 0; // hệ thống hiện không chia team ⇒ ẩn mọi phần theo team của Goals
-const teamOf = n => HAS_TEAMS ? (HXC.saleByName(n) || { values:{} }).values.team || null : null;
-const membersOf = t => HXC.sales().filter(s => s.values.team === t).map(s => s.values.name);
-function goalSeed() {
-  const names = HXC.sales().map(s => s.values.name), q = n => Number((HXC.saleByName(n) || { values:{} }).values.quota) || 0, fill = (n, v) => Array.from({ length:n }, () => v);
-  const T = (arr, n, v) => Object.fromEntries(arr.map(k => [k, fill(n, typeof v === 'function' ? v(k) : v)]));
-  return [
-    { id:'g1', name:`Doanh số ${GY}`, tpl:'revenue', contrib:'users', users:names, teams:[], dur:'monthly', year:GY, pipeline:PIPE, forecast:true, targets:T(names, 12, q), notify:['75','100'], createdBy:HXC.ME, createdAt:`${GY}-01-02` },
-    { id:'g2', name:`Cuộc gọi theo quý ${GY}`, tpl:'calls', contrib:'users', users:names, teams:[], dur:'quarterly', year:GY, pipeline:null, forecast:false, targets:T(names, 4, 6), notify:['100'], createdBy:HXC.ME, createdAt:`${GY}-01-02` },
-    { id:'g3', name:`Cuộc họp hằng tháng ${GY}`, tpl:'meetings', contrib:'users', users:names, teams:[], dur:'monthly', year:GY, pipeline:null, forecast:false, targets:T(names, 12, 2), notify:[], createdBy:HXC.ME, createdAt:`${GY}-01-02` },
-    { id:'g4', name:`Deal tạo mới theo quý ${GY}`, tpl:'deals', contrib:'users', users:names, teams:[], dur:'quarterly', year:GY, pipeline:PIPE, forecast:false, targets:T(names, 4, 2), notify:['100','miss'], createdBy:HXC.ME, createdAt:`${GY}-01-02` },
-  ];
-}
-let GOALS = (() => { try { const s = localStorage.getItem(GKEY); if (s) return JSON.parse(s); } catch {} return goalSeed(); })();
-const saveGoals = () => { try { localStorage.setItem(GKEY, JSON.stringify(GOALS)); } catch {} };
-const gFmt = (g, v) => g.tpl === 'revenue' ? short(v) : (Number(v) || 0).toLocaleString('vi-VN');
-function gPeriods(g) { const y = g.year || GY;
-  if (g.dur === 'monthly') return Array.from({ length:12 }, (_, i) => ({ l:'T' + (i + 1), from:new Date(y, i, 1), to:new Date(y, i + 1, 1) }));
-  if (g.dur === 'quarterly') return [0, 1, 2, 3].map(i => ({ l:'Q' + (i + 1), from:new Date(y, i * 3, 1), to:new Date(y, i * 3 + 3, 1) }));
-  if (g.dur === 'yearly') return [{ l:String(y), from:new Date(y, 0, 1), to:new Date(y + 1, 0, 1) }];
-  if (g.dur === 'weekly') { const s = d0(monday(new Date(g.start))); return Array.from({ length:g.weeks || 4 }, (_, i) => ({ l:'Tuần ' + dmy(lk(addD(s, i * 7))).slice(0, 5), from:addD(s, i * 7), to:addD(s, i * 7 + 7) })); }
-  return [{ l:`${dmy(g.start)} – ${dmy(g.end)}`, from:d0(g.start), to:addD(d0(g.end), 1) }]; }
-function gActual(g, user, from, to) { const S = HXC, inP = d => { const x = +new Date(d); return x >= +from && x < +to; };
-  if (g.tpl === 'revenue') return S.list('deal').filter(d => d.values[S.SALE] === user && d.values[S.STAGE] === S.WON && d.values[S.CLOSE] && inP(d.values[S.CLOSE])).reduce((s, d) => s + (Number(d.values[S.CASH]) || 0), 0);
-  if (g.tpl === 'deals') return S.list('deal').filter(d => d.values[S.SALE] === user && inP(d.createdAt)).length;
-  const ty = g.tpl === 'calls' ? 'CALL' : 'MEETING'; return S.db().activities.filter(a => a.type === ty && a.by === user && inP(a.at)).length; }
-// Dòng đóng góp của một goal: [{ key, name, type:'team'|'user', team, t:[target từng kỳ], a:[thực tế từng kỳ] }]
-function gRows(g) { const P = gPeriods(g), rows = [], zero = () => P.map(() => 0);
-  const user = n => ({ key:n, name:n, type:'user', team:teamOf(n), t:P.map((_, i) => Number((g.targets[n] || [])[i]) || 0), a:P.map(p => gActual(g, n, p.from, p.to)) });
-  if (g.contrib === 'users') g.users.forEach(n => rows.push(user(n)));
-  else g.teams.forEach(t => { const mem = g.contrib === 'teams' ? membersOf(t) : g.users.filter(n => teamOf(n) === t), us = mem.map(user);
-    const tr = { key:'team:' + t, name:t, type:'team', team:t, t: g.contrib === 'teams' ? P.map((_, i) => Number((g.targets['team:' + t] || [])[i]) || 0) : us.reduce((s, u) => s.map((v, i) => v + u.t[i]), zero()), a:us.reduce((s, u) => s.map((v, i) => v + u.a[i]), zero()) };
-    rows.push(tr); if (g.contrib === 'teams_users') us.forEach(u => rows.push(u)); });
-  return rows; }
-const gTop = (g, rows) => rows.filter(r => g.contrib === 'users' ? r.type === 'user' : r.type === 'team');
-const sumA = a => a.reduce((s, v) => s + v, 0), pctOf = (a, t) => t ? Math.round(a / t * 100) : null;
-function gTotal(g, idx) { const rows = gRows(g), top = gTop(g, rows), pick = arr => idx == null ? sumA(arr) : arr[idx]; const t = top.reduce((s, r) => s + pick(r.t), 0), a = top.reduce((s, r) => s + pick(r.a), 0); return { t, a, pct:pctOf(a, t), rows }; }
-function gStatus(g) { const P = gPeriods(g), T = gTotal(g); if (+P[0].from > +NOW) return 'upcoming'; if (T.t && T.a >= T.t) return 'achieved'; return +P[P.length - 1].to <= +NOW ? 'missed' : 'progress'; }
-const cellSt = (a, t, p) => !t ? '' : a >= t ? 'achieved' : +p.to <= +NOW ? 'missed' : +p.from > +NOW ? 'upcoming' : 'progress';
-const gTag = st => `<span class="gtag ${GST[st][1]}">${GST[st][0]}</span>`;
-const curIdx = P => { const i = P.findIndex(p => +p.from <= +NOW && +NOW < +p.to); return i < 0 ? P.length - 1 : i; };
-
-const gs = { tab:'overview', tpl:'', name:'', brk:'total', team:'', user:'', pipe:'', st:'', wz:null, dtab:'summary', dr:'all', dteam:'', duser:'' };
-const gSel = (id, label, opts, cur) => `<label class="gf">${label}<select data-gsel="${id}">${opts.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>`;
-function drawGoals() {
-  if (gs.wz) return drawGoalWizard();
-  const gid = qs.get('goal'), g = gid && GOALS.find(x => x.id === gid); if (gid) return g ? drawGoalDetail(g) : wsFrame('', `<div class="wc"><div class="soon"><span class="ms">search_off</span>Không tìm thấy chỉ tiêu.<a class="btn btn--secondary" href="?tab=goals">Về danh sách chỉ tiêu</a></div></div>`);
-  document.title = 'Chỉ tiêu — Sales workspace — HarnexAI CRM (mockup)';
-  const list = GOALS.filter(x => (!gs.tpl || x.tpl === gs.tpl) && (!gs.name || x.id === gs.name) && (!gs.pipe || x.pipeline === gs.pipe) && (!gs.st || gStatus(x) === gs.st)
-    && (!gs.team || x.teams.includes(gs.team) || x.users.some(n => teamOf(n) === gs.team)) && (gs.tab !== 'users' || !gs.user || x.users.includes(gs.user) || (x.contrib === 'teams' && x.teams.includes(teamOf(gs.user)))));
-  const filters = gSel('tpl', 'Goal templates', [['', 'Tất cả mẫu'], ...Object.entries(GTPL).map(([k, v]) => [k, v[1]])], gs.tpl) + gSel('name', 'Goal name', [['', 'Tất cả chỉ tiêu'], ...GOALS.map(x => [x.id, x.name])], gs.name)
-    + (gs.tab === 'overview' ? '' : gSel('brk', 'Total progress breakdown', [['total', 'Total'], ['quarterly', 'Quarterly'], ['monthly', 'Monthly'], ['weekly', 'Weekly']], gs.brk))
-    + (HAS_TEAMS ? gSel('team', 'Teams', [['', 'Tất cả team'], ...HXC.TEAMS.map(t => [t, t])], gs.team) : '') + (gs.tab === 'users' ? gSel('user', 'Users', [['', 'Tất cả người dùng'], ...HXC.sales().map(s => [s.values.name, s.values.name])], gs.user) : '')
-    + gSel('pipe', 'Pipelines', [['', 'Tất cả pipeline'], [PIPE, PIPE]], gs.pipe) + gSel('st', 'Display options', [['', 'Mọi trạng thái'], ...Object.entries(GST).map(([k, v]) => [k, v[0]])], gs.st);
-  let table;
-  if (gs.tab === 'overview') table = `<table class="lt"><thead><tr>${['Goal name','Goal template','Duration','Contributors','Target','Actual','Progress','Status',''].map((h, i) => `<th class="${i === 4 || i === 5 ? 'num' : ''}" style="cursor:default">${h}</th>`).join('')}</tr></thead><tbody>${list.map(x => { const T = gTotal(x);
-      return `<tr><td class="wrap"><a href="?tab=goals&goal=${x.id}">${esc(x.name)}</a></td><td><span class="obj"><span class="ms sm">${GTPL[x.tpl][0]}</span>${GTPL[x.tpl][1]}</span></td><td>${GDUR[x.dur]}</td><td>${x.contrib === 'users' ? x.users.length + ' người' : x.teams.length + ' team' + (x.contrib === 'teams_users' ? ' · ' + x.users.length + ' người' : '')}</td>
-        <td class="num">${gFmt(x, T.t)}</td><td class="num"><b>${gFmt(x, T.a)}</b></td><td>${bar(T.pct)}</td><td>${gTag(gStatus(x))}</td><td><button class="btn btn--text sm" data-gact="${x.id}">Actions<span class="ms xs">arrow_drop_down</span></button></td></tr>`; }).join('') || `<tr><td colspan="9" class="empty">Không có chỉ tiêu nào khớp bộ lọc.</td></tr>`}</tbody></table>`;
-  else { // Team performance / User performance: mỗi dòng = một team (hoặc người) trong một goal, cột theo Total progress breakdown
-    const y = GY, B = gs.brk === 'monthly' ? Array.from({ length:12 }, (_, i) => ({ l:'T' + (i + 1), from:new Date(y, i, 1), to:new Date(y, i + 1, 1) })) : gs.brk === 'quarterly' ? [0, 1, 2, 3].map(i => ({ l:'Q' + (i + 1), from:new Date(y, i * 3, 1), to:new Date(y, i * 3 + 3, 1) }))
-      : gs.brk === 'weekly' ? (s => [0, 1, 2, 3, 4].map(i => ({ l:dmy(lk(addD(s, i * 7))).slice(0, 5), from:addD(s, i * 7), to:addD(s, i * 7 + 7) })))(d0(monday(new Date(NOW.getFullYear(), NOW.getMonth(), 1)))) : null;
-    const want = gs.tab === 'teams' ? 'team' : 'user', out = [];
-    list.forEach(x => { const P = gPeriods(x); gRows(x).filter(r => r.type === want && (!gs.team || r.team === gs.team) && (want !== 'user' || !gs.user || r.name === gs.user)).forEach(r => out.push({ x, r, P })); });
-    const cells = ({ x, r, P }) => !B ? `<td class="num">${gFmt(x, sumA(r.t))}</td><td class="num"><b>${gFmt(x, sumA(r.a))}</b></td><td>${bar(pctOf(sumA(r.a), sumA(r.t)))}</td>`
-      : B.map(b => { const t = P.reduce((s, p, i) => s + (+p.from >= +b.from && +p.from < +b.to ? r.t[i] : 0), 0), mem = r.type === 'team' ? (x.contrib === 'teams' ? membersOf(r.name) : x.users.filter(n => teamOf(n) === r.name)) : [r.name], a = mem.reduce((s, n) => s + gActual(x, n, b.from, b.to), 0);
-          return `<td class="num gcell ${cellSt(a, t, b)}"><b>${gFmt(x, a)}</b>${t ? `<small>/ ${gFmt(x, t)}</small>` : ''}</td>`; }).join('');
-    table = `<table class="lt"><thead><tr><th class="nmcol" style="cursor:default">${want === 'team' ? 'Team' : 'User'}</th><th style="cursor:default">Goal name</th>${B ? B.map(b => `<th class="num" style="cursor:default">${b.l}</th>`).join('') : '<th class="num" style="cursor:default">Target</th><th class="num" style="cursor:default">Actual</th><th style="cursor:default">Progress</th>'}</tr></thead>
-      <tbody>${out.map(o => `<tr><td class="nmcol"><span class="pri"><span class="av sm ${want === 'team' ? 'sq' : ''}">${esc(HXC.initials(o.r.name))}</span><div><b>${esc(o.r.name)}</b>${want === 'user' && o.r.team ? `<small>${esc(o.r.team)}</small>` : ''}</div></span></td><td><a href="?tab=goals&goal=${o.x.id}">${esc(o.x.name)}</a></td>${cells(o)}</tr>`).join('') || `<tr><td colspan="${(B ? B.length : 3) + 2}" class="empty">Không có dữ liệu khớp bộ lọc.</td></tr>`}</tbody></table>`; }
-  wsFrame(`<button class="btn btn--primary" id="gNew"><span class="ms sm">add</span>Create goal</button>`,
-    `<div class="wc"><div class="vtabs" role="tablist" style="padding-top:6px">${[['overview','Goals overview'], ...(HAS_TEAMS ? [['teams','Team performance']] : []), ['users','User performance']].map(([k, l]) => `<button class="vtab" role="tab" aria-selected="${gs.tab === k}" data-gtab="${k}">${l}</button>`).join('')}</div>
-      <div class="ws-bar gfs">${filters}</div><div class="ws-tw">${table}</div>
-      <div class="ws-foot"><span>${gs.tab === 'overview' ? list.length + ' chỉ tiêu' : 'Ô theo kỳ: thực tế / chỉ tiêu'}</span>${gs.tab === 'overview' ? '' : '<span class="gleg"><i class="achieved"></i>Đã đạt<i class="progress"></i>Đang diễn ra<i class="missed"></i>Không đạt</span>'}</div></div>`);
-}
-function drawGoalDetail(g) {
-  document.title = `${g.name} — Chỉ tiêu — HarnexAI CRM (mockup)`;
-  const P = gPeriods(g), idx = gs.dr === 'all' ? null : gs.dr === 'cur' ? curIdx(P) : Number(gs.dr), T = gTotal(g, idx), rows = T.rows, users = rows.filter(r => r.type === 'user'), lead = (users.length ? users : rows);
-  const pick = arr => idx == null ? sumA(arr) : arr[idx], per = idx == null ? { from:P[0].from, to:P[P.length - 1].to } : P[idx];
-  const L = lead.map(r => ({ r, t:pick(r.t), a:pick(r.a) })).map(o => ({ ...o, pct:pctOf(o.a, o.t), st:cellSt(o.a, o.t, per) })), maxV = Math.max(1, ...L.map(o => Math.max(o.a, o.t)));
-  const cnt = st => L.filter(o => o.st === st).length;
-  const info = [['Goal template', GTPL[g.tpl][1]], ['Pipelines', g.pipeline || '—'], ['Duration', GDUR[g.dur]], ['Start date', dmy(lk(P[0].from))], ['End date', dmy(lk(addD(P[P.length - 1].to, -1)))], ['Created by', g.createdBy]];
-  let body;
-  if (gs.dtab === 'summary') body = `<div class="ws-bar"><label class="gf">Date range<select data-gsel="dr">${[['all', 'Toàn bộ thời gian chỉ tiêu'], ['cur', 'Kỳ hiện tại'], ...P.map((p, i) => [String(i), p.l])].map(([v, l]) => `<option value="${v}" ${gs.dr === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label></div>
-    <div class="wc-b"><div class="gsum">
-      <section class="gcard"><h3>Total progress</h3><div class="gbig">${gFmt(g, T.a)}<small> / ${gFmt(g, T.t)}</small></div>${bar(T.pct)}<p class="nil">${GTPL[g.tpl][2]}.</p></section>
-      <section class="gcard"><h3>User goals in progress</h3><div class="gbig">${cnt('progress') + cnt('upcoming')}</div><p class="nil">Kỳ chưa kết thúc và chưa đạt.</p></section>
-      <section class="gcard"><h3>User goals achieved</h3><div class="gbig ok">${cnt('achieved')}</div><p class="nil">Thực tế bằng hoặc vượt chỉ tiêu.</p></section>
-      <section class="gcard"><h3>User goals missed</h3><div class="gbig bad">${cnt('missed')}</div><p class="nil">Kỳ đã kết thúc mà chưa đạt.</p></section></div>
-      <div class="gtwo"><section class="gcard"><h3>Actual versus user goals</h3><div class="stg">${L.map(o => `<div class="row"><span>${esc(o.r.name)}</span><span class="t" title="Chỉ tiêu ${gFmt(g, o.t)}"><i class="${barCls(o.pct)}" style="width:${Math.round(o.a / maxV * 100)}%"></i><em style="left:${Math.round(o.t / maxV * 100)}%"></em></span><span class="n">${gFmt(g, o.a)} / ${gFmt(g, o.t)}</span></div>`).join('')}</div><p class="nil" style="margin-top:8px">Thanh = thực tế · vạch đứng = chỉ tiêu.</p></section>
-        <section class="gcard"><h3>Leaderboard</h3><div class="wl">${[...L].sort((x, y) => (y.pct ?? -1) - (x.pct ?? -1) || y.a - x.a).map((o, i) => `<div class="wi"><span class="rk ${i === 0 && o.a ? 'g1' : ''}">${i + 1}</span><div class="x"><b>${esc(o.r.name)}</b><small>${o.r.type === 'user' && o.r.team ? esc(o.r.team) + ' · ' : ''}${gFmt(g, o.a)} / ${gFmt(g, o.t)}</small></div><b>${o.pct == null ? '—' : o.pct + '%'}</b></div>`).join('')}</div></section></div></div>`;
-  else { const R = rows.filter(r => (!gs.dteam || r.team === gs.dteam) && (!gs.duser || r.name === gs.duser || (r.type === 'team' && teamOf(gs.duser) === r.name)));
-    body = `<div class="ws-bar gfs">${HAS_TEAMS ? gSel('dteam', 'Teams', [['', 'Tất cả team'], ...[...new Set(rows.map(r => r.team).filter(Boolean))].map(t => [t, t])], gs.dteam) : ''}${users.length ? gSel('duser', 'Users', [['', 'Tất cả người dùng'], ...users.map(u => [u.name, u.name])], gs.duser) : ''}</div>
-      <div class="ws-tw"><table class="lt"><thead><tr><th class="nmcol" style="cursor:default">${g.contrib === 'users' ? 'User' : 'Team / User'}</th>${P.map(p => `<th class="num" style="cursor:default">${p.l}</th>`).join('')}<th class="num" style="cursor:default">Total</th></tr></thead>
-        <tbody>${R.map(r => `<tr class="${r.type === 'team' ? 'gteam' : ''}"><td class="nmcol"><span class="pri" style="${r.type === 'user' && g.contrib !== 'users' ? 'padding-left:22px' : ''}"><span class="av sm ${r.type === 'team' ? 'sq' : ''}">${esc(HXC.initials(r.name))}</span><b>${esc(r.name)}</b></span></td>
-          ${P.map((p, i) => `<td class="num gcell ${cellSt(r.a[i], r.t[i], p)}"><b>${gFmt(g, r.a[i])}</b><small>/ ${gFmt(g, r.t[i])}</small></td>`).join('')}<td class="num gcell"><b>${gFmt(g, sumA(r.a))}</b><small>/ ${gFmt(g, sumA(r.t))}</small></td></tr>`).join('')}</tbody></table></div>
-      <div class="ws-foot"><span>Ô: thực tế / chỉ tiêu</span><span class="gleg"><i class="achieved"></i>Đã đạt<i class="progress"></i>Đang diễn ra<i class="missed"></i>Không đạt</span></div>`; }
-  wsFrame(`<a class="btn btn--secondary" href="?tab=goals"><span class="ms sm">chevron_left</span>Goals</a><button class="btn btn--secondary" data-gact="${g.id}">Actions<span class="ms xs">arrow_drop_down</span></button>`,
-    `<div class="wc"><div class="wc-h"><h2><span class="ms sm">${GTPL[g.tpl][0]}</span>${esc(g.name)}</h2>${gTag(gStatus(g))}${g.forecast ? '<span class="gtag mut">Forecasted revenue goal</span>' : ''}</div>
-      <div class="ginfo">${info.map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div>
-      <div class="vtabs" role="tablist">${[['summary','Summary'],['users','User performance']].map(([k, l]) => `<button class="vtab" role="tab" aria-selected="${gs.dtab === k}" data-gdtab="${k}">${l}</button>`).join('')}</div>${body}</div>`);
-}
-/* Trình tạo / sửa goal — 5 màn như HubSpot: cách tạo → mẫu → Setup → Performance → Notifications */
-function wzNew() { return { step:0, edit:null, tpl:'revenue', name:'', contrib:'users', users:[HXC.ME], teams:[], dur:'monthly', year:GY, start:todayL, end:lk(addD(NOW, 30)), fiscal:false, forecast:false, pipeline:PIPE, targets:{}, notify:['100'], sel:new Set() }; }
-const wzGoal = w => ({ tpl:w.tpl, contrib:w.contrib, users:w.contrib === 'teams' ? [] : w.contrib === 'users' ? w.users : w.users.filter(n => w.teams.includes(teamOf(n))), teams:w.contrib === 'users' ? [] : w.teams, dur:w.dur, year:w.year, start:w.start, end:w.end, weeks:4, targets:w.targets });
-const wzKeys = w => { const g = wzGoal(w); return g.contrib === 'teams' ? g.teams.map(t => ['team:' + t, t, 'team']) : g.users.map(n => [n, n, 'user']); };
-function drawGoalWizard() {
-  const w = gs.wz, STEPS = ['Setup', 'Performance', 'Notifications'];
-  document.title = (w.edit ? 'Sửa chỉ tiêu' : 'Tạo chỉ tiêu') + ' — HarnexAI CRM (mockup)';
-  const head = `<div class="wc-h"><h2>${w.edit ? 'Edit goal' : 'Create goal'}</h2><span class="r"><button class="btn btn--text" id="wzX">Huỷ</button></span></div>${w.step >= 2 ? `<div class="wzs">${STEPS.map((s, i) => `<span class="${w.step - 2 === i ? 'on' : w.step - 2 > i ? 'done' : ''}"><b>${i + 1}</b>${s}</span>`).join('')}</div>` : ''}`;
-  let body, foot = '';
-  if (w.step === 0) body = `<div class="wc-b"><p class="nil" style="margin-bottom:12px">Chọn cách tạo chỉ tiêu.</p><div class="gtpl"><button data-wzm="tpl"><span class="ms">dashboard_customize</span><b>Create from template</b><small>Dùng mẫu chỉ tiêu có sẵn cho đội sale.</small></button><button data-wzm="scratch"><span class="ms">draw</span><b>Create from scratch</b><small>Tự chọn đối tượng, thuộc tính và cách tổng hợp.</small></button></div></div>`;
-  else if (w.step === 1) { body = `<div class="wc-b"><div class="gpick"><div class="gcat"><button aria-pressed="true">Sales</button></div><div class="gtpl">${Object.entries(GTPL).map(([k, v]) => `<button data-wzt="${k}" aria-pressed="${w.tpl === k}"><span class="ms">${v[0]}</span><b>${v[1]}</b><small>${v[2]}.</small></button>`).join('')}</div></div></div>`;
-    foot = `<button class="btn btn--secondary" data-wzgo="0">Quay lại</button><button class="btn btn--primary" data-wzgo="2">Set goal</button>`; }
-  else if (w.step === 2) { const chk = (arr, v) => arr.includes(v) ? 'checked' : '';
-    body = `<form class="wc-b field-form gform" id="wzF"><label>Goal name <span class="req">*</span><input class="in" id="wz_name" value="${esc(w.name)}" placeholder="${GTPL[w.tpl][1]} ${GY}"></label>
-      ${w.tpl === 'revenue' ? `<label>Is this a forecasted revenue goal?<select class="in" id="wz_fc"><option value="0" ${w.forecast ? '' : 'selected'}>No</option><option value="1" ${w.forecast ? 'selected' : ''}>Yes</option></select><small>Chọn Yes để chỉ tiêu này hiện ở tab Dự báo.</small></label>` : ''}
-      <fieldset class="gfs2"><legend>Contributors</legend>${Object.entries(GCON).filter(([k]) => HAS_TEAMS || k === 'users').map(([k, l]) => `<label class="chk"><input type="radio" name="wz_con" value="${k}" ${w.contrib === k ? 'checked' : ''}>${l}</label>`).join('')}</fieldset>
-      ${w.contrib !== 'users' ? `<fieldset class="gfs2"><legend>Teams <span class="req">*</span></legend>${HXC.TEAMS.map(t => `<label class="chk"><input type="checkbox" data-wzteam="${esc(t)}" ${chk(w.teams, t)}>${esc(t)} <span class="nil">(${membersOf(t).length} người)</span></label>`).join('')}</fieldset>` : ''}
-      ${w.contrib === 'users' ? `<fieldset class="gfs2"><legend>Users <span class="req">*</span></legend>${HXC.sales().map(s => `<label class="chk"><input type="checkbox" data-wzuser="${esc(s.values.name)}" ${chk(w.users, s.values.name)}>${esc(s.values.name)}${s.values.team ? ` <span class="nil">· ${esc(s.values.team)}</span>` : ''}</label>`).join('')}</fieldset>` : ''}
-      <label>Duration<select class="in" id="wz_dur">${Object.entries(GDUR).map(([k, l]) => `<option value="${k}" ${w.dur === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
-      ${w.dur === 'custom' ? `<div class="g2"><label>Start date<input class="in" type="date" id="wz_start" value="${w.start}"></label><label>End date<input class="in" type="date" id="wz_end" value="${w.end}"></label></div>` : w.dur === 'weekly' ? `<label>Start date<input class="in" type="date" id="wz_start" value="${w.start}"><small>4 tuần tính từ thứ Hai của tuần chứa ngày này.</small></label>` : `<label>Year<select class="in" id="wz_year">${[GY, GY + 1].map(y => `<option ${w.year === y ? 'selected' : ''}>${y}</option>`).join('')}</select></label>`}
-      <label class="chk"><input type="checkbox" id="wz_fis" ${w.fiscal ? 'checked' : ''}>Align with your fiscal year settings?</label>
-      ${w.tpl === 'revenue' || w.tpl === 'deals' ? `<label>Pipeline this goal applies to<select class="in" id="wz_pipe"><option>${PIPE}</option></select></label>` : ''}<p class="err" id="wzE" role="alert"></p></form>`;
-    foot = `${w.edit ? '' : '<button class="btn btn--secondary" data-wzgo="1">Quay lại</button>'}<button class="btn btn--primary" data-wzgo="3">Next</button>`; }
-  else if (w.step === 3) { const g = wzGoal(w), P = gPeriods(g), K = wzKeys(w); K.forEach(([k]) => { const o = w.targets[k] || []; w.targets[k] = P.map((_, i) => o[i] ?? ''); });
-    body = `<div class="ws-bar"><span class="nil" style="font-size:13px">${w.sel.size ? `Đã chọn ${w.sel.size} dòng` : 'Nhập chỉ tiêu từng kỳ cho mỗi người đóng góp, hoặc tick dòng để áp dụng hàng loạt.'}</span><div class="sp"><button class="btn btn--secondary sm" id="wzApply" ${w.sel.size ? '' : 'disabled'}>Apply targets</button>${w.tpl === 'revenue' || w.tpl === 'deals' ? `<button class="btn btn--secondary sm" id="wzPipe" ${w.sel.size ? '' : 'disabled'}>Apply pipelines</button>` : ''}<button class="btn btn--text sm" data-toast="Mockup: chọn tệp CSV có cột ${w.contrib === 'teams' ? 'Team' : 'User'} và các kỳ"><span class="ms xs">upload_file</span>${w.contrib === 'teams' ? 'Import team targets' : 'Import user targets'}</button></div></div>
-      <div class="ws-tw"><table class="lt gtt"><thead><tr><th style="width:44px;cursor:default"><input type="checkbox" id="wzAll" ${K.length && w.sel.size === K.length ? 'checked' : ''} aria-label="Chọn tất cả"></th><th class="nmcol" style="cursor:default">${w.contrib === 'teams' ? 'Team' : 'User'}</th>${w.tpl === 'revenue' || w.tpl === 'deals' ? '<th style="cursor:default">Pipeline</th>' : ''}${P.map(p => `<th class="num" style="cursor:default">${p.l}</th>`).join('')}</tr></thead>
-        <tbody>${K.map(([k, n, ty]) => `<tr><td><input type="checkbox" data-wzsel="${esc(k)}" ${w.sel.has(k) ? 'checked' : ''} aria-label="Chọn ${esc(n)}"></td><td class="nmcol"><span class="pri"><span class="av sm ${ty === 'team' ? 'sq' : ''}">${esc(HXC.initials(n))}</span><div><b>${esc(n)}</b>${ty === 'user' && teamOf(n) ? `<small>${esc(teamOf(n))}</small>` : ''}</div></span></td>${w.tpl === 'revenue' || w.tpl === 'deals' ? `<td>${PIPE}</td>` : ''}
-          ${P.map((_, i) => `<td class="num"><input class="gin" type="number" min="0" data-wztg="${esc(k)}" data-i="${i}" value="${w.targets[k][i]}" aria-label="Chỉ tiêu ${esc(n)} kỳ ${P[i].l}"></td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="err" id="wzE" role="alert" style="padding:0 14px"></p>`;
-    foot = `<button class="btn btn--secondary" data-wzgo="2">Quay lại</button><button class="btn btn--primary" data-wzgo="4">Next</button>`; }
-  else { body = `<div class="wc-b field-form gform"><p class="nil">Chọn các mốc sẽ gửi thông báo cho người đóng góp và người tạo chỉ tiêu.</p>${GNOTI.map(([k, l]) => `<label class="chk"><input type="checkbox" data-wzn="${k}" ${w.notify.includes(k) ? 'checked' : ''}>${l}</label>`).join('')}</div>`;
-    foot = `<button class="btn btn--secondary" data-wzgo="3">Quay lại</button><button class="btn btn--primary" id="wzDone">Done</button>`; }
-  wsFrame('', `<div class="wc">${head}${body}${foot ? `<div class="ws-foot" style="justify-content:flex-end">${foot}</div>` : ''}</div>`);
-}
-function wzRead() { const w = gs.wz, v = id => { const el = $('#' + id); return el ? el.value : null; };
-  if (w.step === 2) { w.name = (v('wz_name') || '').trim(); if (v('wz_fc') != null) w.forecast = v('wz_fc') === '1'; w.dur = v('wz_dur') || w.dur; if (v('wz_year')) w.year = Number(v('wz_year')); if (v('wz_start')) w.start = v('wz_start'); if (v('wz_end')) w.end = v('wz_end'); w.fiscal = !!($('#wz_fis') && $('#wz_fis').checked); } }
-function wzValid() { const w = gs.wz, err = m => { const e = $('#wzE'); if (e) e.textContent = m; return false; };
-  if (w.step === 2) { if (!w.name) return err('Nhập tên chỉ tiêu'); if (w.contrib === 'users' ? !w.users.length : !w.teams.length) return err(w.contrib === 'users' ? 'Chọn ít nhất một người dùng' : 'Chọn ít nhất một team');
-    if (w.contrib === 'teams_users' && !wzGoal(w).users.length) return err('Các team đã chọn chưa có người nào'); if (w.dur === 'custom' && w.end < w.start) return err('End date phải sau Start date'); }
-  if (w.step === 3 && !wzKeys(w).some(([k]) => (w.targets[k] || []).some(x => Number(x) > 0))) return err('Nhập ít nhất một chỉ tiêu lớn hơn 0');
-  return true; }
-function goalActions(btn, id) { const g = GOALS.find(x => x.id === id); if (!g) return;
-  openFp(btn, `<button class="mi" data-gq="${id}"><span class="ms sm">bolt</span>Quick edit</button><button class="mi" data-ge="${id}"><span class="ms sm">edit</span>Edit</button><button class="mi" data-gc="${id}"><span class="ms sm">content_copy</span>Clone</button><div class="sep"></div><button class="mi" data-gd="${id}"><span class="ms sm">delete</span>Delete</button>`, 200); }
-function goalQuickEdit(g) {
-  HX.modal(`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="gqT"><div class="mh" id="gqT">Quick edit<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
-    <div class="mb"><form class="field-form"><label>Goal name <span class="req">*</span><input class="in" id="gq_name" value="${esc(g.name)}"></label>
-      <label>Goal target amount<input class="in" id="gq_amt" type="number" min="0" placeholder="Để trống nếu giữ nguyên"><small>Áp dụng cho mọi kỳ của mọi ${g.contrib === 'teams' ? 'team' : 'người'} trong chỉ tiêu này.</small></label>
-      <fieldset class="gfs2"><legend>Notifications</legend>${GNOTI.map(([k, l]) => `<label class="chk"><input type="checkbox" data-gqn="${k}" ${g.notify.includes(k) ? 'checked' : ''}>${l}</label>`).join('')}</fieldset><p class="err" id="gqE" role="alert"></p></form></div>
-    <div class="mf"><button class="btn btn--secondary" data-close>Huỷ</button><button class="btn btn--primary" id="gqOk">Lưu</button></div></div>`, (bg, close) => {
-    $('#gqOk', bg).onclick = () => { const n = $('#gq_name', bg).value.trim(); if (!n) { $('#gqE', bg).textContent = 'Nhập tên chỉ tiêu'; return; }
-      g.name = n; const a = $('#gq_amt', bg).value; if (a !== '') Object.keys(g.targets).forEach(k => g.targets[k] = g.targets[k].map(() => Number(a)));
-      g.notify = [...bg.querySelectorAll('[data-gqn]:checked')].map(c => c.dataset.gqn); saveGoals(); close(); toast('Đã lưu chỉ tiêu'); draw(); }; });
-}
-document.addEventListener('click', e => {
-  if (qs.get('id') || TAB !== 'goals') return; const T = s => e.target.closest(s); let x; const w = gs.wz;
-  if ((x = T('[data-gtab]'))) { gs.tab = x.dataset.gtab; return draw(); }
-  if ((x = T('[data-gdtab]'))) { gs.dtab = x.dataset.gdtab; return draw(); }
-  if (T('#gNew')) { gs.wz = wzNew(); return draw(); }
-  if ((x = T('[data-gact]'))) { e.stopImmediatePropagation(); return goalActions(x, x.dataset.gact); }
-  if ((x = T('[data-gq]'))) { closeFp(); return goalQuickEdit(GOALS.find(g => g.id === x.dataset.gq)); }
-  if ((x = T('[data-ge]'))) { closeFp(); const g = GOALS.find(v => v.id === x.dataset.ge); gs.wz = { ...wzNew(), ...JSON.parse(JSON.stringify(g)), step:2, edit:g.id, sel:new Set(), start:g.start || todayL, end:g.end || lk(addD(NOW, 30)) }; return draw(); }
-  if ((x = T('[data-gc]'))) { closeFp(); const g = GOALS.find(v => v.id === x.dataset.gc), c = { ...JSON.parse(JSON.stringify(g)), id:'g' + Date.now().toString(36), name:g.name + ' (bản sao)', createdBy:HXC.ME, createdAt:todayL }; GOALS.unshift(c); saveGoals(); toast('Đã nhân bản chỉ tiêu'); return draw(); }
-  if ((x = T('[data-gd]'))) { closeFp(); const g = GOALS.find(v => v.id === x.dataset.gd); return confirmBox('Xoá chỉ tiêu', `Xoá chỉ tiêu “${esc(g.name)}” cùng toàn bộ chỉ tiêu của người đóng góp? Không thể hoàn tác.`, 'Xoá', () => { GOALS = GOALS.filter(v => v.id !== g.id); saveGoals(); toast('Đã xoá chỉ tiêu'); if (qs.get('goal')) location.href = '?tab=goals'; else draw(); }); }
-  if (!w) return;
-  if (T('#wzX')) { gs.wz = null; return draw(); }
-  if ((x = T('[data-wzm]'))) { if (x.dataset.wzm === 'scratch') return toast('Chỉ tiêu tuỳ chỉnh (Create from scratch) chưa dựng trong prototype'); w.step = 1; return draw(); }
-  if ((x = T('[data-wzt]'))) { w.tpl = x.dataset.wzt; return draw(); }
-  if ((x = T('[data-wzgo]'))) { const to = Number(x.dataset.wzgo); wzRead(); if (to > w.step && !wzValid()) return; w.step = to; w.sel = new Set(); return draw(); }
-  if (T('#wzApply')) { return HX.modal(`<div class="modal" role="dialog" aria-modal="true"><div class="mh">Apply targets</div><div class="mb"><form class="field-form"><label>Chỉ tiêu mỗi kỳ cho ${w.sel.size} dòng đã chọn<input class="in" id="apV" type="number" min="0"></label></form></div><div class="mf"><button class="btn btn--secondary" data-close>Huỷ</button><button class="btn btn--primary" id="apOk">Áp dụng</button></div></div>`, (bg, close) => { setTimeout(() => $('#apV', bg).focus(), 40);
-      $('#apOk', bg).onclick = () => { const n = $('#apV', bg).value; if (n === '') return; w.sel.forEach(k => w.targets[k] = w.targets[k].map(() => Number(n))); close(); draw(); }; }); }
-  if (T('#wzPipe')) return toast(`Đã áp dụng pipeline ${PIPE} cho ${w.sel.size} dòng`);
-  if (T('#wzDone')) { const g = wzGoal(w), K = wzKeys(w), P = gPeriods(g), targets = Object.fromEntries(K.map(([k]) => [k, P.map((_, i) => Number(w.targets[k][i]) || 0)]));
-    const rec = { ...g, targets, name:w.name, pipeline: w.tpl === 'revenue' || w.tpl === 'deals' ? PIPE : null, forecast: w.tpl === 'revenue' && w.forecast, fiscal:w.fiscal, notify:w.notify };
-    if (w.edit) { Object.assign(GOALS.find(v => v.id === w.edit), rec); toast('Đã cập nhật chỉ tiêu'); } else { GOALS.unshift({ id:'g' + Date.now().toString(36), ...rec, createdBy:HXC.ME, createdAt:todayL }); toast(`Đã tạo chỉ tiêu “${w.name}”`); }
-    saveGoals(); gs.wz = null; return draw(); }
-});
-document.addEventListener('change', e => { if (TAB !== 'goals') return; const t = e.target, d = t.dataset || {}, w = gs.wz;
-  if (d.gsel) { gs[d.gsel] = t.value; return draw(); }
-  if (!w) return;
-  if (t.name === 'wz_con') { wzRead(); w.contrib = t.value; if (t.value !== 'users' && !w.teams.length) w.teams = HXC.TEAMS.filter(x => membersOf(x).length); if (t.value === 'teams_users') w.users = HXC.sales().map(s => s.values.name); if (t.value === 'users' && !w.users.length) w.users = [HXC.ME]; w.targets = {}; return draw(); }
-  if (t.id === 'wz_dur') { wzRead(); w.targets = {}; return draw(); }
-  if (d.wzteam) { w.teams = t.checked ? [...w.teams, d.wzteam] : w.teams.filter(x => x !== d.wzteam); return; }
-  if (d.wzuser) { w.users = t.checked ? [...w.users, d.wzuser] : w.users.filter(x => x !== d.wzuser); return; }
-  if (d.wztg) { w.targets[d.wztg][Number(d.i)] = t.value; return; }
-  if (d.wzsel) { t.checked ? w.sel.add(d.wzsel) : w.sel.delete(d.wzsel); return draw(); }
-  if (t.id === 'wzAll') { w.sel = new Set(t.checked ? wzKeys(w).map(k => k[0]) : []); return draw(); }
-  if (d.wzn) { w.notify = t.checked ? [...w.notify, d.wzn] : w.notify.filter(x => x !== d.wzn); }
-});
-document.addEventListener('input', e => { const d = e.target.dataset || {}; if (TAB === 'goals' && gs.wz && d.wztg) gs.wz.targets[d.wztg][Number(d.i)] = e.target.value; });
-
 function drawSoon() {
   const [, name, ph] = TABS.find(t => t[0] === TAB);
-  const what = { leads:'Danh sách lead của sale đang xem, dùng lại màn Leads.', deals:'Deal của sale đang xem theo giai đoạn, dùng lại màn Deals.', tasks:'Toàn bộ task có bộ lọc, view lưu và hàng đợi thực hiện.', schedule:'Lịch theo ngày / tuần / tháng gồm cuộc họp và task.', feed:'Dòng hoạt động đầy đủ kèm số liệu hoạt động theo tuần.',
-    goals:'Chỉ tiêu theo sale và team: doanh số, deal tạo mới, cuộc gọi, cuộc họp; có bảng xếp hạng.', forecast:'Dự báo theo team và từng sale: chỉ tiêu, đã thắng, khoảng cách, pipeline mở, gửi dự báo.' }[TAB];
-  const alt = { leads:['crm-leads-hubspot.html','Mở màn Leads'], deals:['crm-giao-dich-hubspot.html','Mở màn Deals'], goals:['?tab=team','Xem chỉ tiêu ở Đội sale'], forecast:['crm-bao-cao-hubspot.html','Mở Báo cáo pipeline'] }[TAB];
+  const what = { leads:'Danh sách lead của sale đang xem, dùng lại màn Leads.', deals:'Deal của sale đang xem theo giai đoạn, dùng lại màn Deals.', tasks:'Toàn bộ task có bộ lọc, view lưu và hàng đợi thực hiện.', schedule:'Lịch theo ngày / tuần / tháng gồm cuộc họp và task.', feed:'Dòng hoạt động đầy đủ kèm số liệu hoạt động theo tuần.', forecast:'Dự báo theo từng sale: đã thắng, pipeline mở, giá trị theo nhóm dự báo, gửi dự báo.' }[TAB];
+  const alt = { leads:['crm-leads-hubspot.html','Mở màn Leads'], deals:['crm-giao-dich-hubspot.html','Mở màn Deals'], forecast:['crm-bao-cao-hubspot.html','Mở Báo cáo pipeline'] }[TAB];
   $('#frame').className = 'frame';
   $('#frame').innerHTML = wsHead() + `<div class="ws"><div class="wc"><div class="soon"><span class="ms">construction</span><b style="color:var(--on-surface);font-size:15px">Tab “${esc(name)}” sẽ dựng ở phần ${ph} của kế hoạch</b><span style="max-width:520px">${what}</span>${alt ? `<a class="btn btn--secondary" href="${alt[0]}">${alt[1]}</a>` : ''}</div></div></div>`;
 }
@@ -925,7 +681,7 @@ document.addEventListener('click', e => {
 document.addEventListener('change', e => { const id = e.target.dataset && e.target.dataset.tdone; if (id) { HXC.updateActivity(id, { done: e.target.checked }); toast(e.target.checked ? 'Đã hoàn thành task' : 'Đã mở lại task'); draw(); } });
 
 /* ── Điều phối ── */
-function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : ({ summary:drawSummary, team:drawList, tasks:drawTasks, schedule:drawSchedule, feed:drawFeed, leads:drawWsLeads, deals:drawWsDeals, goals:drawGoals }[TAB] || drawSoon)(); }
+function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : ({ summary:drawSummary, team:drawList, tasks:drawTasks, schedule:drawSchedule, feed:drawFeed, leads:drawWsLeads, deals:drawWsDeals }[TAB] || drawSoon)(); }
 draw();
 HX.onChange = draw;
 // Board Đội sale: kéo thẻ sang cột khác = đổi Trạng thái của sale

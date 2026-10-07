@@ -284,7 +284,7 @@ function salePanel() {
   const p = $('#panel'), pick = new Set(); let q = '';
   const list = () => MEMBERS.filter(m => !q || (m[0] + ' ' + m[1] + ' ' + m[3]).toLowerCase().includes(q));
   const rowsH = () => list().map(m => { const is = !!HXC.saleByName(m[0]); return `<label class="mi mb-i ${is ? 'dis' : ''}"><input type="checkbox" data-mb="${esc(m[0])}" ${is ? 'checked disabled' : pick.has(m[0]) ? 'checked' : ''}><span class="x"><b>${esc(m[0])}</b><small>${esc(m[1])} · ${esc(m[3])}</small></span>${is ? '<span class="tag">Đã là sale</span>' : ''}</label>`; }).join('') || '<div class="wempty"><span class="ms">search_off</span>Không tìm thấy thành viên.</div>';
-  p.innerHTML = `<div class="pn-h"><h2>Thêm sale từ thành viên</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
+  p.innerHTML = `<div class="pn-h"><h2>Thêm sale</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
     <div class="pn-b"><p class="nil" style="font-size:13px;margin-bottom:10px">Chọn từ danh sách thành viên có sẵn trên hệ thống. Thành viên được chọn sẽ xuất hiện trong danh sách chọn Contact owner / Company owner và “Sale phụ trách” của Deal.</p>
       <label class="srch2" style="margin-bottom:8px"><input id="mbQ" placeholder="Tìm tên, email, phòng ban" aria-label="Tìm thành viên"><span class="ms sm">search</span></label><div id="mbL">${rowsH()}</div></div>
     <div class="pn-f"><button class="btn btn--primary" id="mbAdd" disabled>Thêm</button><button class="btn btn--text" data-pclose>Huỷ</button></div>`;
@@ -307,27 +307,26 @@ function rows() {
 }
 function drawList() {
   document.title = 'Đội sale — Sales — HarnexAI CRM (mockup)';
-  const all = rows(), ranked = [...all].sort((a, b) => b.wonSum - a.wonSum || b.pipeline - a.pipeline);
-  const rank = new Map(ranked.map((r, i) => [r.s.id, i + 1]));
+  const all = rows();
   let list = all.filter(r => !st.q || [r.name, r.s.values.email, r.role].join(' ').toLowerCase().includes(st.q));
   const { k, dir } = st.sort; list.sort((a, b) => { const va = a[k], vb = b[k]; const c = typeof va === 'number' ? va - vb : String(va || '').localeCompare(String(vb || ''), 'vi'); return dir === 'asc' ? c : -c; });
   $('#frame').className = 'frame';
   $('#frame').innerHTML = `
-    ${wsHead(`<span class="count">${HXC.sales().length} sale</span><button class="btn btn--secondary" id="csvBtn"><span class="ms sm">ios_share</span>Export</button><button class="btn btn--primary" id="addSale"><span class="ms sm">person_add</span>Thêm từ thành viên</button>`)}
+    ${wsHead(`<span class="count">${HXC.sales().length} sale</span><button class="btn btn--secondary" id="csvBtn"><span class="ms sm">ios_share</span>Export</button><button class="btn btn--primary" id="addSale"><span class="ms sm">person_add</span>Thêm sale</button>`)}
     <div class="tools"><label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm tên, email" value="${esc(st.q)}" aria-label="Tìm sale"></label>${rgSeg()}<div class="seg" role="group" aria-label="Kiểu hiển thị"><button data-mode="BOARD" title="Board" aria-label="Board" aria-pressed="${MODE === 'BOARD'}"><span class="ms sm">view_kanban</span></button><button data-mode="TABLE" title="Bảng" aria-label="Bảng" aria-pressed="${MODE === 'TABLE'}"><span class="ms sm">table_rows</span></button></div></div>
-    ${MODE === 'BOARD' ? `<div class="body brd">${boardHtml(list, rank)}</div>` : `<div class="body"><table class="lt"><thead><tr><th class="nmcol" data-sort="name">Sale${srt('name')}</th>${COLS.map(([k, l, n]) => `<th class="${n ? 'num' : ''}" data-sort="${k}">${l}${srt(k)}</th>`).join('')}</tr></thead>
-      <tbody>${list.map(r => `<tr data-id="${r.s.id}" class="${r.s.values.status && r.s.values.status !== 'Đang làm việc' ? 'st-off' : ''}"><td class="nmcol"><div class="pri"><span class="rk ${rank.get(r.s.id) === 1 && r.wonSum ? 'g1' : ''}" title="Hạng theo doanh số thắng">${rank.get(r.s.id)}</span><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.s.values.email || '')}</small></div></div></td>
+    ${MODE === 'BOARD' ? `<div class="body brd">${boardHtml(list)}</div>` : `<div class="body"><table class="lt"><thead><tr><th class="nmcol" data-sort="name">Sale${srt('name')}</th>${COLS.map(([k, l, n]) => `<th class="${n ? 'num' : ''}" data-sort="${k}">${l}${srt(k)}</th>`).join('')}</tr></thead>
+      <tbody>${list.map(r => `<tr data-id="${r.s.id}" class="${r.s.values.status && r.s.values.status !== 'Đang làm việc' ? 'st-off' : ''}"><td class="nmcol"><div class="pri"><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.s.values.email || '')}</small></div></div></td>
         <td>${esc(r.role || '—')}</td><td class="num">${r.contacts}</td><td class="num">${r.companies}</td><td class="num">${r.open}</td><td class="num">${short(r.pipeline)}</td><td class="num">${short(r.forecast)}</td>
         <td class="num"><b>${short(r.wonSum)}</b></td><td class="num">${r.x.winRate == null ? '—' : r.x.winRate + '%'}</td><td class="num">${r.acts30}</td><td class="num">${r.overdue ? `<span class="od">${r.overdue}</span>` : 0}</td></tr>`).join('')
         || `<tr><td colspan="${COLS.length + 1}" class="empty">Không có sale phù hợp.</td></tr>`}</tbody></table></div>`}
     <div class="foot"><span class="pillc">${list.length} sale</span><span>${MODE === 'BOARD' ? 'Kéo thẻ sang cột khác để đổi trạng thái, bấm thẻ để xem chi tiết.' : 'Bấm tên cột để sắp xếp, bấm dòng để xem chi tiết.'}</span></div>`;
 }
 const srt = k => st.sort.k === k ? `<span class="ms xs srt">${st.sort.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>` : '';
-function boardHtml(list, rank) {
+function boardHtml(list) {
   const teams = HXC.SALE_FIELDS.find(f => f.key === 'status').choices; // cột = Trạng thái của sale (không chia team theo khu vực)
   return `<div class="kb">${teams.map(t => { const items = list.filter(r => r.status === t);
     return `<section class="kcol"><div class="kh">${esc(t)}<span class="n">${items.length}</span><span class="sm2">${short(items.reduce((s, r) => s + r.wonSum, 0))}</span></div><div class="kcards" data-drop="${esc(t)}">${items.map(r => `<article class="kc ${r.s.values.status && r.s.values.status !== 'Đang làm việc' ? 'st-off' : ''}" draggable="true" data-card="${r.s.id}">
-      <div class="pri"><span class="rk ${rank.get(r.s.id) === 1 && r.wonSum ? 'g1' : ''}" title="Hạng theo doanh số thắng">${rank.get(r.s.id)}</span><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.role || '')}</small></div></div>
+      <div class="pri"><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.role || '')}</small></div></div>
       <div class="ln"><span>Doanh số thắng</span><b>${short(r.wonSum)}</b></div>
       <div class="ln"><span>Deal đang mở</span><b>${r.open} · ${short(r.pipeline)}</b></div>
       <div class="ln"><span>Hoạt động 30 ngày</span><b>${r.acts30}</b></div>${r.overdue ? `<div class="ln"><span>Task quá hạn</span><b class="od">${r.overdue}</b></div>` : ''}</article>`).join('') || '<div class="kempty">Không có sale</div>'}</div></section>`; }).join('')}</div>`;

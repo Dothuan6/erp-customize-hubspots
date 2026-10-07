@@ -298,12 +298,12 @@ function salePanel() {
 
 /* ═══ DANH SÁCH ═══ */
 const COLS = [
-  ['role','Vai trò'],['contacts','Contacts','n'],['companies','Companies','n'],['open','Deal đang mở','n'],['pipeline','Giá trị pipeline','n'],['forecast','Dự báo (theo tỷ lệ)','n'],
+  ['role','Vai trò'],['contacts','Contacts','n'],['companies','Companies','n'],['open','Deal đang mở','n'],['pipeline','Giá trị pipeline','n'],
   ['wonSum','Doanh số thắng','n'],['winRate','Tỷ lệ thắng','n'],['acts30','Hoạt động 30 ngày','n'],['overdue','Task quá hạn','n']];
 function rows() {
   const [a, b] = range(st.rg);
   return HXC.sales().map(s => { const x = HXC.saleStats(s.values.name, a, b);
-    return { s, x, status:s.values.status || 'Đang làm việc', role:s.values.role, contacts:x.contacts.length, companies:x.companies.length, open:x.open.length, pipeline:x.pipeline, forecast:x.forecast, wonSum:x.wonSum, winRate:x.winRate ?? -1, acts30:x.acts30, overdue:x.overdue.length, name:s.values.name }; });
+    return { s, x, status:s.values.status || 'Đang làm việc', role:s.values.role, contacts:x.contacts.length, companies:x.companies.length, open:x.open.length, pipeline:x.pipeline, wonSum:x.wonSum, winRate:x.winRate ?? -1, acts30:x.acts30, overdue:x.overdue.length, name:s.values.name }; });
 }
 function drawList() {
   document.title = 'Đội sale — Sales — HarnexAI CRM (mockup)';
@@ -316,7 +316,7 @@ function drawList() {
     <div class="tools"><label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm tên, email" value="${esc(st.q)}" aria-label="Tìm sale"></label>${rgSeg()}<div class="seg" role="group" aria-label="Kiểu hiển thị"><button data-mode="BOARD" title="Board" aria-label="Board" aria-pressed="${MODE === 'BOARD'}"><span class="ms sm">view_kanban</span></button><button data-mode="TABLE" title="Bảng" aria-label="Bảng" aria-pressed="${MODE === 'TABLE'}"><span class="ms sm">table_rows</span></button></div></div>
     ${MODE === 'BOARD' ? `<div class="body brd">${boardHtml(list)}</div>` : `<div class="body"><table class="lt"><thead><tr><th class="nmcol" data-sort="name">Sale${srt('name')}</th>${COLS.map(([k, l, n]) => `<th class="${n ? 'num' : ''}" data-sort="${k}">${l}${srt(k)}</th>`).join('')}</tr></thead>
       <tbody>${list.map(r => `<tr data-id="${r.s.id}" class="${r.s.values.status && r.s.values.status !== 'Đang làm việc' ? 'st-off' : ''}"><td class="nmcol"><div class="pri"><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.s.values.email || '')}</small></div></div></td>
-        <td>${esc(r.role || '—')}</td><td class="num">${r.contacts}</td><td class="num">${r.companies}</td><td class="num">${r.open}</td><td class="num">${short(r.pipeline)}</td><td class="num">${short(r.forecast)}</td>
+        <td>${esc(r.role || '—')}</td><td class="num">${r.contacts}</td><td class="num">${r.companies}</td><td class="num">${r.open}</td><td class="num">${short(r.pipeline)}</td>
         <td class="num"><b>${short(r.wonSum)}</b></td><td class="num">${r.x.winRate == null ? '—' : r.x.winRate + '%'}</td><td class="num">${r.acts30}</td><td class="num">${r.overdue ? `<span class="od">${r.overdue}</span>` : 0}</td></tr>`).join('')
         || `<tr><td colspan="${COLS.length + 1}" class="empty">Không có sale phù hợp.</td></tr>`}</tbody></table></div>`}
     <div class="foot"><span class="pillc">${list.length} sale</span><span>${MODE === 'BOARD' ? 'Kéo thẻ sang cột khác để đổi trạng thái, bấm thẻ để xem chi tiết.' : 'Bấm tên cột để sắp xếp, bấm dòng để xem chi tiết.'}</span></div>`;
@@ -333,7 +333,7 @@ function boardHtml(list) {
 }
 function exportCsv() {
   const list = rows(), head = ['Sale','Email', ...COLS.map(c => c[1])];
-  const csv = [head, ...list.map(r => [r.name, r.s.values.email, r.role, r.contacts, r.companies, r.open, r.pipeline, Math.round(r.forecast), r.wonSum, r.x.winRate ?? '', r.acts30, r.overdue])].map(a => a.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const csv = [head, ...list.map(r => [r.name, r.s.values.email, r.role, r.contacts, r.companies, r.open, r.pipeline, r.wonSum, r.x.winRate ?? '', r.acts30, r.overdue])].map(a => a.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type:'text/csv' })); a.download = `sales-${st.rg}.csv`; a.click(); toast('Đã xuất CSV');
 }
 
@@ -361,7 +361,7 @@ function drawDetail(s) {
       <section class="card"><div class="ch">Hiệu suất</div><div class="cb"><div class="perf-rg">${rgSeg()}</div>
         <div class="dk">
           <div class="kpi"><div class="l">Doanh số thắng</div><div class="v">${short(x.wonSum)}</div><div class="s">${x.won.length} deal Closed Won</div></div>
-          <div class="kpi"><div class="l">Pipeline đang mở</div><div class="v">${short(x.pipeline)}</div><div class="s">${x.open.length} deal · dự báo ${short(x.forecast)}</div></div>
+          <div class="kpi"><div class="l">Pipeline đang mở</div><div class="v">${short(x.pipeline)}</div><div class="s">${x.open.length} deal</div></div>
           <div class="kpi"><div class="l">Tỷ lệ thắng</div><div class="v">${x.winRate == null ? '—' : x.winRate + '%'}</div><div class="s">${x.won.length} thắng · ${x.lost.length} thua trong kỳ</div></div>
           <div class="kpi"><div class="l">Hoạt động 30 ngày</div><div class="v">${x.acts30}</div><div class="s">Ghi chú · cuộc gọi · cuộc họp</div></div>
           <div class="kpi ${x.overdue.length ? 'warn' : ''}"><div class="l">Task quá hạn</div><div class="v">${x.overdue.length}</div><div class="s">${x.tasks.length} task chưa xong</div></div>
@@ -407,10 +407,10 @@ function reassign(s, anchor) {
 }
 
 /* ═══ SALES WORKSPACE (07/10/2026) — theo "Sales workspace" của HubSpot ═══
-   ?tab=summary (mặc định) | leads | deals | tasks | schedule | feed | goals | forecast | team
-   Đã dựng: phần 1 (khung tab + Tổng quan + Đội sale) và phần 2 (Tasks · Lịch · Feed · Leads · Deals). Tab Chỉ tiêu (Goals) đã gỡ theo yêu cầu, không dùng chỉ tiêu. Dự báo dựng ở phần sau.
+   ?tab=summary (mặc định) | leads | deals | tasks | schedule | feed | team
+   Đã dựng: phần 1 (khung tab + Tổng quan + Đội sale) và phần 2 (Tasks · Lịch · Feed · Leads · Deals). Tab Chỉ tiêu (Goals) và Dự báo (Forecast) đã gỡ theo yêu cầu: không dùng chỉ tiêu, không dùng dự báo.
    "Xem theo": một sale (mặc định là tôi) hoặc tất cả sales — dành cho quản lý. */
-const TABS = [['summary','Tổng quan'],['team','Đội sale'],['leads','Leads'],['deals','Deals'],['tasks','Tasks'],['schedule','Lịch'],['feed','Feed'],['forecast','Dự báo',3]];
+const TABS = [['summary','Tổng quan'],['team','Đội sale'],['leads','Leads'],['deals','Deals'],['tasks','Tasks'],['schedule','Lịch'],['feed','Feed']];
 const TAB = TABS.some(t => t[0] === qs.get('tab')) ? qs.get('tab') : 'summary';
 const WKEY = 'hx-crm-ws-ui-v2'; // v2: mặc định xem Tất cả sales, muốn xem riêng ai thì chọn
 const ws = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem(WKEY) || '{}'); } catch {} return { who: qs.get('who') || '*', shut: o.shut || {}, tf:'all', gf:'all' }; })(); // "xem theo" KHÔNG lưu lại: mỗi lần vào Sales đều là Tất cả sales; chọn riêng ai thì chỉ giữ qua ?who= khi chuyển tab
@@ -642,13 +642,6 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.sct; if (k) { sc[k] = e.target.checked; drawSchedule(); } });
 
-function drawSoon() {
-  const [, name, ph] = TABS.find(t => t[0] === TAB);
-  const what = { leads:'Danh sách lead của sale đang xem, dùng lại màn Leads.', deals:'Deal của sale đang xem theo giai đoạn, dùng lại màn Deals.', tasks:'Toàn bộ task có bộ lọc, view lưu và hàng đợi thực hiện.', schedule:'Lịch theo ngày / tuần / tháng gồm cuộc họp và task.', feed:'Dòng hoạt động đầy đủ kèm số liệu hoạt động theo tuần.', forecast:'Dự báo theo từng sale: đã thắng, pipeline mở, giá trị theo nhóm dự báo, gửi dự báo.' }[TAB];
-  const alt = { leads:['crm-leads-hubspot.html','Mở màn Leads'], deals:['crm-giao-dich-hubspot.html','Mở màn Deals'], forecast:['crm-bao-cao-hubspot.html','Mở Báo cáo pipeline'] }[TAB];
-  $('#frame').className = 'frame';
-  $('#frame').innerHTML = wsHead() + `<div class="ws"><div class="wc"><div class="soon"><span class="ms">construction</span><b style="color:var(--on-surface);font-size:15px">Tab “${esc(name)}” sẽ dựng ở phần ${ph} của kế hoạch</b><span style="max-width:520px">${what}</span>${alt ? `<a class="btn btn--secondary" href="${alt[0]}">${alt[1]}</a>` : ''}</div></div></div>`;
-}
 function taskDialog(preset = {}) {
   const cts = HXC.list('contact'), dls = HXC.list('deal');
   HX.modal(`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="tkT"><div class="mh" id="tkT">Tạo task<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
@@ -681,7 +674,7 @@ document.addEventListener('click', e => {
 document.addEventListener('change', e => { const id = e.target.dataset && e.target.dataset.tdone; if (id) { HXC.updateActivity(id, { done: e.target.checked }); toast(e.target.checked ? 'Đã hoàn thành task' : 'Đã mở lại task'); draw(); } });
 
 /* ── Điều phối ── */
-function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : ({ summary:drawSummary, team:drawList, tasks:drawTasks, schedule:drawSchedule, feed:drawFeed, leads:drawWsLeads, deals:drawWsDeals }[TAB] || drawSoon)(); }
+function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : ({ summary:drawSummary, team:drawList, tasks:drawTasks, schedule:drawSchedule, feed:drawFeed, leads:drawWsLeads, deals:drawWsDeals }[TAB] || drawSummary)(); }
 draw();
 HX.onChange = draw;
 // Board Đội sale: kéo thẻ sang cột khác = đổi Trạng thái của sale

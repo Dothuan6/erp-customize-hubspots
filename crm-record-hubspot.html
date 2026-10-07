@@ -267,10 +267,19 @@ else {
 
   /* ── Cột phải ── */
   function drawRight() {
-    const cards = T === 'contact' ? ['company','deal'] : T === 'company' ? ['contact','deal'] : ['contact','company','lineitems'];
+    const cards = T === 'contact' ? ['company','deal'] : T === 'company' ? ['contact','deal'] : ['contact','company','sales','lineitems'];
     $('#right').innerHTML = cards.map(c => `<section class="card" id="rc-${c}"></section>`).join('')
       + (true ? `<section class="card"><div class="ch"><span class="ms sm">expand_more</span>Tệp đính kèm<span class="r"><button class="btn btn--text sm" data-toast="Tải tệp lên (sắp ra mắt — dùng trường Tệp của ERP)"><span class="ms xs">add</span>Thêm</button></span></div><div class="ac-empty" style="padding:0 14px 16px"><span class="ms">attach_file</span>Xem các tệp đính kèm vào hoạt động hoặc tải lên bản ghi này.</div></section>` : '');
-    cards.forEach(c => c === 'lineitems' ? HXC.lineItemsCard($('#rc-lineitems'), ID, refreshAll) : HXC.assocCard($('#rc-' + c), T, ID, c, refreshAll));
+    cards.forEach(c => c === 'lineitems' ? HXC.lineItemsCard($('#rc-lineitems'), ID, refreshAll) : c === 'sales' ? salesCard($('#rc-sales')) : HXC.assocCard($('#rc-' + c), T, ID, c, refreshAll));
+  }
+  /* Card "Sales" trên Deal: sale phụ trách (trường "Sale phụ trách" của Deal) — cùng dạng card liên kết Contacts / Companies */
+  function salesCard(el) {
+    const name = r.values[HXC.SALE], s = name ? HXC.saleByName(name) : null;
+    el.innerHTML = `<div class="ch"><span class="ms sm">expand_more</span>Sales (${name ? 1 : 0})<span class="r"><button class="btn btn--text sm" data-salepick><span class="ms xs">${name ? 'swap_horiz' : 'add'}</span>${name ? 'Đổi' : 'Thêm'}</button></span></div>
+      <div class="cb">${name ? `<div class="ac-it"><div class="ac-top"><span class="av sm">${esc(HXC.initials(name))}</span>${s ? `<a href="${HXC.saleUrl(name)}" class="ac-name">${esc(name)}</a>` : `<span class="ac-name" style="color:var(--on-surface)">${esc(name)}</span>`}<span class="tag pk">Deal owner</span></div>
+        ${s ? `${[s.values.role, s.values.team].filter(Boolean).length ? `<div class="ac-ln">${esc([s.values.role, s.values.team].filter(Boolean).join(' · '))}</div>` : ''}
+        <div class="ac-ln"><span>Email:</span> ${s.values.email ? `<a class="lk" href="mailto:${esc(s.values.email)}">${esc(s.values.email)}</a>` : '—'}</div><div class="ac-ln"><span>Số điện thoại:</span> ${esc(s.values.phone || '—')}</div>` : `<div class="ac-ln"><span>Chưa có hồ sơ trong Đội sale.</span></div>`}</div>`
+        : `<div class="ac-empty"><span class="ms">badge</span>Chưa có sale phụ trách Deal này.</div>`}</div>`;
   }
 
   /* ── Tab Tổng quan (Catch-up): 2 mục thu gọn được xếp dọc như HubSpot — Tổng quan (Overview) · Sức khoẻ (Health) ── */
@@ -376,6 +385,9 @@ else {
   }
 
   document.addEventListener('click', e => {
+    const sp = e.target.closest('[data-salepick]'); if (sp) { e.stopPropagation(); const cur = r.values[HXC.SALE];
+      openFp(sp, `<div class="hd">Sale phụ trách</div>${HX.USERS.map(u => `<button class="mi" data-saleset="${esc(u)}"><span class="ms sm" style="${u === cur ? '' : 'visibility:hidden'}">check</span>${esc(u)}</button>`).join('')}${cur ? `<div class="sep"></div><button class="mi" data-saleset=""><span class="ms sm">person_remove</span>Bỏ sale phụ trách</button>` : ''}`, 260, true); fp.dataset.src = 'sale'; return; }
+    const ss = e.target.closest('[data-saleset]'); if (ss) { const v = ss.dataset.saleset || null; closeFp(); if (v !== (r.values[HXC.SALE] || null)) { HXC.update('deal', ID, HXC.SALE, v); toast(v ? `Sale phụ trách: ${v}` : 'Đã bỏ sale phụ trách'); refreshAll(); } return; }
     const am = e.target.closest('[data-actmenu]'); if (am) { e.stopPropagation(); fp.classList.contains('open') && fp.dataset.src === am.dataset.actmenu ? closeFp() : (openFp(am, actMenu(), 260, true), fp.dataset.src = am.dataset.actmenu); return; }
     const km = e.target.closest('[data-keymenu]'); if (km) { e.stopPropagation(); fp.classList.contains('open') && fp.dataset.src === 'key' ? closeFp() : (openFp(km, keyMenu(), 260, true), fp.dataset.src = 'key'); return; }
     const t = e.target.closest('[data-toast]'); if (t) { toast(t.dataset.toast); closeFp(); return; }

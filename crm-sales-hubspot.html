@@ -88,6 +88,53 @@ d.readyState==='loading'?d.addEventListener('DOMContentLoaded',go):go()})();</sc
 .wempty .ms{font-size:28px;max-width:none}
 .wmore{font-size:12.5px;font-weight:600;color:var(--link);padding-top:8px;display:inline-block}
 @media(max-width:760px){ .ws{overflow:visible} }
+/* Sales Workspace phần 2: Tasks · Lịch · Feed · Leads · Deals */
+.ws-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 14px}
+.ws-bar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ws-bar .search{background:var(--surface)}
+.ws-tw{overflow-x:auto;border-top:1px solid var(--outline-variant)}
+.ws-tw .lt th,.ws-tw .lt td{height:44px}
+.ws-tw .lt>tbody>tr{cursor:default}
+.ws-tw .lt td a{color:var(--link);font-weight:600}
+.ws-tw .lt td a:hover{text-decoration:underline}
+.ws-tw .lt td.wrap{white-space:normal;min-width:220px}
+.ws-tw .lt input[type=checkbox]{accent-color:var(--primary)}
+.ws-tw .done td{color:var(--on-surface-variant)} .ws-tw .done .tt{text-decoration:line-through}
+.ws-foot{padding:10px 14px;font-size:12px;color:var(--on-surface-variant);border-top:1px solid var(--outline-variant);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.prio{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:var(--radius-pill);background:var(--surface-2);color:var(--on-surface-variant)}
+.prio.hi{background:var(--error-container);color:var(--error)}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600}
+.chk input{accent-color:var(--primary)}
+/* Lịch */
+.cal-nav{display:flex;align-items:center;gap:4px}
+.cal-nav b{font-size:15px;min-width:170px;text-align:center}
+.cal{display:grid;gap:1px;background:var(--outline-variant);border-top:1px solid var(--outline-variant)}
+.cal.wk{grid-template-columns:repeat(var(--n),minmax(100px,1fr));overflow-x:auto}
+.cal.mo{grid-template-columns:repeat(var(--n),minmax(0,1fr))}
+.cal-d{background:var(--surface);min-height:110px;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.cal.wk .cal-d{min-height:340px}
+.cal-d.out{background:var(--surface-2)} .cal-d.out .dn{color:var(--on-surface-variant)}
+.cal-h{background:var(--surface);padding:6px;font-size:12px;font-weight:600;color:var(--on-surface-variant);text-align:center}
+.dn{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.dn .d{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:50%;padding:0 4px}
+.cal-d.today .dn .d{background:var(--primary);color:var(--on-primary)}
+.ev{display:flex;flex-direction:column;align-items:stretch;width:100%;overflow:hidden;gap:1px;padding:4px 6px;border-radius:var(--radius-sm);font-size:12px;border-left:3px solid var(--c1);background:var(--surface-2);min-width:0;text-align:left;color:var(--on-surface)}
+.ev.tk{border-left-color:var(--c5)} .ev.done{opacity:.55;text-decoration:line-through}
+.ev b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev small{color:var(--on-surface-variant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal.mo .ev small{display:none}
+.evmore{font-size:11.5px;color:var(--on-surface-variant);padding:0 6px}
+.cal-day{padding:0 14px 14px}
+@media(max-width:760px){ .cal.mo .ev b{font-size:11px} .cal-d{padding:4px;min-height:74px} }
+/* Feed */
+.fd-day{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--on-surface-variant);padding:14px 0 4px}
+.delta{font-size:11.5px;font-weight:700} .delta.up{color:var(--success)} .delta.dn2{color:var(--error)}
+/* Hàng đợi task */
+.tq-p{font-size:12px;font-weight:700;color:var(--on-surface-variant)}
+.tq-t{font-size:17px;font-weight:700;overflow-wrap:anywhere}
+.tq-m{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.tq-m span>b{font-weight:600}
+.tq-bar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden} .tq-bar i{display:block;height:100%;background:var(--primary)}
 /* Board theo Team (mặc định) */
 .seg{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden;margin-left:auto}
 .seg button{height:30px;width:34px;display:grid;place-items:center;color:var(--on-surface-variant)}
@@ -254,17 +301,15 @@ function rows() {
 }
 function drawList() {
   document.title = 'Đội sale — Sales — HarnexAI CRM (mockup)';
-  const teams = [...new Set(HXC.sales().map(s => s.values.team).filter(Boolean))];
   const all = rows(), ranked = [...all].sort((a, b) => b.wonSum - a.wonSum || b.pipeline - a.pipeline);
   const rank = new Map(ranked.map((r, i) => [r.s.id, i + 1]));
-  let list = all.filter(r => st.view === 'all' || (st.view === 'me' ? r.name === HXC.ME : r.team === st.view)).filter(r => !st.q || [r.name, r.s.values.email, r.team, r.role].join(' ').toLowerCase().includes(st.q));
+  let list = all.filter(r => !st.q || [r.name, r.s.values.email, r.team, r.role].join(' ').toLowerCase().includes(st.q));
   const { k, dir } = st.sort; list.sort((a, b) => { const va = a[k], vb = b[k]; const c = typeof va === 'number' ? va - vb : String(va || '').localeCompare(String(vb || ''), 'vi'); return dir === 'asc' ? c : -c; });
   const sum = f => list.reduce((s, r) => s + (Number(r[f]) || 0), 0);
   const tq = sum('quota'), tw = sum('wonSum'), tp = tq ? Math.round(tw / tq * 100) : null;
   $('#frame').className = 'frame';
   $('#frame').innerHTML = `
     ${wsHead(`<span class="count">${HXC.sales().length} sale</span><button class="btn btn--secondary" id="csvBtn"><span class="ms sm">ios_share</span>Export</button><button class="btn btn--primary" id="addSale"><span class="ms sm">person_add</span>Thêm sale</button>`)}
-    <div class="vtabs" role="tablist" style="border-bottom:none;padding-top:10px">${[['all','Tất cả sales'],['me','Của tôi'], ...teams.map(t => [t, t])].map(([k, l]) => `<button class="vtab" role="tab" aria-selected="${st.view === k}" data-view="${esc(k)}">${esc(l)}</button>`).join('')}</div>
     <div class="tools"><label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm tên, email, team" value="${esc(st.q)}" aria-label="Tìm sale"></label>${rgSeg()}<div class="seg" role="group" aria-label="Kiểu hiển thị"><button data-mode="BOARD" title="Board" aria-label="Board" aria-pressed="${MODE === 'BOARD'}"><span class="ms sm">view_kanban</span></button><button data-mode="TABLE" title="Bảng" aria-label="Bảng" aria-pressed="${MODE === 'TABLE'}"><span class="ms sm">table_rows</span></button></div></div>
     <div class="kpis">
       <div class="kpi"><div class="l"><span class="ms xs">emoji_events</span>Doanh số thắng</div><div class="v">${short(tw)}</div><div class="s">Deal Closed Won có ngày chốt trong kỳ</div></div>
@@ -367,9 +412,9 @@ function reassign(s, anchor) {
 
 /* ═══ SALES WORKSPACE (07/10/2026) — theo "Sales workspace" của HubSpot ═══
    ?tab=summary (mặc định) | leads | deals | tasks | schedule | feed | goals | forecast | team
-   Phần 1 đã dựng: khung tab + Summary + "Đội sale" (bảng xếp hạng cũ). Các tab còn lại dựng ở phần 2–4 của kế hoạch.
+   Đã dựng: phần 1 (khung tab + Tổng quan + Đội sale) và phần 2 (Tasks · Lịch · Feed · Leads · Deals). Chỉ tiêu, Dự báo dựng ở phần 3–4 của kế hoạch.
    "Xem theo": một sale (mặc định là tôi) hoặc tất cả sales — dành cho quản lý. */
-const TABS = [['summary','Tổng quan'],['leads','Leads',2],['deals','Deals',2],['tasks','Tasks',2],['schedule','Lịch',2],['feed','Feed',2],['goals','Chỉ tiêu',3],['forecast','Dự báo',4],['team','Đội sale']];
+const TABS = [['summary','Tổng quan'],['team','Đội sale'],['leads','Leads'],['deals','Deals'],['tasks','Tasks'],['schedule','Lịch'],['feed','Feed'],['goals','Chỉ tiêu',3],['forecast','Dự báo',4]];
 const TAB = TABS.some(t => t[0] === qs.get('tab')) ? qs.get('tab') : 'summary';
 const WKEY = 'hx-crm-ws-ui';
 const ws = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem(WKEY) || '{}'); } catch {} return { who: o.who || HXC.ME, shut: o.shut || {}, tf:'all', gf:'all' }; })();
@@ -411,9 +456,7 @@ function wsData() {
 }
 function drawSummary() {
   document.title = 'Sales workspace — HarnexAI CRM (mockup)';
-  const D = wsData(), [a, b] = range('month');
-  const X = D.names.map(n => HXC.saleStats(n, a, b)), sum = f => X.reduce((s, x) => s + (Number(typeof f === 'function' ? f(x) : x[f]) || 0), 0);
-  const won = sum('wonSum'), quota = sum('quota'), pct = quota ? Math.round(won / quota * 100) : null;
+  const D = wsData();
   const TF = [['od','Quá hạn','bad'],['today','Hôm nay'],['tmr','Ngày mai'],['later','Sắp tới']];
   const tl = ws.tf === 'all' ? [...D.grp.od, ...D.grp.today, ...D.grp.tmr, ...D.grp.later] : D.grp[ws.tf];
   const al = D.acts.filter(x => ws.gf === 'all' || x.k === ws.gf);
@@ -421,12 +464,6 @@ function drawSummary() {
   $('#frame').className = 'frame';
   $('#frame').innerHTML = wsHead(`<button class="btn btn--secondary" id="wsTask"><span class="ms sm">add_task</span>Tạo task</button>`) + `<div class="ws"><div class="ws-g">
     <div class="ws-c">
-      <div class="kpis">
-        <div class="kpi"><div class="l"><span class="ms xs">emoji_events</span>Doanh số tháng này</div><div class="v">${short(won)}</div>${bar(pct)}</div>
-        <div class="kpi"><div class="l"><span class="ms xs">handshake</span>Deal đang mở</div><div class="v">${D.open.length}</div><div class="s">Pipeline ${short(sum('pipeline'))}</div></div>
-        <div class="kpi"><div class="l"><span class="ms xs">event</span>Cuộc họp sắp tới</div><div class="v">${D.nextMeet.length}</div><div class="s">${D.nextMeet[0] ? 'Gần nhất ' + dmy(D.nextMeet[0].at) : 'Chưa có lịch'}</div></div>
-        <div class="kpi"><div class="l"><span class="ms xs">forum</span>Hoạt động 30 ngày</div><div class="v">${sum('acts30')}</div><div class="s">Ghi chú · cuộc gọi · cuộc họp</div></div>
-        <div class="kpi ${D.grp.od.length ? 'warn' : ''}"><div class="l"><span class="ms xs">assignment_late</span>Task quá hạn</div><div class="v">${D.grp.od.length}</div><div class="s">${D.tasks.length} task đang mở</div></div></div>
       ${wcard('tasks', 'task_alt', ws.who === '*' ? 'Task của đội' : 'Task của bạn', `<button class="btn btn--primary sm" id="wsStart" ${tl.length ? '' : 'disabled'}><span class="ms xs">play_arrow</span>Bắt đầu ${tl.length} task</button>`,
         `<div class="tcnt" role="group" aria-label="Lọc task theo hạn">${TF.map(([k, l, c]) => `<button data-tf="${k}" aria-pressed="${ws.tf === k}" class="${c && D.grp[k].length ? c : ''}"><b>${D.grp[k].length}</b><span>${l}</span></button>`).join('')}</div>
         <div class="wl">${tl.slice(0, 8).map(taskRow).join('') || `<div class="wempty"><span class="ms">task_alt</span>${ws.tf === 'all' ? 'Không còn task nào đang mở.' : 'Không có task trong nhóm này.'}</div>`}</div>
@@ -445,6 +482,169 @@ function drawSummary() {
         `<div class="wl">${D.feed.slice(0, 6).map(f => `<div class="wi"><span class="ms sm">${IC[f.type] || 'sync'}</span><div class="x"><b>${esc(f.title || TN[f.type] || 'Cập nhật')}</b><small>${esc((f.body || '').slice(0, 90))}${(f.body || '').length > 90 ? '…' : ''}</small><small>${dmy(f.at)} ${hm(f.at)}${ws.who === '*' ? ' · ' + esc(f.by || '') : ''}${refOf(f)}</small></div></div>`).join('') || `<div class="wempty"><span class="ms">dynamic_feed</span>Chưa có hoạt động.</div>`}</div><a class="wmore" href="?tab=feed">Xem toàn bộ feed</a>`)}
     </div></div></div>`;
 }
+/* ═══ SALES WORKSPACE — phần 2: Tasks · Lịch · Feed · Leads · Deals (07/10/2026) ═══ */
+const p2 = n => String(n).padStart(2, '0');
+const lk = s => { const d = new Date(s); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; };   // khoá ngày theo giờ máy
+const todayL = lk(NOW);
+const prioTag = p => p ? `<span class="prio ${p === 'Cao' ? 'hi' : ''}">${esc(p)}</span>` : '<span class="nil">--</span>';
+const allTasks = () => HXC.db().activities.filter(a => a.type === 'TASK' && mine(a.assignee || a.by));
+const wsFrame = (actions, body) => { $('#frame').className = 'frame'; $('#frame').innerHTML = wsHead(actions) + `<div class="ws">${body}</div>`; };
+
+/* ── Tasks ── */
+const tk = { view:'open', q:'', prio:'' };
+const TKV = [['open','Đang mở'],['today','Hôm nay'],['od','Quá hạn'],['up','Sắp tới'],['done','Đã hoàn thành'],['all','Tất cả']];
+function taskRows() {
+  const f = { open:t => !t.done, today:t => !t.done && t.due === todayS, od:t => !t.done && t.due && t.due < todayS, up:t => !t.done && (!t.due || t.due > todayS), done:t => t.done, all:() => true }[tk.view];
+  return allTasks().filter(f).filter(t => !tk.prio || t.prio === tk.prio).filter(t => !tk.q || [t.title, t.body, t.assignee].join(' ').toLowerCase().includes(tk.q))
+    .sort((a, b) => (a.done - b.done) || String(a.due || '9999').localeCompare(String(b.due || '9999')));
+}
+function drawTasks() {
+  document.title = 'Tasks — Sales workspace — HarnexAI CRM (mockup)';
+  const all = allTasks(), list = taskRows(), openN = list.filter(t => !t.done).length;
+  const cnt = k => ({ open:all.filter(t => !t.done), today:all.filter(t => !t.done && t.due === todayS), od:all.filter(t => !t.done && t.due && t.due < todayS), up:all.filter(t => !t.done && (!t.due || t.due > todayS)), done:all.filter(t => t.done), all })[k].length;
+  wsFrame(`<button class="btn btn--secondary" id="wsTask"><span class="ms sm">add_task</span>Tạo task</button><button class="btn btn--primary" id="tqStart" ${openN ? '' : 'disabled'}><span class="ms sm">play_arrow</span>Bắt đầu ${openN} task</button>`,
+    `<div class="wc"><div class="vtabs" role="tablist" style="padding-top:6px">${TKV.map(([k, l]) => `<button class="vtab" role="tab" aria-selected="${tk.view === k}" data-tkv="${k}">${l}<span class="soonb">${cnt(k)}</span></button>`).join('')}</div>
+      <div class="ws-bar"><label class="search"><span class="ms sm">search</span><input id="tkQ" placeholder="Tìm task" value="${esc(tk.q)}" aria-label="Tìm task"></label>
+        <span class="segtxt" role="group" aria-label="Ưu tiên">${[['','Mọi ưu tiên'],['Cao','Cao'],['Trung bình','Trung bình'],['Thấp','Thấp']].map(([k, l]) => `<button data-tkp="${k}" aria-pressed="${tk.prio === k}">${l}</button>`).join('')}</span></div>
+      <div class="ws-tw"><table class="lt"><thead><tr><th style="width:44px;cursor:default"></th><th style="cursor:default">Tiêu đề</th><th style="cursor:default">Liên kết</th><th style="cursor:default">Ưu tiên</th><th style="cursor:default">Hạn</th><th style="cursor:default">Giao cho</th><th style="cursor:default"></th></tr></thead>
+        <tbody>${list.map(t => `<tr class="${t.done ? 'done' : ''}"><td><input type="checkbox" data-tdone="${t.id}" ${t.done ? 'checked' : ''} aria-label="${t.done ? 'Mở lại task' : 'Hoàn thành task'}"></td><td class="wrap"><b class="tt">${esc(t.title || t.body || 'Task')}</b></td>
+          <td>${recLink(t) || '<span class="nil">--</span>'}</td><td>${prioTag(t.prio)}</td><td><span class="due ${!t.done && t.due && t.due < todayS ? 'od' : ''}">${t.due ? dmy(t.due) : '<span class="nil">Chưa có hạn</span>'}</span></td><td>${esc(t.assignee || t.by || '')}</td>
+          <td><button class="btn btn--text btn--icon" data-tdel="${t.id}" title="Xoá task" aria-label="Xoá task"><span class="ms sm">delete</span></button></td></tr>`).join('')
+          || `<tr><td colspan="7" class="empty">Không có task nào trong view này.</td></tr>`}</tbody></table></div>
+      <div class="ws-foot"><span>${list.length} task</span><span>“Bắt đầu” chạy lần lượt các task đang mở trong view này, theo thứ tự hạn.</span></div></div>`);
+  const q = $('#tkQ'); q.oninput = () => { tk.q = q.value.trim().toLowerCase(); const p = q.selectionStart; drawTasks(); const n = $('#tkQ'); n.focus(); n.setSelectionRange(p, p); };
+}
+/* Hàng đợi task (HubSpot: "Start tasks" mở queue làm lần lượt) */
+function taskQueue(ids) {
+  let i = 0, doneN = 0;
+  const show = () => {
+    const t = HXC.db().activities.find(a => a.id === ids[i]);
+    if (!t) { HX.modal(`<div class="modal" role="dialog" aria-modal="true"><div class="mh">Xong hàng đợi</div><div class="mb"><p>Đã hoàn thành <b>${doneN}</b> / ${ids.length} task.</p></div><div class="mf"><button class="btn btn--primary" data-close>Đóng</button></div></div>`); draw(); return; }
+    const ref = t.deals && t.deals[0] ? ['deal', t.deals[0]] : t.contacts && t.contacts[0] ? ['contact', t.contacts[0]] : t.companies && t.companies[0] ? ['company', t.companies[0]] : null, r = ref && HXC.get(ref[0], ref[1]);
+    HX.modal(`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="tqT"><div class="mh"><span class="tq-p" id="tqT">Task ${i + 1} / ${ids.length}</span><button class="btn btn--text btn--icon x" data-close aria-label="Dừng hàng đợi"><span class="ms">close</span></button></div>
+      <div class="mb"><div class="tq-bar"><i style="width:${Math.round(i / ids.length * 100)}%"></i></div><div class="tq-t">${esc(t.title || t.body || 'Task')}</div>
+        <div class="tq-m"><span>Hạn: <b class="${t.due && t.due < todayS ? 'od' : ''}">${t.due ? dmy(t.due) : 'Chưa có hạn'}</b> · Ưu tiên: <b>${esc(t.prio || '—')}</b> · Giao cho: <b>${esc(t.assignee || t.by || '')}</b></span>
+          ${t.body && t.body !== t.title ? `<span>${esc(t.body)}</span>` : ''}
+          ${r ? `<span>Bản ghi: <a class="lk" style="color:var(--link);font-weight:600" href="${HXC.url(ref[0], ref[1])}" target="_blank" rel="noopener">${esc(HXC.titleOf(ref[0], r))}</a> <span class="nil">(mở tab mới)</span></span>` : '<span class="nil">Task này chưa liên kết bản ghi nào.</span>'}</div></div>
+      <div class="mf"><button class="btn btn--text" data-close>Dừng</button><button class="btn btn--secondary" id="tqSkip">Bỏ qua</button><button class="btn btn--primary" id="tqDone"><span class="ms sm">check</span>Hoàn thành &amp; tiếp</button></div></div>`, (bg) => {
+      $('#tqSkip', bg).onclick = () => { i++; show(); };
+      $('#tqDone', bg).onclick = () => { HXC.updateActivity(t.id, { done:true }); doneN++; i++; show(); };
+      const orig = bg.onclick; bg.onclick = e => { const c = e.target === bg || e.target.closest('[data-close]'); orig(e); if (c) { if (doneN) toast(`Đã hoàn thành ${doneN} task`); draw(); } }; });
+  };
+  show();
+}
+
+/* ── Lịch ── */
+const sc = { mode:'week', cur:new Date(NOW), meet:true, task:true, wknd:true };
+const addD = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const monday = d => addD(d, -((d.getDay() + 6) % 7));
+const DOW = ['T2','T3','T4','T5','T6','T7','CN'];
+function calEvents() {
+  const m = {}; const put = (k, e) => (m[k] = m[k] || []).push(e);
+  if (sc.meet) HXC.db().activities.filter(a => a.type === 'MEETING' && mine(a.by)).forEach(a => put(lk(a.at), { tm:hm(a.at), t:a.title || 'Cuộc họp', k:'mt', a }));
+  if (sc.task) allTasks().filter(t => t.due).forEach(t => put(t.due, { tm:'', t:t.title || t.body || 'Task', k:'tk', a:t }));
+  Object.values(m).forEach(l => l.sort((x, y) => (x.tm || '99').localeCompare(y.tm || '99'))); return m;
+}
+const evHtml = e => { const ref = recLink(e.a).replace(/<[^>]+>/g, ''); return `<button class="ev ${e.k === 'tk' ? 'tk' : ''} ${e.a.done ? 'done' : ''}" data-ev="${e.a.id}" title="${esc(e.t)}"><b>${e.tm ? e.tm + ' ' : ''}${esc(e.t)}</b><small>${e.k === 'tk' ? 'Task' : 'Cuộc họp'}${ref ? ' · ' + esc(ref) : ''}${ws.who === '*' ? ' · ' + esc(e.a.assignee || e.a.by || '') : ''}</small></button>`; };
+function drawSchedule() {
+  document.title = 'Lịch — Sales workspace — HarnexAI CRM (mockup)';
+  const E = calEvents(), c = sc.cur, days = sc.wknd ? [0, 1, 2, 3, 4, 5, 6] : [0, 1, 2, 3, 4];
+  let title, body;
+  if (sc.mode === 'day') { const l = E[lk(c)] || []; title = `${DOW[(c.getDay() + 6) % 7]}, ${dmy(lk(c))}`;
+    body = `<div class="cal-day"><div class="wl">${l.map(e => `<div class="wi"><span class="tm">${e.tm || 'Cả ngày'}</span><div class="x"><b>${esc(e.t)}</b><small>${e.k === 'tk' ? 'Task' : 'Cuộc họp'}${recLink(e.a) ? ' · ' + recLink(e.a) : ''}${e.a.outcome ? ' · ' + esc(e.a.outcome) : ''}</small></div><span class="ms sm">${e.k === 'tk' ? 'task_alt' : 'event'}</span></div>`).join('') || `<div class="wempty"><span class="ms">event_note</span>Không có cuộc họp hay task nào trong ngày này.</div>`}</div></div>`; }
+  else if (sc.mode === 'week') { const m0 = monday(c), e0 = addD(m0, 6); title = `${dmy(lk(m0)).slice(0, 5)} – ${dmy(lk(e0))}`;
+    body = `<div class="cal wk" style="--n:${days.length}">${days.map(i => { const d = addD(m0, i), k = lk(d), l = E[k] || [];
+      return `<div class="cal-d ${k === todayL ? 'today' : ''}"><div class="dn"><span>${DOW[i]}</span><span class="d">${d.getDate()}</span></div>${l.map(evHtml).join('') || '<span class="evmore">—</span>'}</div>`; }).join('')}</div>`; }
+  else { const f = new Date(c.getFullYear(), c.getMonth(), 1), s = monday(f); title = `Tháng ${c.getMonth() + 1} năm ${c.getFullYear()}`; const cells = [];
+    for (let w = 0; w < 6; w++) { if (w && addD(s, w * 7).getMonth() !== c.getMonth() && addD(s, w * 7) > f) break; days.forEach(i => cells.push(addD(s, w * 7 + i))); }
+    body = `<div class="cal mo" style="--n:${days.length}">${days.map(i => `<div class="cal-h">${DOW[i]}</div>`).join('')}${cells.map(d => { const k = lk(d), l = E[k] || [];
+      return `<div class="cal-d ${k === todayL ? 'today' : ''} ${d.getMonth() !== c.getMonth() ? 'out' : ''}"><div class="dn"><button class="d" data-day="${k}" title="Xem ngày ${dmy(k)}">${d.getDate()}</button></div>${l.slice(0, 3).map(evHtml).join('')}${l.length > 3 ? `<button class="evmore" data-day="${k}">+${l.length - 3} nữa</button>` : ''}</div>`; }).join('')}</div>`; }
+  const meets = HXC.db().activities.filter(a => a.type === 'MEETING' && mine(a.by)), up = meets.filter(m => m.at > nowIso).sort((a, b) => a.at.localeCompare(b.at)), fu = meets.filter(m => m.at <= nowIso && +NOW - +new Date(m.at) <= 7 * 864e5).sort((a, b) => b.at.localeCompare(a.at));
+  wsFrame(`<button class="btn btn--secondary" id="wsTask"><span class="ms sm">add_task</span>Tạo task</button>`, `<div class="ws-g">
+    <div class="wc"><div class="ws-bar"><div class="cal-nav"><button class="btn btn--secondary sm" data-cal="today">Hôm nay</button><button class="btn btn--text btn--icon" data-cal="-1" aria-label="Trước"><span class="ms sm">chevron_left</span></button><b>${title}</b><button class="btn btn--text btn--icon" data-cal="1" aria-label="Sau"><span class="ms sm">chevron_right</span></button></div>
+        <div class="sp"><label class="chk"><input type="checkbox" data-sct="meet" ${sc.meet ? 'checked' : ''}>Cuộc họp</label><label class="chk"><input type="checkbox" data-sct="task" ${sc.task ? 'checked' : ''}>Task</label><label class="chk"><input type="checkbox" data-sct="wknd" ${sc.wknd ? 'checked' : ''}>Cuối tuần</label>
+          <span class="segtxt" role="group" aria-label="Khung thời gian">${[['day','Ngày'],['week','Tuần'],['month','Tháng']].map(([k, l]) => `<button data-scm="${k}" aria-pressed="${sc.mode === k}">${l}</button>`).join('')}</span></div></div>${body}</div>
+    <div class="ws-c">
+      ${wcard('upm', 'event_upcoming', 'Cuộc họp sắp tới', '', `<div class="wl">${up.slice(0, 5).map(m => `<div class="wi"><span class="tm">${dmy(lk(m.at)).slice(0, 5)}</span><div class="x"><b>${esc(m.title || 'Cuộc họp')}</b><small>${hm(m.at)}${m.dur ? ' · ' + m.dur + ' phút' : ''}${recLink(m) ? ' · ' + recLink(m) : ''}</small></div></div>`).join('') || `<div class="wempty"><span class="ms">event_upcoming</span>Chưa có cuộc họp nào sắp tới.</div>`}</div>`)}
+      ${wcard('fu7', 'event_available', 'Cần follow-up', `<span class="nil" style="font-size:12px">7 ngày gần đây</span>`, `<div class="wl">${fu.map(m => `<div class="wi"><div class="x"><b>${esc(m.title || 'Cuộc họp')}</b><small>${dmy(lk(m.at))} ${hm(m.at)}${recLink(m) ? ' · ' + recLink(m) : ''}</small></div><button class="btn btn--secondary sm" data-fu="${m.id}">Task follow-up</button></div>`).join('') || `<div class="wempty"><span class="ms">event_available</span>Không có cuộc họp nào cần follow-up.</div>`}</div>`)}
+    </div></div>`);
+}
+
+/* ── Feed ── */
+const fd = { sub:'feed', type:'all' };
+const FDT = [['all','Tất cả'],['NOTE','Ghi chú'],['CALL','Cuộc gọi'],['MEETING','Cuộc họp'],['SYSTEM','Cập nhật bản ghi']];
+function drawFeed() {
+  document.title = 'Feed — Sales workspace — HarnexAI CRM (mockup)';
+  const db = HXC.db(), acts = db.activities.filter(a => mine(a.by) && a.at <= nowIso);
+  let body;
+  if (fd.sub === 'feed') {
+    const list = [...acts.filter(a => a.type !== 'TASK'), ...db.events.filter(e => mine(e.by))].filter(a => fd.type === 'all' || a.type === fd.type).sort((a, b) => b.at.localeCompare(a.at)).slice(0, 60);
+    let last = '';
+    body = `<div class="ws-bar"><span class="segtxt" role="group" aria-label="Loại hoạt động">${FDT.map(([k, l]) => `<button data-fdt="${k}" aria-pressed="${fd.type === k}">${l}</button>`).join('')}</span></div>
+      <div class="wc-b"><div class="wl">${list.map(f => { const d = lk(f.at), h = d !== last ? `<div class="fd-day">${d === todayL ? 'Hôm nay' : dmy(d)}</div>` : ''; last = d;
+        return `${h}<div class="wi"><span class="ms sm">${IC[f.type] || 'sync'}</span><div class="x"><b>${esc(f.title || TN[f.type] || 'Cập nhật bản ghi')}${f.outcome ? ` <span class="nil">· ${esc(f.outcome)}</span>` : ''}</b><small>${esc(f.body || '')}</small><small>${hm(f.at)} · ${esc(f.by || '')}${refOf(f)}</small></div></div>`; }).join('') || `<div class="wempty"><span class="ms">dynamic_feed</span>Chưa có hoạt động loại này.</div>`}</div></div>`;
+  } else {
+    // Số liệu theo tuần: tuần này so với tuần trước
+    const w0 = monday(new Date(NOW)); w0.setHours(0, 0, 0, 0);
+    const inW = (a, i) => { const s = +addD(w0, -7 * i), e = +addD(w0, -7 * i + 7); const x = +new Date(a.at); return x >= s && x < e; };
+    const M = [['CALL','call','Cuộc gọi'],['MEETING','event','Cuộc họp'],['NOTE','edit_note','Ghi chú']];
+    const n = (ty, i) => acts.filter(a => a.type === ty && inW(a, i)).length;
+    const delta = (a, b) => a === b ? '<span class="delta">= tuần trước</span>' : `<span class="delta ${a > b ? 'up' : 'dn2'}">${a > b ? '▲' : '▼'} ${Math.abs(a - b)} so với tuần trước</span>`;
+    body = `<div class="wc-b" style="padding-top:14px"><div class="kpis" style="margin-bottom:14px">${M.map(([ty, ic, l]) => `<div class="kpi"><div class="l"><span class="ms xs">${ic}</span>${l} tuần này</div><div class="v">${n(ty, 0)}</div><div class="s">${delta(n(ty, 0), n(ty, 1))}</div></div>`).join('')}
+        <div class="kpi"><div class="l"><span class="ms xs">task_alt</span>Task đã hoàn thành</div><div class="v">${allTasks().filter(t => t.done).length}</div><div class="s">${allTasks().filter(t => !t.done).length} task đang mở</div></div></div></div>
+      <div class="ws-foot"><span>Tuần tính từ thứ Hai. Hoạt động tính theo người thực hiện.</span></div>`;
+  }
+  wsFrame('', `<div class="wc"><div class="vtabs" role="tablist" style="padding-top:6px">${[['feed','Dòng hoạt động'],['insights','Số liệu theo tuần']].map(([k, l]) => `<button class="vtab" role="tab" aria-selected="${fd.sub === k}" data-fds="${k}">${l}</button>`).join('')}</div>${body}</div>`);
+}
+
+/* ── Leads · Deals của sale đang xem ── */
+const ld = { f:'open' }, dl = { f:'open' };
+function drawWsLeads() {
+  document.title = 'Leads — Sales workspace — HarnexAI CRM (mockup)';
+  const all = HXL.list().filter(l => ws.who === '*' || l.values.owner === ws.who), F = { open:HXL.isOpen, qual:l => l.values.stage === HXL.QUAL, disq:l => l.values.stage === HXL.DISQ, all:() => true };
+  const list = all.filter(F[ld.f]).sort((a, b) => HXL.STAGES.indexOf(a.values.stage) - HXL.STAGES.indexOf(b.values.stage) || b.createdAt.localeCompare(a.createdAt));
+  wsFrame(`<a class="btn btn--secondary" href="${HXL.LIST_URL}"><span class="ms sm">open_in_new</span>Mở màn Leads</a><button class="btn btn--primary" id="wsLead"><span class="ms sm">add</span>Tạo lead</button>`,
+    `<div class="wc"><div class="ws-bar"><span class="segtxt" role="group" aria-label="Lọc lead">${[['open','Đang mở'],['qual','Đạt'],['disq','Không đạt'],['all','Tất cả']].map(([k, l]) => `<button data-ldf="${k}" aria-pressed="${ld.f === k}">${l} (${all.filter(F[k]).length})</button>`).join('')}</span></div>
+      <div class="ws-tw"><table class="lt"><thead><tr>${['Tên lead','Giai đoạn','Contact','Company','Nhãn','Hoạt động gần nhất','Ngày tạo', ...(ws.who === '*' ? ['Owner'] : [])].map(h => `<th style="cursor:default">${h}</th>`).join('')}</tr></thead>
+        <tbody>${list.map(l => `<tr><td><a href="${HXL.url(l.id)}">${esc(l.values.name)}</a></td><td>${display(l.values.stage, HXL.F('stage'))}</td><td>${HXL.contactLink(l)}</td><td>${HXL.companyLink(l)}</td><td>${l.values.label ? display(l.values.label, HXL.F('label')) : HXL.nil}</td>
+          <td>${(v => v ? HXL.dShort(v) : HXL.nil)(HXL.lastAct(l))}</td><td>${HXL.dShort(l.createdAt)}</td>${ws.who === '*' ? `<td>${esc(l.values.owner || 'Chưa có owner')}</td>` : ''}</tr>`).join('') || `<tr><td colspan="8" class="empty">Không có lead nào trong nhóm này.</td></tr>`}</tbody></table></div>
+      <div class="ws-foot"><span>${list.length} lead</span><span>Đổi giai đoạn, tạo Deal từ lead: mở lead hoặc dùng board ở màn Leads.</span></div></div>`);
+}
+function drawWsDeals() {
+  document.title = 'Deals — Sales workspace — HarnexAI CRM (mockup)';
+  const S = HXC, all = S.list('deal').filter(d => mine(d.values[S.SALE])), st = d => d.values[S.STAGE], F = { open:d => ![S.WON, S.LOST].includes(st(d)), won:d => st(d) === S.WON, lost:d => st(d) === S.LOST, all:() => true };
+  const list = all.filter(F[dl.f]).sort((a, b) => HX.STAGES.indexOf(st(a)) - HX.STAGES.indexOf(st(b)) || (Number(b.values[S.CASH]) || 0) - (Number(a.values[S.CASH]) || 0));
+  const tasks = allTasks().filter(t => !t.done);
+  wsFrame(`<a class="btn btn--secondary" href="crm-giao-dich-hubspot.html"><span class="ms sm">open_in_new</span>Mở màn Deals</a>`,
+    `<div class="wc"><div class="ws-bar"><span class="segtxt" role="group" aria-label="Lọc deal">${[['open','Đang mở'],['won','Đã thắng'],['lost','Đã thua'],['all','Tất cả']].map(([k, l]) => `<button data-dlf="${k}" aria-pressed="${dl.f === k}">${l} (${all.filter(F[k]).length})</button>`).join('')}</span></div>
+      <div class="ws-tw"><table class="lt"><thead><tr>${['Deal','Giai đoạn','Amount','Tỷ lệ','Ngày dự kiến chốt','Hoạt động gần nhất','Bước tiếp theo', ...(ws.who === '*' ? ['Sale'] : [])].map((h, i) => `<th class="${i === 2 || i === 3 ? 'num' : ''}" style="cursor:default">${h}</th>`).join('')}</tr></thead>
+        <tbody>${list.map(d => { const la = S.activitiesOf('deal', d.id).find(a => a.type !== 'SYSTEM' && a.type !== 'TASK' && a.at <= nowIso), nt = tasks.filter(t => (t.deals || []).includes(d.id)).sort((a, b) => String(a.due || '9').localeCompare(String(b.due || '9')))[0], cl = d.values[S.CLOSE], late = F.open(d) && cl && cl.slice(0, 10) < todayS;
+          return `<tr><td class="wrap"><a href="${S.url('deal', d.id)}">${esc(HX.title(d))}</a> <span class="nil">${esc(d.values.t_n_deal || '')}</span></td><td>${HX.F[S.STAGE] ? display(st(d), HX.F[S.STAGE]) : esc(st(d) || '')}</td><td class="num"><b>${short(d.values[S.CASH])}</b></td><td class="num">${d.values.t_l_th_nh_c_ng != null ? d.values.t_l_th_nh_c_ng + '%' : '--'}</td>
+            <td><span class="due ${late ? 'od' : ''}">${cl ? dmy(cl) : '--'}</span></td><td>${la ? `${TN[la.type] || ''} · ${dmy(lk(la.at))}` : '<span class="nil">Chưa có</span>'}</td><td class="wrap">${nt ? `${esc(nt.title || nt.body)} <span class="nil">· ${nt.due ? dmy(nt.due) : 'chưa có hạn'}</span>` : `<button class="btn btn--text sm" data-ntask="${d.id}"><span class="ms xs">add</span>Thêm task</button>`}</td>${ws.who === '*' ? `<td>${esc(d.values[S.SALE] || '')}</td>` : ''}</tr>`; }).join('')
+          || `<tr><td colspan="8" class="empty">Không có deal nào trong nhóm này.</td></tr>`}</tbody></table></div>
+      <div class="ws-foot"><span>${list.length} deal</span><span>Kéo thả đổi giai đoạn: dùng board ở màn Deals.</span></div></div>`);
+}
+document.addEventListener('click', e => {
+  if (qs.get('id')) return; const T = (s) => e.target.closest(s);
+  let x;
+  if ((x = T('[data-tkv]'))) { tk.view = x.dataset.tkv; return drawTasks(); }
+  if ((x = T('[data-tkp]'))) { tk.prio = x.dataset.tkp; return drawTasks(); }
+  if (T('#tqStart')) { const ids = taskRows().filter(t => !t.done).map(t => t.id); if (ids.length) taskQueue(ids); return; }
+  if ((x = T('[data-tdel]'))) { const id = x.dataset.tdel; return confirmBox('Xoá task', 'Xoá task này? Không thể hoàn tác.', 'Xoá', () => { HXC.removeActivity(id); toast('Đã xoá task'); draw(); }); }
+  if ((x = T('[data-scm]'))) { sc.mode = x.dataset.scm; return drawSchedule(); }
+  if ((x = T('[data-cal]'))) { const v = x.dataset.cal; sc.cur = v === 'today' ? new Date(NOW) : sc.mode === 'day' ? addD(sc.cur, +v) : sc.mode === 'week' ? addD(sc.cur, 7 * v) : new Date(sc.cur.getFullYear(), sc.cur.getMonth() + (+v), 1); return drawSchedule(); }
+  if ((x = T('[data-day]'))) { const [y, m, d] = x.dataset.day.split('-').map(Number); sc.cur = new Date(y, m - 1, d); sc.mode = 'day'; return drawSchedule(); }
+  if ((x = T('[data-ev]'))) { const a = HXC.db().activities.find(v => v.id === x.dataset.ev); if (!a) return; const ref = a.deals && a.deals[0] ? ['deal', a.deals[0]] : a.contacts && a.contacts[0] ? ['contact', a.contacts[0]] : null;
+    if (ref && HXC.get(ref[0], ref[1])) location.href = HXC.url(ref[0], ref[1]); else toast('Mục này chưa liên kết bản ghi nào'); return; }
+  if ((x = T('[data-fds]'))) { fd.sub = x.dataset.fds; return drawFeed(); }
+  if ((x = T('[data-fdt]'))) { fd.type = x.dataset.fdt; return drawFeed(); }
+  if ((x = T('[data-ldf]'))) { ld.f = x.dataset.ldf; return drawWsLeads(); }
+  if ((x = T('[data-dlf]'))) { dl.f = x.dataset.dlf; return drawWsDeals(); }
+  if (T('#wsLead')) return HXL.createPanel({ onCreated: draw });
+  if ((x = T('[data-ntask]'))) { const d = HXC.get('deal', x.dataset.ntask); return taskDialog({ title:'Bước tiếp theo: ' + (d.values.t_n_deal || HX.title(d)), deals:[d.id] }); }
+});
+document.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.sct; if (k) { sc[k] = e.target.checked; drawSchedule(); } });
+
 function drawSoon() {
   const [, name, ph] = TABS.find(t => t[0] === TAB);
   const what = { leads:'Danh sách lead của sale đang xem, dùng lại màn Leads.', deals:'Deal của sale đang xem theo giai đoạn, dùng lại màn Deals.', tasks:'Toàn bộ task có bộ lọc, view lưu và hàng đợi thực hiện.', schedule:'Lịch theo ngày / tuần / tháng gồm cuộc họp và task.', feed:'Dòng hoạt động đầy đủ kèm số liệu hoạt động theo tuần.',
@@ -480,14 +680,12 @@ document.addEventListener('click', e => {
   const gf = e.target.closest('[data-gf]'); if (gf) { ws.gf = gf.dataset.gf; draw(); return; }
   if (e.target.closest('#wsTask')) { taskDialog(); return; }
   const fu = e.target.closest('[data-fu]'); if (fu) { const m = HXC.db().activities.find(a => a.id === fu.dataset.fu); if (m) taskDialog({ title:'Follow-up: ' + (m.title || 'cuộc họp'), contacts:m.contacts, companies:m.companies, deals:m.deals }); return; }
-  if (e.target.closest('#wsStart')) { const D = wsData(), l = ws.tf === 'all' ? [...D.grp.od, ...D.grp.today, ...D.grp.tmr, ...D.grp.later] : D.grp[ws.tf]; const t = l[0]; if (!t) return;
-    const ref = t.deals && t.deals[0] ? ['deal', t.deals[0]] : t.contacts && t.contacts[0] ? ['contact', t.contacts[0]] : t.companies && t.companies[0] ? ['company', t.companies[0]] : null;
-    if (ref && HXC.get(ref[0], ref[1])) location.href = HXC.url(ref[0], ref[1]); else toast('Task này chưa liên kết bản ghi nào'); return; }
+  if (e.target.closest('#wsStart')) { const D = wsData(), l = ws.tf === 'all' ? [...D.grp.od, ...D.grp.today, ...D.grp.tmr, ...D.grp.later] : D.grp[ws.tf]; if (l.length) taskQueue(l.map(t => t.id)); return; }
 });
-document.addEventListener('change', e => { const id = e.target.dataset && e.target.dataset.tdone; if (id) { HXC.updateActivity(id, { done:true }); toast('Đã hoàn thành task'); draw(); } });
+document.addEventListener('change', e => { const id = e.target.dataset && e.target.dataset.tdone; if (id) { HXC.updateActivity(id, { done: e.target.checked }); toast(e.target.checked ? 'Đã hoàn thành task' : 'Đã mở lại task'); draw(); } });
 
 /* ── Điều phối ── */
-function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : TAB === 'summary' ? drawSummary() : TAB === 'team' ? drawList() : drawSoon(); }
+function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : ({ summary:drawSummary, team:drawList, tasks:drawTasks, schedule:drawSchedule, feed:drawFeed, leads:drawWsLeads, deals:drawWsDeals }[TAB] || drawSoon)(); }
 draw();
 HX.onChange = draw;
 // Board Sales: kéo thẻ sang cột khác = đổi Team của sale
@@ -499,7 +697,6 @@ document.addEventListener('drop', e => { const z = e.target.closest && e.target.
   if (s && (s.values.team || null) !== t) { HXC.updateSale(s.id, 'team', t); toast(`Đã chuyển ${s.values.name} sang ${t || 'Chưa có team'}`); } draw(); });
 document.addEventListener('click', e => {
   const rg = e.target.closest('[data-rg]'); if (rg) { st.rg = rg.dataset.rg; saveSt(); draw(); return; }
-  const vt = e.target.closest('[data-view]'); if (vt) { st.view = vt.dataset.view; saveSt(); draw(); return; }
   const th = e.target.closest('th[data-sort]'); if (th) { const k = th.dataset.sort; st.sort = { k, dir: st.sort.k === k && st.sort.dir === 'desc' ? 'asc' : 'desc' }; saveSt(); draw(); return; }
   const md = e.target.closest('[data-mode]'); if (md) { MODE = md.dataset.mode; draw(); return; }
   const kc = e.target.closest('.kc[data-card]'); if (kc && !e.target.closest('a')) { location.href = '?id=' + kc.dataset.card; return; }

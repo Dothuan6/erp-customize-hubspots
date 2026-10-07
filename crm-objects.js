@@ -506,7 +506,7 @@ const HXC = (() => {
       const text = a.type === 'TASK' ? (a.body && a.body !== a.title ? richOf(a) : '') : sys ? esc(a.body || '') : richOf(a);
       return `<article class="ta ${sys ? 'sys' : ''} ${open ? '' : 'shut'} ${pinned ? 'pin' : ''}" data-aid="${a.id}">
         ${pinned ? '<div class="ta-pin"><span class="ms xs">push_pin</span>Đã ghim</div>' : ''}
-        <div class="ta-h" data-tog="${a.id}"><span class="ms sm ic">${ICON[a.type]}</span>${head}<time>${dt(a.at)}</time>
+        <div class="ta-h" data-tog="${a.id}">${a.type === 'TASK' ? '' : `<span class="ms sm ic">${ICON[a.type]}</span>`}${head}<time>${dt(a.at)}</time>
           ${sys ? '' : `<button class="btn btn--text sm ta-act" data-amenu="${a.id}" aria-label="Thao tác hoạt động">Thao tác<span class="ms xs">arrow_drop_down</span></button>`}</div>
         <div class="ta-b">${meta}${text ? `<div class="ta-x">${text}</div>` : ''}
           ${rn.length > 1 || !sys ? `<div class="ta-f"><button class="ta-as" data-asl="${a.id}"><span class="ms xs">link</span>${rn.length} liên kết<span class="ms xs">arrow_drop_down</span></button><span class="ta-asl" id="asl-${a.id}" hidden>${rn.map(([ty, i, n]) => `<a class="lk" href="${url(ty, i)}">${esc(n)}</a>`).join(' · ')}</span></div>` : ''}</div></article>`;
@@ -928,7 +928,7 @@ const HXC = (() => {
     if (co && co.value) associate('deal', dealId, 'company', co.value); }
 
   return { ME, TODAY, LIFECYCLE, LEAD_STATUS, SOURCES, INDUSTRIES, ASSOC_LABELS, CONTACT_FIELDS, COMPANY_FIELDS, OBJ, STAGE, CASH, CLOSE, SALE, WON, LOST,
-    db: () => db, get, list, related, assoc, associate, dissociate, update, create, remove, activitiesOf, addActivity, updateActivity, lastContacted, itemsOf, liTotal, liNet, totalsOf, dealTotals, saveItems, money,
+    db: () => db, get, list, related, assoc, associate, dissociate, update, create, remove, activitiesOf, addActivity, updateActivity, removeActivity, lastContacted, itemsOf, liTotal, liNet, totalsOf, dealTotals, saveItems, money,
     SALE_FIELDS, TEAMS, ROLES, sales, saleById, saleByName, saleUrl, createSale, updateSale, saleStats, DEAL_BASE, isNewField, extraKeys, setExtra, addCustomField,
     titleOf, fullName, initials, url, dt, dOnly, props, createPanel, addAssocPanel, assocCard, timeline, composer, lineItemsCard, lineItemEditor, dealAssocForm, saveDealAssoc,
     reset() { try { localStorage.removeItem(KEY); } catch {} } };

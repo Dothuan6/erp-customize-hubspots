@@ -2,7 +2,7 @@
 
 > **Phạm vi:** đồng bộ giao diện **toàn bộ web ERP hiện tại** (erp.tuoitresoft.com, mã nguồn `systemdesign/`) với prototype hướng HubSpot (repo `erp-customize-hubspots`).
 > **Quan hệ với file gốc:** đây là **lớp theme** nằm trên `systemdesign/systemdesign/DESIGN-SYSTEM.md` (v3.3). File gốc vẫn là nguồn-sự-thật cho kiến trúc (component-first §1bis, token 3 tầng §2, breakpoint §7.2, z-index §7.5, trợ năng §12bis, quy ước code §13). File này **chỉ ghi đè giá trị và bổ sung mẫu** — mục nào không nhắc ở đây thì giữ nguyên như file gốc.
-> **Phiên bản 1.6** · 07/10/2026 · Trạng thái: 🟡 Đề xuất — chờ team FE duyệt
+> **Phiên bản 1.7** · 07/10/2026 · Trạng thái: 🟡 Đề xuất — chờ team FE duyệt
 > **Xem trực quan:** `design-system.html` trong repo prototype (mở cùng các màn `crm-*.html` để so).
 > **Nguyên tắc dự án không đổi:** *chức năng = 100% ERP · giao diện & UX = theo HubSpot.* Theme này không thêm/bớt chức năng nào.
 
@@ -576,6 +576,18 @@ Dùng cho tab Tổng quan của Sales workspace (`crm-sales-hubspot.html`): mỗ
 
 Tab chưa dựng hiển thị nhãn `.soonb` cạnh tên tab; nhãn này chỉ có trong prototype.
 
+### 6.21 Lịch và hàng đợi task của Sales workspace (mới, bản 1.7) (`.cal .ev` · `.tq-*`)
+
+| Phần | Đặc tả |
+| --- | --- |
+| Thanh lịch | nút "Hôm nay" · mũi tên trước / sau · tiêu đề kỳ 15/700 · ba ô chọn (Cuộc họp, Task, Cuối tuần) · bộ chọn `.segtxt` Ngày / Tuần / Tháng |
+| Lưới `.cal` | các ô ngăn nhau bằng khe 1px màu `--outline-variant`. Tuần: 5 hoặc 7 cột, tối thiểu 100px, cuộn ngang khi hẹp, ô cao tối thiểu 340px. Tháng: hàng tên thứ + tối đa 6 tuần, ô cao tối thiểu 110px, ngày ngoài tháng nền `--surface-2` |
+| Ngày hôm nay | số ngày trong vòng tròn 22px nền `--primary`, chữ `--on-primary` |
+| Mục lịch `.ev` | `<button>` nền `--surface-2`, vạch trái 3px: cuộc họp `--c1`, task `--c5`; dòng chính 12/600 cắt `…`, dòng phụ 12px; task đã xong gạch ngang, mờ 55%. Ô tháng hiện tối đa 3 mục rồi "+n nữa" (mở khung Ngày) |
+| Khung Ngày | danh sách dòng `.wi` của §6.20, cột giờ bên trái |
+| Hàng đợi task | Modal `sm` (§6.11): nhãn "Task i / n", thanh tiến độ 6px `--primary`, tiêu đề 17/700, hạn · ưu tiên · người nhận, liên kết bản ghi mở tab mới; chân: Dừng (text) · Bỏ qua (secondary) · Hoàn thành & tiếp (primary) |
+| Bảng trong thẻ `.ws-tw` | dùng DataTable §6.6, dòng 44px, không cố định cột; thanh lọc `.ws-bar` phía trên, chân `.ws-foot` 12px |
+
 ---
 
 ## 7. Mẫu trang (template)
@@ -744,6 +756,7 @@ Theo RULE 2b của dự án — mọi lệch/bổ sung phải ghi vào file gố
 | §8.7 DataTable | Sửa (bản 1.1) | Mật độ Thoáng/Gọn là tuỳ chọn cá nhân lưu theo người dùng (không localStorage); kiểu Bảng/Board là thuộc tính của view. Nguồn: `specs/CRM-01` §4.11 |
 | §8.22 Tổng hợp | Bổ sung component mới (bản 1.4) | `StageBar` — thanh giai đoạn bấm được cho Lead pipeline (§6.19). Nguồn: prototype `crm-leads.js` |
 | §8.22 Tổng hợp | Bổ sung component mới (bản 1.6) | `WorkspaceCard` — thẻ thu gọn của Sales workspace, kèm ô đếm lọc và dòng việc (§6.20). Nguồn: prototype `crm-sales-hubspot.html` |
+| §8.22 Tổng hợp | Bổ sung mẫu mới (bản 1.7) | Lịch `.cal` (Ngày / Tuần / Tháng) và hàng đợi task trong Modal (§6.21). Nguồn: prototype `crm-sales-hubspot.html` |
 
 ---
 
@@ -751,6 +764,7 @@ Theo RULE 2b của dự án — mọi lệch/bổ sung phải ghi vào file gố
 
 | Phiên bản | Ngày | Nội dung | Tác giả |
 | --- | --- | --- | --- |
+| 1.7 | 07/10/2026 | §6.21: lịch Ngày / Tuần / Tháng và hàng đợi task của Sales workspace; thêm dòng vào §12 | Claude (Cowork) cho TTS |
 | 1.6 | 07/10/2026 | §6.20: thêm `WorkspaceCard` (thẻ thu gọn, ô đếm, dòng việc) cho tab Tổng quan của Sales workspace; thêm dòng vào §12 | Claude (Cowork) cho TTS |
 | 1.5 | 07/10/2026 | §7.1: trang danh sách CRM mặc định mở ở Board; thêm board theo Team cho trang Sales (dùng lại `.kb .kcol .kc` của §6.7, không thêm component) | Claude (Cowork) cho TTS |
 | 1.4 | 06/10/2026 | §6.19: thêm component `StageBar` (thanh giai đoạn của Lead) theo `crm-shared.css`; thêm dòng vào §12. Phát sinh khi dựng màn Leads (`crm-leads-hubspot.html`, `crm-lead-hubspot.html`) | Claude (Cowork) cho TTS |

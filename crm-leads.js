@@ -435,7 +435,7 @@ function HXLeadRecord() {
     const shown = all.filter(a => tab === 'ALL' || a.type === tab);
     $('#tabs').innerHTML = TABS.map(([k, n]) => `<button class="tab" role="tab" aria-selected="${tab === k}" data-tab="${k}">${n}${k === 'ALL' ? '' : ` <span class="nil">${all.filter(a => a.type === k).length}</span>`}</button>`).join('');
     $('#tl').innerHTML = shown.length ? `<div class="ltl">${shown.map(a => { const sysA = a.type === 'SYSTEM';
-      return `<article class="ta ${sysA ? 'sys' : ''}"><div class="ta-h" style="cursor:default"><span class="ms sm ic">${L.ACT[a.type][0]}</span>
+      return `<article class="ta ${sysA ? 'sys' : ''}"><div class="ta-h" style="cursor:default">${a.type === 'TASK' && !a._ct ? '' : `<span class="ms sm ic">${L.ACT[a.type][0]}</span>`}
         ${a.type === 'TASK' && !a._ct ? `<input type="checkbox" data-task="${a.id}" ${a.done ? 'checked' : ''} aria-label="Hoàn thành task" style="accent-color:var(--primary)">` : ''}
         <b>${sysA ? esc(a.title || 'Hệ thống') : `${L.ACT[a.type][1]}${a.title ? ' · ' + esc(a.title) : ''}`}</b><span class="nil">${esc(a.by || '')}</span>${a._ct ? '<span class="tag">Từ contact</span>' : ''}<time>${L.dShort(a.at)}</time></div>
         <div class="ta-b">${a.outcome || a.due ? `<div class="tm">${a.outcome ? `<span>Kết quả: <b>${esc(a.outcome)}</b></span>` : ''}${a.due ? `<span>Hạn: <b>${esc(a.due.split('-').reverse().join('/'))}</b></span>` : ''}</div>` : ''}${a.body ? `<div class="ta-x ${a.done ? 'strike' : ''}">${esc(a.body)}</div>` : ''}</div></article>`; }).join('')}</div>`

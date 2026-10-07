@@ -43,6 +43,73 @@ d.readyState==='loading'?d.addEventListener('DOMContentLoaded',go):go()})();</sc
 .kpi .v{font-size:20px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .s{font-size:11.5px;color:var(--on-surface-variant);margin-top:2px}
 .kpi.warn .v{color:var(--error)}
+/* ═══ Sales Workspace (07/10/2026) — khung tab + Summary ═══ */
+.who{display:inline-flex;align-items:center;gap:2px;font-size:20px;font-weight:600;border-radius:var(--radius-md);padding:0 6px;height:34px}
+.who:hover{background:var(--surface-2)}
+.wsep{width:1px;height:22px;background:var(--outline);margin:0 4px}
+.vtabs .vtab{text-decoration:none}
+.vtab .soonb{font-size:10px;font-weight:700;padding:1px 5px;border-radius:var(--radius-pill);background:var(--surface-2);color:var(--on-surface-variant)}
+.ws{flex:1;min-height:0;overflow:auto;background:var(--page-bg);padding:12px}
+.ws-g{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
+@media(min-width:1100px){.ws-g{grid-template-columns:minmax(0,1fr) 340px}}
+.ws-c{display:flex;flex-direction:column;gap:12px;min-width:0}
+.ws .kpis{padding:0;margin:0}
+.ws .kpi{background:var(--surface)}
+.wc{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-lg)}
+.wc-h{display:flex;align-items:center;gap:8px;padding:12px 14px;flex-wrap:wrap}
+.wc-h h2{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px}
+.wc-h .r{margin-left:auto;display:flex;gap:6px;align-items:center}
+.wc-h .tgc{width:26px;height:26px;border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--on-surface-variant)}
+.wc-h .tgc:hover{background:var(--surface-2)}
+.wc-b{padding:0 14px 14px}
+.wc.shut .wc-b{display:none} .wc.shut .tgc .ms{transform:rotate(-90deg)}
+.tcnt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px}
+@media(min-width:600px){.tcnt{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tcnt button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border:1px solid var(--outline-variant);border-radius:var(--radius-md);text-align:left}
+.tcnt button:hover{background:var(--surface-2)}
+.tcnt button[aria-pressed="true"]{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary) inset}
+.tcnt b{font-size:22px;font-weight:700;line-height:1.1}
+.tcnt span{font-size:12px;color:var(--on-surface-variant)}
+.tcnt .bad b{color:var(--error)}
+.wl{display:flex;flex-direction:column}
+.wi{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--outline-variant);font-size:13px;min-width:0}
+.wi:first-child{border-top:none}
+.wi>.ms{color:var(--on-surface-variant);margin-top:1px}
+.wi input[type=checkbox]{accent-color:var(--primary);margin-top:3px;flex:none}
+.wi .x{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.wi .x b{font-weight:600;overflow-wrap:anywhere}
+.wi .x small{font-size:12px;color:var(--on-surface-variant);overflow-wrap:anywhere}
+.wi a{color:var(--link);font-weight:600}
+.wi a:hover{text-decoration:underline}
+.wi .due{font-size:12px;white-space:nowrap;color:var(--on-surface-variant)} .wi .due.od{color:var(--error);font-weight:600}
+.wi .btn{flex:none}
+.wi .tm{font-size:12px;font-weight:700;min-width:44px;color:var(--on-surface)}
+.wempty{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:13px;color:var(--on-surface-variant);padding:14px 4px}
+.wempty .ms{font-size:28px;max-width:none}
+.wmore{font-size:12.5px;font-weight:600;color:var(--link);padding-top:8px;display:inline-block}
+@media(max-width:760px){ .ws{overflow:visible} }
+/* Board theo Team (mặc định) */
+.seg{display:inline-flex;border:1px solid var(--outline);border-radius:var(--btn-radius);overflow:hidden;margin-left:auto}
+.seg button{height:30px;width:34px;display:grid;place-items:center;color:var(--on-surface-variant)}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--on-surface)}
+.body.brd{overflow:hidden;display:flex}
+.kb{flex:1;display:flex;gap:10px;padding:12px 16px;overflow-x:auto;align-items:stretch}
+.kcol{flex:none;width:82vw;max-width:300px;display:flex;flex-direction:column;min-height:0;background:#F0F0F0;border-radius:var(--radius-lg)}
+html[data-theme="dark"] .kcol{background:var(--surface-variant)}
+@media(min-width:600px){.kcol{width:300px}}
+.kh{display:flex;align-items:center;gap:6px;padding:10px 12px 6px;font-weight:700;font-size:13px}
+.kh .n{font-size:12px;font-weight:700;color:var(--on-surface-variant)}
+.kh .sm2{margin-left:auto;font-size:12px;font-weight:600;color:var(--on-surface-variant)}
+.kcards{flex:1;overflow-y:auto;padding:4px 8px 8px;display:flex;flex-direction:column;gap:8px;min-height:80px}
+.kcards.drop{outline:2px dashed var(--primary);outline-offset:-4px;border-radius:var(--radius-md)}
+.kc{background:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--radius-lg);padding:12px;display:flex;flex-direction:column;gap:6px;cursor:grab;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.kc:hover{border-color:var(--outline);box-shadow:var(--shadow-2)}
+.kc.dragging{opacity:.5}
+.kc .ln{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px}
+.kc .ln>span:first-child{color:var(--on-surface-variant)}
+.kc .bar{min-width:0}
+.kempty{padding:14px;text-align:center;font-size:12px;color:var(--on-surface-variant)}
+@media(max-width:760px){ .body.brd{overflow:visible} .kcards{overflow:visible} }
 /* Bảng */
 .body{flex:1;min-height:0;overflow:auto;border-top:1px solid var(--outline-variant)}
 table.lt{border-collapse:separate;border-spacing:0;min-width:100%}
@@ -138,6 +205,7 @@ table.lt{border-collapse:separate;border-spacing:0;min-width:100%}
 
 <script src="crm-shared.js"></script>
 <script src="crm-objects.js"></script>
+<script src="crm-leads.js"></script>
 <script>
 const { esc, display, toast, confirmBox, $ } = HX;
 HX.shell('sales');
@@ -152,6 +220,7 @@ const barCls = p => p == null ? '' : p >= 100 ? 'ok' : p >= 50 ? 'mid' : 'low';
 const bar = p => p == null ? '<span class="nil">Chưa đặt chỉ tiêu</span>' : `<span class="bar"><span class="t"><i class="${barCls(p)}" style="width:${Math.min(100, p)}%"></i></span><b>${p}%</b></span>`;
 const st = (() => { try { return { rg:'month', view:'all', q:'', sort:{ k:'wonSum', dir:'desc' }, ...JSON.parse(localStorage.getItem('hx-crm-sales-ui') || '{}'), q:'' }; } catch { return { rg:'month', view:'all', q:'', sort:{ k:'wonSum', dir:'desc' } }; } })();
 const saveSt = () => { try { localStorage.setItem('hx-crm-sales-ui', JSON.stringify({ rg:st.rg, view:st.view, sort:st.sort })); } catch {} };
+let MODE = 'BOARD'; // Kiểu hiển thị danh sách: mặc định Board (Kanban) theo Team mỗi lần vào trang
 const fp = $('#fpop');
 function openFp(anchor, html, w = 260) { const a = anchor.getBoundingClientRect(); fp.style.width = w + 'px'; fp.innerHTML = html; fp.style.left = Math.max(8, Math.min(a.right - w, innerWidth - w - 8)) + 'px'; fp.classList.add('open'); const h = fp.offsetHeight; fp.style.top = (a.bottom + 4 + h > innerHeight - 8 ? Math.max(8, a.top - h - 4) : a.bottom + 4) + 'px'; return fp; }
 const closeFp = () => fp.classList.remove('open');
@@ -184,7 +253,7 @@ function rows() {
     return { s, x, team:s.values.team, role:s.values.role, contacts:x.contacts.length, companies:x.companies.length, open:x.open.length, pipeline:x.pipeline, forecast:x.forecast, wonSum:x.wonSum, quota:x.quota, pct:x.pct ?? -1, winRate:x.winRate ?? -1, acts30:x.acts30, overdue:x.overdue.length, name:s.values.name }; });
 }
 function drawList() {
-  document.title = 'Sales — HarnexAI CRM (mockup)';
+  document.title = 'Đội sale — Sales — HarnexAI CRM (mockup)';
   const teams = [...new Set(HXC.sales().map(s => s.values.team).filter(Boolean))];
   const all = rows(), ranked = [...all].sort((a, b) => b.wonSum - a.wonSum || b.pipeline - a.pipeline);
   const rank = new Map(ranked.map((r, i) => [r.s.id, i + 1]));
@@ -194,24 +263,32 @@ function drawList() {
   const tq = sum('quota'), tw = sum('wonSum'), tp = tq ? Math.round(tw / tq * 100) : null;
   $('#frame').className = 'frame';
   $('#frame').innerHTML = `
-    <div class="ph"><h1 class="ttl">Sales</h1><span class="count">${HXC.sales().length} sale</span>
-      <div class="ph-act"><button class="btn btn--secondary" id="csvBtn"><span class="ms sm">ios_share</span>Export</button><button class="btn btn--primary" id="addSale"><span class="ms sm">person_add</span>Thêm sale</button></div></div>
-    <div class="vtabs" role="tablist">${[['all','Tất cả sales'],['me','Của tôi'], ...teams.map(t => [t, t])].map(([k, l]) => `<button class="vtab" role="tab" aria-selected="${st.view === k}" data-view="${esc(k)}">${esc(l)}</button>`).join('')}</div>
-    <div class="tools"><label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm tên, email, team" value="${esc(st.q)}" aria-label="Tìm sale"></label>${rgSeg()}</div>
+    ${wsHead(`<span class="count">${HXC.sales().length} sale</span><button class="btn btn--secondary" id="csvBtn"><span class="ms sm">ios_share</span>Export</button><button class="btn btn--primary" id="addSale"><span class="ms sm">person_add</span>Thêm sale</button>`)}
+    <div class="vtabs" role="tablist" style="border-bottom:none;padding-top:10px">${[['all','Tất cả sales'],['me','Của tôi'], ...teams.map(t => [t, t])].map(([k, l]) => `<button class="vtab" role="tab" aria-selected="${st.view === k}" data-view="${esc(k)}">${esc(l)}</button>`).join('')}</div>
+    <div class="tools"><label class="search"><span class="ms sm">search</span><input id="q" placeholder="Tìm tên, email, team" value="${esc(st.q)}" aria-label="Tìm sale"></label>${rgSeg()}<div class="seg" role="group" aria-label="Kiểu hiển thị"><button data-mode="BOARD" title="Board" aria-label="Board" aria-pressed="${MODE === 'BOARD'}"><span class="ms sm">view_kanban</span></button><button data-mode="TABLE" title="Bảng" aria-label="Bảng" aria-pressed="${MODE === 'TABLE'}"><span class="ms sm">table_rows</span></button></div></div>
     <div class="kpis">
       <div class="kpi"><div class="l"><span class="ms xs">emoji_events</span>Doanh số thắng</div><div class="v">${short(tw)}</div><div class="s">Deal Closed Won có ngày chốt trong kỳ</div></div>
       <div class="kpi"><div class="l"><span class="ms xs">flag</span>Đạt chỉ tiêu</div><div class="v">${tp == null ? '—' : tp + '%'}</div><div class="s">Chỉ tiêu kỳ: ${short(tq)}</div></div>
       <div class="kpi"><div class="l"><span class="ms xs">filter_alt</span>Pipeline đang mở</div><div class="v">${short(sum('pipeline'))}</div><div class="s">${sum('open')} deal · dự báo ${short(sum('forecast'))}</div></div>
       <div class="kpi"><div class="l"><span class="ms xs">forum</span>Hoạt động 30 ngày</div><div class="v">${sum('acts30')}</div><div class="s">Ghi chú · cuộc gọi · cuộc họp</div></div>
       <div class="kpi ${sum('overdue') ? 'warn' : ''}"><div class="l"><span class="ms xs">assignment_late</span>Task quá hạn</div><div class="v">${sum('overdue')}</div><div class="s">Chưa hoàn thành, quá ngày hạn</div></div></div>
-    <div class="body"><table class="lt"><thead><tr><th class="nmcol" data-sort="name">Sale${srt('name')}</th>${COLS.map(([k, l, n]) => `<th class="${n ? 'num' : ''}" data-sort="${k}">${l}${srt(k)}</th>`).join('')}</tr></thead>
+    ${MODE === 'BOARD' ? `<div class="body brd">${boardHtml(list, rank)}</div>` : `<div class="body"><table class="lt"><thead><tr><th class="nmcol" data-sort="name">Sale${srt('name')}</th>${COLS.map(([k, l, n]) => `<th class="${n ? 'num' : ''}" data-sort="${k}">${l}${srt(k)}</th>`).join('')}</tr></thead>
       <tbody>${list.map(r => `<tr data-id="${r.s.id}" class="${r.s.values.status && r.s.values.status !== 'Đang làm việc' ? 'st-off' : ''}"><td class="nmcol"><div class="pri"><span class="rk ${rank.get(r.s.id) === 1 && r.wonSum ? 'g1' : ''}" title="Hạng theo doanh số thắng">${rank.get(r.s.id)}</span><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.s.values.email || '')}</small></div></div></td>
         <td>${esc(r.team || '—')}</td><td>${esc(r.role || '—')}</td><td class="num">${r.contacts}</td><td class="num">${r.companies}</td><td class="num">${r.open}</td><td class="num">${short(r.pipeline)}</td><td class="num">${short(r.forecast)}</td>
         <td class="num"><b>${short(r.wonSum)}</b></td><td class="num">${r.quota ? short(r.quota) : '—'}</td><td>${bar(r.x.pct)}</td><td class="num">${r.x.winRate == null ? '—' : r.x.winRate + '%'}</td><td class="num">${r.acts30}</td><td class="num">${r.overdue ? `<span class="od">${r.overdue}</span>` : 0}</td></tr>`).join('')
-        || `<tr><td colspan="${COLS.length + 1}" class="empty">Không có sale phù hợp.</td></tr>`}</tbody></table></div>
-    <div class="foot"><span class="pillc">${list.length} sale</span><span>Chỉ tiêu kỳ = chỉ tiêu tháng × số tháng của kỳ. Bấm tên cột để sắp xếp, bấm dòng để xem chi tiết.</span></div>`;
+        || `<tr><td colspan="${COLS.length + 1}" class="empty">Không có sale phù hợp.</td></tr>`}</tbody></table></div>`}
+    <div class="foot"><span class="pillc">${list.length} sale</span><span>Chỉ tiêu kỳ = chỉ tiêu tháng × số tháng của kỳ. ${MODE === 'BOARD' ? 'Kéo thẻ sang cột khác để đổi team, bấm thẻ để xem chi tiết.' : 'Bấm tên cột để sắp xếp, bấm dòng để xem chi tiết.'}</span></div>`;
 }
 const srt = k => st.sort.k === k ? `<span class="ms xs srt">${st.sort.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>` : '';
+function boardHtml(list, rank) {
+  const teams = [...HXC.TEAMS, ...new Set(list.map(r => r.team).filter(t => t && !HXC.TEAMS.includes(t)))]; if (list.some(r => !r.team)) teams.push('');
+  return `<div class="kb">${teams.map(t => { const items = list.filter(r => (r.team || '') === t);
+    return `<section class="kcol"><div class="kh">${esc(t || 'Chưa có team')}<span class="n">${items.length}</span><span class="sm2">${short(items.reduce((s, r) => s + r.wonSum, 0))}</span></div><div class="kcards" data-drop="${esc(t)}">${items.map(r => `<article class="kc ${r.s.values.status && r.s.values.status !== 'Đang làm việc' ? 'st-off' : ''}" draggable="true" data-card="${r.s.id}">
+      <div class="pri"><span class="rk ${rank.get(r.s.id) === 1 && r.wonSum ? 'g1' : ''}" title="Hạng theo doanh số thắng">${rank.get(r.s.id)}</span><span class="av sm">${esc(HXC.initials(r.name))}</span><div style="min-width:0"><a href="?id=${r.s.id}">${esc(r.name)}</a><small>${esc(r.role || '')}</small></div></div>
+      <div class="ln"><span>Doanh số thắng</span><b>${short(r.wonSum)}</b></div>${bar(r.x.pct)}
+      <div class="ln"><span>Deal đang mở</span><b>${r.open} · ${short(r.pipeline)}</b></div>
+      <div class="ln"><span>Hoạt động 30 ngày</span><b>${r.acts30}</b></div>${r.overdue ? `<div class="ln"><span>Task quá hạn</span><b class="od">${r.overdue}</b></div>` : ''}</article>`).join('') || '<div class="kempty">Không có sale</div>'}</div></section>`; }).join('')}</div>`;
+}
 function exportCsv() {
   const list = rows(), head = ['Sale','Email', ...COLS.map(c => c[1])];
   const csv = [head, ...list.map(r => [r.name, r.s.values.email, r.team, r.role, r.contacts, r.companies, r.open, r.pipeline, Math.round(r.forecast), r.wonSum, r.quota, r.x.pct ?? '', r.x.winRate ?? '', r.acts30, r.overdue])].map(a => a.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
@@ -231,7 +308,7 @@ function drawDetail(s) {
   $('#frame').className = 'frame rec';
   $('#frame').innerHTML = `<div class="grid">
     <div class="col">
-      <section class="card"><div class="top"><a class="back" href="crm-sales-hubspot.html"><span class="ms sm">chevron_left</span>Sales</a><button class="btn btn--text sm" id="actBtn" aria-haspopup="menu">Thao tác<span class="ms xs">arrow_drop_down</span></button></div>
+      <section class="card"><div class="top"><a class="back" href="crm-sales-hubspot.html?tab=team"><span class="ms sm">chevron_left</span>Đội sale</a><button class="btn btn--text sm" id="actBtn" aria-haspopup="menu">Thao tác<span class="ms xs">arrow_drop_down</span></button></div>
         <div class="idt"><span class="ic">${esc(HXC.initials(name))}</span><div style="min-width:0"><h1>${esc(name)}</h1><div class="nil" style="font-size:13px">${esc([s.values.role, s.values.team].filter(Boolean).join(' · '))}</div></div></div>
         <div class="sub">${s.values.email ? `<a href="mailto:${esc(s.values.email)}">${esc(s.values.email)}</a>` : ''}${s.values.phone ? `<span>${esc(s.values.phone)}</span>` : ''}</div>
         <div class="qa">${s.values.email ? `<a href="mailto:${esc(s.values.email)}"><span class="o"><span class="ms sm">mail</span></span>Email</a>` : ''}${s.values.phone ? `<a href="tel:${esc(s.values.phone.replace(/\s/g, ''))}"><span class="o"><span class="ms sm">call</span></span>Gọi</a>` : ''}
@@ -288,14 +365,144 @@ function reassign(s, anchor) {
     closeFp(); toast(`Đã chuyển ${x.contacts.length + x.companies.length + x.open.length} bản ghi cho ${to}`); drawDetail(s); };
 }
 
+/* ═══ SALES WORKSPACE (07/10/2026) — theo "Sales workspace" của HubSpot ═══
+   ?tab=summary (mặc định) | leads | deals | tasks | schedule | feed | goals | forecast | team
+   Phần 1 đã dựng: khung tab + Summary + "Đội sale" (bảng xếp hạng cũ). Các tab còn lại dựng ở phần 2–4 của kế hoạch.
+   "Xem theo": một sale (mặc định là tôi) hoặc tất cả sales — dành cho quản lý. */
+const TABS = [['summary','Tổng quan'],['leads','Leads',2],['deals','Deals',2],['tasks','Tasks',2],['schedule','Lịch',2],['feed','Feed',2],['goals','Chỉ tiêu',3],['forecast','Dự báo',4],['team','Đội sale']];
+const TAB = TABS.some(t => t[0] === qs.get('tab')) ? qs.get('tab') : 'summary';
+const WKEY = 'hx-crm-ws-ui';
+const ws = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem(WKEY) || '{}'); } catch {} return { who: o.who || HXC.ME, shut: o.shut || {}, tf:'all', gf:'all' }; })();
+if (ws.who !== '*' && !HXC.saleByName(ws.who)) ws.who = HXC.ME;
+const saveWs = () => { try { localStorage.setItem(WKEY, JSON.stringify({ who: ws.who, shut: ws.shut })); } catch {} };
+const mine = n => ws.who === '*' || n === ws.who;
+const todayS = NOW.toISOString().slice(0, 10), tomorrowS = new Date(+NOW + 864e5).toISOString().slice(0, 10), nowIso = NOW.toISOString();
+const dmy = s => s ? s.slice(0, 10).split('-').reverse().join('/') : '';
+const hm = s => { const d = new Date(s); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+const recLink = a => refOf(a).replace(/^ · /, '');
+function wsHead(actions = '') {
+  return `<div class="ph"><h1 class="ttl">Sales</h1>${TAB === 'team' ? '' : `<span class="wsep"></span><button class="who" id="whoBtn" aria-haspopup="menu" title="Xem theo sale">${esc(ws.who === '*' ? 'Tất cả sales' : ws.who)}<span class="ms sm">expand_more</span></button>`}
+      <div class="ph-act">${actions}</div></div>
+    <div class="vtabs" role="tablist" aria-label="Sales workspace">${TABS.map(([k, l, ph]) => `<a class="vtab" role="tab" aria-selected="${TAB === k}" href="?tab=${k}">${l}${ph ? `<span class="soonb" title="Dựng ở phần ${ph} của kế hoạch">P${ph}</span>` : ''}</a>`).join('')}</div>`;
+}
+const wcard = (id, icon, title, right, body) => `<section class="wc ${ws.shut[id] ? 'shut' : ''}" data-wc="${id}"><div class="wc-h"><button class="tgc" data-wtg="${id}" aria-expanded="${!ws.shut[id]}" aria-label="Thu gọn / mở rộng ${esc(title)}"><span class="ms sm">expand_more</span></button><h2><span class="ms sm">${icon}</span>${title}</h2><span class="r">${right || ''}</span></div><div class="wc-b">${body}</div></section>`;
+function wsData() {
+  const db = HXC.db(), names = ws.who === '*' ? HXC.sales().map(s => s.values.name) : [ws.who];
+  const tasks = db.activities.filter(a => a.type === 'TASK' && !a.done && mine(a.assignee || a.by));
+  const grp = { od: tasks.filter(t => t.due && t.due < todayS), today: tasks.filter(t => t.due === todayS), tmr: tasks.filter(t => t.due === tomorrowS), later: tasks.filter(t => !t.due || t.due > tomorrowS) };
+  const meets = db.activities.filter(a => a.type === 'MEETING' && mine(a.by));
+  const myDeals = HXC.list('deal').filter(d => mine(d.values[HXC.SALE])), open = myDeals.filter(d => ![HXC.WON, HXC.LOST].includes(d.values[HXC.STAGE]));
+  // Hành động gợi ý — suy ra từ dữ liệu (HubSpot: Guided actions)
+  const acts = [];
+  open.forEach(d => { const la = HXC.activitiesOf('deal', d.id).find(a => a.type !== 'SYSTEM' && a.type !== 'TASK' && a.at <= nowIso); const days = la ? Math.floor((+NOW - +new Date(la.at)) / 864e5) : null;
+    const hasTask = tasks.some(t => (t.deals || []).includes(d.id)); const nm = `<a href="${HXC.url('deal', d.id)}">${esc(HX.title(d))}</a> ${esc(d.values.t_n_deal || '')}`;
+    if (d.values[HXC.CLOSE] && d.values[HXC.CLOSE].slice(0, 10) < todayS) acts.push({ k:'deal', i:'event_busy', t:`Deal quá ngày dự kiến chốt (${dmy(d.values[HXC.CLOSE])})`, s:nm, href:HXC.url('deal', d.id), go:'Cập nhật deal' });
+    else if (days == null || days >= 7) acts.push({ k:'deal', i:'hourglass_bottom', t: days == null ? 'Deal chưa có hoạt động nào' : `Deal không có hoạt động ${days} ngày`, s:nm, href:HXC.url('deal', d.id), go:'Mở deal' });
+    else if (!hasTask) acts.push({ k:'deal', i:'add_task', t:'Deal chưa có bước tiếp theo', s:nm, href:HXC.url('deal', d.id), go:'Tạo task' }); });
+  if (typeof HXL !== 'undefined') HXL.list().filter(l => HXL.isOpen(l) && (ws.who === '*' ? true : l.values.owner === ws.who)).forEach(l => { const la = HXL.lastAct(l);
+    if (l.values.stage === 'Mới') acts.push({ k:'pro', i:'filter_alt', t:'Lead mới chưa liên hệ', s:`<a href="${HXL.url(l.id)}">${esc(l.values.name)}</a>`, href:HXL.url(l.id), go:'Liên hệ' });
+    else if (!la || +NOW - +new Date(la) > 5 * 864e5) acts.push({ k:'pro', i:'phone_callback', t:'Lead cần liên hệ lại', s:`<a href="${HXL.url(l.id)}">${esc(l.values.name)}</a> · ${esc(l.values.stage)}`, href:HXL.url(l.id), go:'Mở lead' }); });
+  if (typeof HXL !== 'undefined' && ws.who === '*') HXL.list().filter(l => HXL.isOpen(l) && !l.values.owner).forEach(l => acts.push({ k:'pro', i:'person_add', t:'Lead chưa có owner', s:`<a href="${HXL.url(l.id)}">${esc(l.values.name)}</a>`, href:HXL.url(l.id), go:'Gán owner' }));
+  const feed = [...db.activities.filter(a => a.type !== 'TASK' && mine(a.by) && a.at <= nowIso), ...db.events.filter(e => mine(e.by))].sort((a, b) => b.at.localeCompare(a.at));
+  return { names, tasks, grp, meets, open, acts, feed,
+    follow: meets.filter(m => m.at <= nowIso && +NOW - +new Date(m.at) <= 14 * 864e5).sort((a, b) => b.at.localeCompare(a.at)),
+    todayEv: [...meets.filter(m => m.at.slice(0, 10) === todayS).map(m => ({ at:m.at, i:'event', t:m.title || 'Cuộc họp', a:m })), ...grp.today.map(t => ({ at:null, i:'task_alt', t:t.title || t.body, a:t }))],
+    nextMeet: meets.filter(m => m.at > nowIso).sort((a, b) => a.at.localeCompare(b.at)) };
+}
+function drawSummary() {
+  document.title = 'Sales workspace — HarnexAI CRM (mockup)';
+  const D = wsData(), [a, b] = range('month');
+  const X = D.names.map(n => HXC.saleStats(n, a, b)), sum = f => X.reduce((s, x) => s + (Number(typeof f === 'function' ? f(x) : x[f]) || 0), 0);
+  const won = sum('wonSum'), quota = sum('quota'), pct = quota ? Math.round(won / quota * 100) : null;
+  const TF = [['od','Quá hạn','bad'],['today','Hôm nay'],['tmr','Ngày mai'],['later','Sắp tới']];
+  const tl = ws.tf === 'all' ? [...D.grp.od, ...D.grp.today, ...D.grp.tmr, ...D.grp.later] : D.grp[ws.tf];
+  const al = D.acts.filter(x => ws.gf === 'all' || x.k === ws.gf);
+  const taskRow = t => `<div class="wi"><input type="checkbox" data-tdone="${t.id}" aria-label="Hoàn thành task"><div class="x"><b>${esc(t.title || t.body || 'Task')}</b><small>${[t.prio ? 'Ưu tiên ' + esc(t.prio) : '', recLink(t), ws.who === '*' ? esc(t.assignee || t.by) : ''].filter(Boolean).join(' · ')}</small></div><span class="due ${t.due && t.due < todayS ? 'od' : ''}">${t.due ? dmy(t.due) : 'Chưa có hạn'}</span></div>`;
+  $('#frame').className = 'frame';
+  $('#frame').innerHTML = wsHead(`<button class="btn btn--secondary" id="wsTask"><span class="ms sm">add_task</span>Tạo task</button>`) + `<div class="ws"><div class="ws-g">
+    <div class="ws-c">
+      <div class="kpis">
+        <div class="kpi"><div class="l"><span class="ms xs">emoji_events</span>Doanh số tháng này</div><div class="v">${short(won)}</div>${bar(pct)}</div>
+        <div class="kpi"><div class="l"><span class="ms xs">handshake</span>Deal đang mở</div><div class="v">${D.open.length}</div><div class="s">Pipeline ${short(sum('pipeline'))}</div></div>
+        <div class="kpi"><div class="l"><span class="ms xs">event</span>Cuộc họp sắp tới</div><div class="v">${D.nextMeet.length}</div><div class="s">${D.nextMeet[0] ? 'Gần nhất ' + dmy(D.nextMeet[0].at) : 'Chưa có lịch'}</div></div>
+        <div class="kpi"><div class="l"><span class="ms xs">forum</span>Hoạt động 30 ngày</div><div class="v">${sum('acts30')}</div><div class="s">Ghi chú · cuộc gọi · cuộc họp</div></div>
+        <div class="kpi ${D.grp.od.length ? 'warn' : ''}"><div class="l"><span class="ms xs">assignment_late</span>Task quá hạn</div><div class="v">${D.grp.od.length}</div><div class="s">${D.tasks.length} task đang mở</div></div></div>
+      ${wcard('tasks', 'task_alt', ws.who === '*' ? 'Task của đội' : 'Task của bạn', `<button class="btn btn--primary sm" id="wsStart" ${tl.length ? '' : 'disabled'}><span class="ms xs">play_arrow</span>Bắt đầu ${tl.length} task</button>`,
+        `<div class="tcnt" role="group" aria-label="Lọc task theo hạn">${TF.map(([k, l, c]) => `<button data-tf="${k}" aria-pressed="${ws.tf === k}" class="${c && D.grp[k].length ? c : ''}"><b>${D.grp[k].length}</b><span>${l}</span></button>`).join('')}</div>
+        <div class="wl">${tl.slice(0, 8).map(taskRow).join('') || `<div class="wempty"><span class="ms">task_alt</span>${ws.tf === 'all' ? 'Không còn task nào đang mở.' : 'Không có task trong nhóm này.'}</div>`}</div>
+        ${tl.length > 8 ? `<a class="wmore" href="?tab=tasks">Xem tất cả ${tl.length} task</a>` : ''}`)}
+      ${wcard('guide', 'bolt', 'Hành động gợi ý', `<span class="segtxt" role="group" aria-label="Loại hành động">${[['all','Tất cả'],['deal','Deal'],['pro','Tìm khách']].map(([k, l]) => `<button data-gf="${k}" aria-pressed="${ws.gf === k}">${l}</button>`).join('')}</span>`,
+        `<div class="wl">${al.slice(0, 8).map(x => `<div class="wi"><span class="ms sm">${x.i}</span><div class="x"><b>${esc(x.t)}</b><small>${x.s}</small></div><a class="btn btn--secondary sm" href="${x.href}">${x.go}</a></div>`).join('') || `<div class="wempty"><span class="ms">verified</span>Không có gợi ý nào. Mọi deal và lead đều đang được chăm sóc.</div>`}</div>${al.length > 8 ? `<span class="nil" style="font-size:12px">Còn ${al.length - 8} gợi ý khác.</span>` : ''}`)}
+      ${wcard('follow', 'event_available', 'Follow-up sau cuộc họp', `<span class="nil" style="font-size:12px">14 ngày gần đây</span>`,
+        `<div class="wl">${D.follow.slice(0, 5).map(m => `<div class="wi"><span class="ms sm">event</span><div class="x"><b>${esc(m.title || 'Cuộc họp')}</b><small>${dmy(m.at)} ${hm(m.at)}${m.outcome ? ' · ' + esc(m.outcome) : ''}${recLink(m) ? ' · ' + recLink(m) : ''}</small></div><button class="btn btn--secondary sm" data-fu="${m.id}"><span class="ms xs">add_task</span>Task follow-up</button></div>`).join('') || `<div class="wempty"><span class="ms">event_available</span>Không có cuộc họp nào cần follow-up.</div>`}</div>`)}
+    </div>
+    <div class="ws-c">
+      ${wcard('sched', 'calendar_today', `Lịch hôm nay · ${dmy(todayS)}`, '',
+        `<div class="wl">${D.todayEv.map(e => `<div class="wi"><span class="tm">${e.at ? hm(e.at) : 'Cả ngày'}</span><div class="x"><b>${esc(e.t)}</b><small>${recLink(e.a)}</small></div><span class="ms sm">${e.i}</span></div>`).join('') || `<div class="wempty"><span class="ms">event_note</span>Hôm nay chưa có cuộc họp hay task nào.</div>`}</div>
+        ${D.nextMeet.length ? `<div class="wl" style="margin-top:6px"><div class="nil" style="font-size:12px;font-weight:700;padding:6px 0 0">SẮP TỚI</div>${D.nextMeet.slice(0, 3).map(m => `<div class="wi"><span class="tm">${dmy(m.at).slice(0, 5)}</span><div class="x"><b>${esc(m.title || 'Cuộc họp')}</b><small>${hm(m.at)}${recLink(m) ? ' · ' + recLink(m) : ''}</small></div></div>`).join('')}</div>` : ''}
+        <a class="wmore" href="?tab=schedule">Mở lịch đầy đủ</a>`)}
+      ${wcard('feed', 'dynamic_feed', 'Feed hoạt động', '',
+        `<div class="wl">${D.feed.slice(0, 6).map(f => `<div class="wi"><span class="ms sm">${IC[f.type] || 'sync'}</span><div class="x"><b>${esc(f.title || TN[f.type] || 'Cập nhật')}</b><small>${esc((f.body || '').slice(0, 90))}${(f.body || '').length > 90 ? '…' : ''}</small><small>${dmy(f.at)} ${hm(f.at)}${ws.who === '*' ? ' · ' + esc(f.by || '') : ''}${refOf(f)}</small></div></div>`).join('') || `<div class="wempty"><span class="ms">dynamic_feed</span>Chưa có hoạt động.</div>`}</div><a class="wmore" href="?tab=feed">Xem toàn bộ feed</a>`)}
+    </div></div></div>`;
+}
+function drawSoon() {
+  const [, name, ph] = TABS.find(t => t[0] === TAB);
+  const what = { leads:'Danh sách lead của sale đang xem, dùng lại màn Leads.', deals:'Deal của sale đang xem theo giai đoạn, dùng lại màn Deals.', tasks:'Toàn bộ task có bộ lọc, view lưu và hàng đợi thực hiện.', schedule:'Lịch theo ngày / tuần / tháng gồm cuộc họp và task.', feed:'Dòng hoạt động đầy đủ kèm số liệu hoạt động theo tuần.',
+    goals:'Chỉ tiêu theo sale và team: doanh số, deal tạo mới, cuộc gọi, cuộc họp; có bảng xếp hạng.', forecast:'Dự báo theo team và từng sale: chỉ tiêu, đã thắng, khoảng cách, pipeline mở, gửi dự báo.' }[TAB];
+  const alt = { leads:['crm-leads-hubspot.html','Mở màn Leads'], deals:['crm-giao-dich-hubspot.html','Mở màn Deals'], goals:['?tab=team','Xem chỉ tiêu ở Đội sale'], forecast:['crm-bao-cao-hubspot.html','Mở Báo cáo pipeline'] }[TAB];
+  $('#frame').className = 'frame';
+  $('#frame').innerHTML = wsHead() + `<div class="ws"><div class="wc"><div class="soon"><span class="ms">construction</span><b style="color:var(--on-surface);font-size:15px">Tab “${esc(name)}” sẽ dựng ở phần ${ph} của kế hoạch</b><span style="max-width:520px">${what}</span>${alt ? `<a class="btn btn--secondary" href="${alt[0]}">${alt[1]}</a>` : ''}</div></div></div>`;
+}
+function taskDialog(preset = {}) {
+  const cts = HXC.list('contact'), dls = HXC.list('deal');
+  HX.modal(`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="tkT"><div class="mh" id="tkT">Tạo task<button class="btn btn--text btn--icon x" data-close aria-label="Đóng"><span class="ms">close</span></button></div>
+    <div class="mb"><form class="field-form" id="tkF"><label>Tiêu đề <span class="req">*</span><input class="in" id="tk_title" value="${esc(preset.title || '')}"></label>
+      <label>Hạn<input class="in" id="tk_due" type="date" value="${preset.due || tomorrowS}"></label>
+      <label>Ưu tiên<select class="in" id="tk_prio">${['Thấp','Trung bình','Cao'].map(p => `<option ${p === 'Trung bình' ? 'selected' : ''}>${p}</option>`).join('')}</select></label>
+      <label>Giao cho<select class="in" id="tk_as">${HXC.sales().map(s => `<option ${s.values.name === (ws.who === '*' ? HXC.ME : ws.who) ? 'selected' : ''}>${esc(s.values.name)}</option>`).join('')}</select></label>
+      <label>Liên kết Contact<select class="in" id="tk_ct"><option value="">— Không —</option>${cts.map(c => `<option value="${c.id}" ${(preset.contacts || [])[0] === c.id ? 'selected' : ''}>${esc(HXC.fullName(c))}</option>`).join('')}</select></label>
+      <label>Liên kết Deal<select class="in" id="tk_dl"><option value="">— Không —</option>${dls.map(d => `<option value="${d.id}" ${(preset.deals || [])[0] === d.id ? 'selected' : ''}>${esc(HX.title(d))} — ${esc(d.values.t_n_deal || '')}</option>`).join('')}</select></label>
+      <p class="err" id="tkE" role="alert"></p></form></div>
+    <div class="mf"><button class="btn btn--secondary" data-close>Huỷ</button><button class="btn btn--primary" id="tkOk">Tạo</button></div></div>`, (bg, close) => {
+    setTimeout(() => $('#tk_title', bg).focus(), 40);
+    $('#tkOk', bg).onclick = () => { const title = $('#tk_title', bg).value.trim(); if (!title) { $('#tkE', bg).textContent = 'Nhập tiêu đề task'; return; }
+      const ct = $('#tk_ct', bg).value, dl = $('#tk_dl', bg).value, c = ct && HXC.get('contact', ct);
+      HXC.addActivity({ type:'TASK', title, body:title, due: $('#tk_due', bg).value || null, done:false, prio: $('#tk_prio', bg).value, assignee: $('#tk_as', bg).value, contacts: ct ? [ct] : [], companies: c && c.company ? [c.company] : (preset.companies || []), deals: dl ? [dl] : [] });
+      close(); toast('Đã tạo task'); draw(); }; });
+}
+document.addEventListener('click', e => {
+  if (qs.get('id')) return;
+  const wb = e.target.closest('#whoBtn'); if (wb) { e.stopImmediatePropagation(); openFp(wb, `<div class="hd">Xem theo</div>${[[HXC.ME, 'Tôi (' + HXC.ME + ')'], ...HXC.sales().filter(s => s.values.name !== HXC.ME).map(s => [s.values.name, s.values.name + (s.values.team ? ' · ' + s.values.team : '')]), ['*', 'Tất cả sales']].map(([v, l]) => `<button class="mi" data-who="${esc(v)}"><span class="ms sm" style="${v === ws.who ? '' : 'visibility:hidden'}">check</span>${esc(l)}</button>`).join('')}`, 280);
+    const r = wb.getBoundingClientRect(); fp.style.left = Math.max(8, r.left) + 'px'; return; }
+  const w = e.target.closest('[data-who]'); if (w) { ws.who = w.dataset.who; saveWs(); closeFp(); draw(); return; }
+  const tg = e.target.closest('[data-wtg]'); if (tg) { ws.shut[tg.dataset.wtg] = !ws.shut[tg.dataset.wtg]; saveWs(); draw(); return; }
+  const tf = e.target.closest('[data-tf]'); if (tf) { ws.tf = ws.tf === tf.dataset.tf ? 'all' : tf.dataset.tf; draw(); return; }
+  const gf = e.target.closest('[data-gf]'); if (gf) { ws.gf = gf.dataset.gf; draw(); return; }
+  if (e.target.closest('#wsTask')) { taskDialog(); return; }
+  const fu = e.target.closest('[data-fu]'); if (fu) { const m = HXC.db().activities.find(a => a.id === fu.dataset.fu); if (m) taskDialog({ title:'Follow-up: ' + (m.title || 'cuộc họp'), contacts:m.contacts, companies:m.companies, deals:m.deals }); return; }
+  if (e.target.closest('#wsStart')) { const D = wsData(), l = ws.tf === 'all' ? [...D.grp.od, ...D.grp.today, ...D.grp.tmr, ...D.grp.later] : D.grp[ws.tf]; const t = l[0]; if (!t) return;
+    const ref = t.deals && t.deals[0] ? ['deal', t.deals[0]] : t.contacts && t.contacts[0] ? ['contact', t.contacts[0]] : t.companies && t.companies[0] ? ['company', t.companies[0]] : null;
+    if (ref && HXC.get(ref[0], ref[1])) location.href = HXC.url(ref[0], ref[1]); else toast('Task này chưa liên kết bản ghi nào'); return; }
+});
+document.addEventListener('change', e => { const id = e.target.dataset && e.target.dataset.tdone; if (id) { HXC.updateActivity(id, { done:true }); toast('Đã hoàn thành task'); draw(); } });
+
 /* ── Điều phối ── */
-function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : drawList(); }
+function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : TAB === 'summary' ? drawSummary() : TAB === 'team' ? drawList() : drawSoon(); }
 draw();
 HX.onChange = draw;
+// Board Sales: kéo thẻ sang cột khác = đổi Team của sale
+document.addEventListener('dragstart', e => { const c = e.target.closest && e.target.closest('.kc[data-card]'); if (c) { c.classList.add('dragging'); e.dataTransfer.setData('text/plain', c.dataset.card); } });
+document.addEventListener('dragend', e => e.target.closest && e.target.closest('.kc')?.classList.remove('dragging'));
+document.addEventListener('dragover', e => { const z = e.target.closest && e.target.closest('[data-drop]'); if (z) { e.preventDefault(); z.classList.add('drop'); } });
+document.addEventListener('dragleave', e => e.target.closest && e.target.closest('[data-drop]')?.classList.remove('drop'));
+document.addEventListener('drop', e => { const z = e.target.closest && e.target.closest('[data-drop]'); if (!z) return; e.preventDefault(); const s = HXC.saleById(e.dataTransfer.getData('text/plain')), t = z.dataset.drop || null;
+  if (s && (s.values.team || null) !== t) { HXC.updateSale(s.id, 'team', t); toast(`Đã chuyển ${s.values.name} sang ${t || 'Chưa có team'}`); } draw(); });
 document.addEventListener('click', e => {
   const rg = e.target.closest('[data-rg]'); if (rg) { st.rg = rg.dataset.rg; saveSt(); draw(); return; }
   const vt = e.target.closest('[data-view]'); if (vt) { st.view = vt.dataset.view; saveSt(); draw(); return; }
   const th = e.target.closest('th[data-sort]'); if (th) { const k = th.dataset.sort; st.sort = { k, dir: st.sort.k === k && st.sort.dir === 'desc' ? 'asc' : 'desc' }; saveSt(); draw(); return; }
+  const md = e.target.closest('[data-mode]'); if (md) { MODE = md.dataset.mode; draw(); return; }
+  const kc = e.target.closest('.kc[data-card]'); if (kc && !e.target.closest('a')) { location.href = '?id=' + kc.dataset.card; return; }
   if (e.target.closest('#addSale')) { salePanel(); return; }
   if (e.target.closest('#csvBtn')) { exportCsv(); return; }
   const tr = e.target.closest('tbody tr[data-id]'); if (tr && !e.target.closest('a')) { location.href = '?id=' + tr.dataset.id; return; }

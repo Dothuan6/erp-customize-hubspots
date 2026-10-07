@@ -928,7 +928,7 @@ const HXC = (() => {
     if (co && co.value) associate('deal', dealId, 'company', co.value); }
 
   return { ME, TODAY, LIFECYCLE, LEAD_STATUS, SOURCES, INDUSTRIES, ASSOC_LABELS, CONTACT_FIELDS, COMPANY_FIELDS, OBJ, STAGE, CASH, CLOSE, SALE, WON, LOST,
-    db: () => db, get, list, related, assoc, associate, dissociate, update, create, remove, activitiesOf, addActivity, lastContacted, itemsOf, liTotal, liNet, totalsOf, dealTotals, saveItems, money,
+    db: () => db, get, list, related, assoc, associate, dissociate, update, create, remove, activitiesOf, addActivity, updateActivity, lastContacted, itemsOf, liTotal, liNet, totalsOf, dealTotals, saveItems, money,
     SALE_FIELDS, TEAMS, ROLES, sales, saleById, saleByName, saleUrl, createSale, updateSale, saleStats, DEAL_BASE, isNewField, extraKeys, setExtra, addCustomField,
     titleOf, fullName, initials, url, dt, dOnly, props, createPanel, addAssocPanel, assocCard, timeline, composer, lineItemsCard, lineItemEditor, dealAssocForm, saveDealAssoc,
     reset() { try { localStorage.removeItem(KEY); } catch {} } };

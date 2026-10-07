@@ -229,11 +229,11 @@ function HXLeadList() {
   const VF = { _contact:{ key:'_contact', name:'Contact', type:'TEXT' }, _company:{ key:'_company', name:'Company', type:'TEXT' }, _deal:{ key:'_deal', name:'Deal', type:'TEXT' },
     _lastact:{ key:'_lastact', name:'Ngày hoạt động gần nhất', type:'DATE' }, _created:{ key:'_created', name:'Ngày tạo', type:'DATE' } };
   const F = k => VF[k] || L.F(k);
-  const VIEWS = [['open', 'Lead đang mở'], ['mine', 'Lead của tôi'], ['un', 'Lead chưa có owner'], ['all', 'Tất cả leads']];
+  const VIEWS = [['all', 'Tất cả leads'], ['open', 'Lead đang mở'], ['mine', 'Lead của tôi'], ['un', 'Lead chưa có owner']];
   const QUICK = ['owner', 'stage', 'label', '_created'], QUICK_MORE = ['type', 'source', 'reason', '_lastact'];
   const COLS = ['stage', '_contact', '_company', 'owner', 'label', '_lastact', '_created'], COLS_MORE = ['type', 'source', 'code', '_deal', 'reason'];
   const DATE_P = [['today', 'Hôm nay'], ['week', 'Tuần này'], ['month', 'Tháng này'], ['d7', '7 ngày qua'], ['d30', '30 ngày qua'], ['d90', '90 ngày qua'], ['year', 'Năm nay']];
-  const st = { view:'open', q:'', f:{}, sort:{ key:'_created', dir:'desc' }, sel:new Set(), mode:'TABLE', quick:[...QUICK], cols:[...COLS], fcollapsed:false };
+  const st = { view:'all', q:'', f:{}, sort:{ key:'_created', dir:'desc' }, sel:new Set(), mode:'BOARD', quick:[...QUICK], cols:[...COLS], fcollapsed:false };
 
   const val = (l, k) => k === '_created' ? l.createdAt : k === '_lastact' ? L.lastAct(l) : k === '_contact' ? (c => c ? HXC.fullName(c) : null)(L.contactOf(l))
     : k === '_company' ? (c => c ? c.values.name : null)(L.companyOf(l)) : k === '_deal' ? (d => d ? HX.title(d) : null)(L.dealOf(l)) : k === 'stage' ? L.STAGES.indexOf(l.values.stage) : l.values[k];
@@ -359,7 +359,7 @@ function HXLeadList() {
       <div class="row"><button class="btn btn--primary sm" id="sOk">Áp dụng</button></div></div>`, 280);
     p.onclick = ev => { ev.stopPropagation(); if (ev.target.closest('#sOk')) { st.sort = { key:$('#sKey', p).value, dir:$('#sDir', p).value }; p.classList.remove('open'); draw(); } }; };
   $('#filterBtn').onclick = $('#colBtn2').onclick = () => { st.fcollapsed = !st.fcollapsed; draw(); };
-  document.querySelector('.seg').onclick = e => { const b = e.target.closest('[data-mode]'); if (b) { st.mode = b.dataset.mode; if (st.mode === 'BOARD' && st.view === 'open') st.view = 'all'; draw(); } };
+  document.querySelector('.seg').onclick = e => { const b = e.target.closest('[data-mode]'); if (b) { st.mode = b.dataset.mode; draw(); } };
   $('#body').addEventListener('click', e => {
     const pv = e.target.closest('[data-pv]'); if (pv) { e.preventDefault(); preview(pv.dataset.pv); return; }
     if (e.target.closest('a[href]')) return;

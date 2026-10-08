@@ -350,7 +350,7 @@ function drawDetail(s) {
   $('#frame').className = 'frame rec';
   $('#frame').innerHTML = `<div class="grid">
     <div class="col">
-      <section class="card"><div class="top"><a class="back" href="crm-sales-hubspot.html?tab=team"><span class="ms sm">chevron_left</span>Đội sale</a><button class="btn btn--text sm" id="actBtn" aria-haspopup="menu">Thao tác<span class="ms xs">arrow_drop_down</span></button></div>
+      <section class="card"><div class="top"><a class="back" href="crm-sales-hubspot.html${MGR ? '?tab=team' : ''}"><span class="ms sm">chevron_left</span>${MGR ? 'Đội sale' : 'Sales'}</a>${MGR ? `<button class="btn btn--text sm" id="actBtn" aria-haspopup="menu">Thao tác<span class="ms xs">arrow_drop_down</span></button>` : ''}</div>
         <div class="idt"><span class="ic">${esc(HXC.initials(name))}</span><div style="min-width:0"><h1>${esc(name)}</h1><div class="nil" style="font-size:13px">${esc(s.values.role || '')}</div></div></div>
         <div class="sub">${s.values.email ? `<a href="mailto:${esc(s.values.email)}">${esc(s.values.email)}</a>` : ''}${s.values.phone ? `<span>${esc(s.values.phone)}</span>` : ''}</div>
         <div class="qa">${s.values.email ? `<a href="mailto:${esc(s.values.email)}"><span class="o"><span class="ms sm">mail</span></span>Email</a>` : ''}${s.values.phone ? `<a href="tel:${esc(s.values.phone.replace(/\s/g, ''))}"><span class="o"><span class="ms sm">call</span></span>Gọi</a>` : ''}
@@ -387,7 +387,8 @@ function card(t, label, arr, fn) {
 }
 function drawSaleProps(s) {
   const box = $('#sp');
-  box.innerHTML = HXC.SALE_FIELDS.map(f => `<div class="prop" data-k="${f.key}"><label>${esc(f.name)}</label><div class="v">${display(s.values[f.key], f)}</div></div>`).join('');
+  box.innerHTML = HXC.SALE_FIELDS.map(f => `<div class="prop ${MGR ? '' : 'ro'}" data-k="${f.key}"><label>${esc(f.name)}</label><div class="v">${display(s.values[f.key], f)}</div></div>`).join('');
+  if (!MGR) { box.onclick = null; return; } // sale thường: hồ sơ của mình chỉ xem
   box.onclick = e => { const pr = e.target.closest('.prop'); if (!pr || pr.querySelector('.ed,.selcell')) return;
     const f = HXC.SALE_FIELDS.find(x => x.key === pr.dataset.k);
     pr.querySelector('.v').replaceChildren(HX.editor(f, s.values[f.key], nv => {
@@ -410,20 +411,24 @@ function reassign(s, anchor) {
    ?tab=summary (mặc định) | leads | deals | tasks | schedule | feed | team
    Đã dựng: phần 1 (khung tab + Tổng quan + Đội sale) và phần 2 (Tasks · Lịch · Feed · Leads · Deals). Tab Chỉ tiêu (Goals) và Dự báo (Forecast) đã gỡ theo yêu cầu: không dùng chỉ tiêu, không dùng dự báo.
    "Xem theo": một sale (mặc định là tôi) hoặc tất cả sales — dành cho quản lý. */
-const TABS = [['summary','Tổng quan'],['team','Đội sale'],['leads','Leads'],['deals','Deals'],['tasks','Tasks'],['schedule','Lịch'],['feed','Feed']];
+/* Phân quyền (08/10/2026, specs/CRM-11): sale thường chỉ xem số liệu của mình — không có bộ chọn "xem theo", không có tab Đội sale,
+   chỉ mở được trang chi tiết của chính mình (chỉ xem). Trưởng nhóm / quản lý: như cũ. */
+const MGR = HXC.perm.canManageTeam();
+const TABS = [['summary','Tổng quan'],['team','Đội sale'],['leads','Leads'],['deals','Deals'],['tasks','Tasks'],['schedule','Lịch'],['feed','Feed']].filter(t => MGR || t[0] !== 'team');
 const TAB = TABS.some(t => t[0] === qs.get('tab')) ? qs.get('tab') : 'summary';
 const WKEY = 'hx-crm-ws-ui-v2'; // v2: mặc định xem Tất cả sales, muốn xem riêng ai thì chọn
 const ws = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem(WKEY) || '{}'); } catch {} return { who: qs.get('who') || '*', shut: o.shut || {}, tf:'all', gf:'all' }; })(); // "xem theo" KHÔNG lưu lại: mỗi lần vào Sales đều là Tất cả sales; chọn riêng ai thì chỉ giữ qua ?who= khi chuyển tab
 if (ws.who !== '*' && !HXC.saleByName(ws.who)) ws.who = '*';
+if (!HXC.perm.seeAll()) ws.who = HXC.ME;
 const saveWs = () => { try { localStorage.setItem(WKEY, JSON.stringify({ shut: ws.shut })); } catch {} };
-const tabUrl = k => `?tab=${k}${ws.who === '*' ? '' : '&who=' + encodeURIComponent(ws.who)}`;
+const tabUrl = k => `?tab=${k}${ws.who === '*' || !MGR ? '' : '&who=' + encodeURIComponent(ws.who)}`;
 const mine = n => ws.who === '*' || n === ws.who;
 const todayS = NOW.toISOString().slice(0, 10), tomorrowS = new Date(+NOW + 864e5).toISOString().slice(0, 10), nowIso = NOW.toISOString();
 const dmy = s => s ? s.slice(0, 10).split('-').reverse().join('/') : '';
 const hm = s => { const d = new Date(s); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
 const recLink = a => refOf(a).replace(/^ · /, '');
 function wsHead(actions = '') {
-  return `<div class="ph"><h1 class="ttl">Sales</h1>${TAB === 'team' ? '' : `<span class="wsep"></span><button class="who" id="whoBtn" aria-haspopup="menu" title="Xem theo sale">${esc(ws.who === '*' ? 'Tất cả sales' : ws.who)}<span class="ms sm">expand_more</span></button>`}
+  return `<div class="ph"><h1 class="ttl">Sales</h1>${TAB === 'team' || !HXC.perm.seeAll() ? '' : `<span class="wsep"></span><button class="who" id="whoBtn" aria-haspopup="menu" title="Xem theo sale">${esc(ws.who === '*' ? 'Tất cả sales' : ws.who)}<span class="ms sm">expand_more</span></button>`}
       <div class="ph-act">${actions}</div></div>
     <div class="vtabs" role="tablist" aria-label="Sales workspace">${TABS.map(([k, l, ph]) => `<a class="vtab" role="tab" aria-selected="${TAB === k}" href="${tabUrl(k)}">${l}${ph ? `<span class="soonb" title="Dựng ở phần ${ph} của kế hoạch">P${ph}</span>` : ''}</a>`).join('')}</div>`;
 }
@@ -674,7 +679,9 @@ document.addEventListener('click', e => {
 document.addEventListener('change', e => { const id = e.target.dataset && e.target.dataset.tdone; if (id) { HXC.updateActivity(id, { done: e.target.checked }); toast(e.target.checked ? 'Đã hoàn thành task' : 'Đã mở lại task'); draw(); } });
 
 /* ── Điều phối ── */
-function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; } s ? drawDetail(s) : ({ summary:drawSummary, team:drawList, tasks:drawTasks, schedule:drawSchedule, feed:drawFeed, leads:drawWsLeads, deals:drawWsDeals }[TAB] || drawSummary)(); }
+function draw() { const s = qs.get('id') && HXC.saleById(qs.get('id')); if (qs.get('id') && !s) { $('#frame').innerHTML = `<div class="soon"><span class="ms">search_off</span>Không tìm thấy sale.<a class="btn btn--secondary" href="crm-sales-hubspot.html">Về Sales</a></div>`; return; }
+  if (s && !MGR && s.values.name !== HXC.ME) { $('#frame').className = 'frame'; $('#frame').innerHTML = HXC.noAccess('hồ sơ sale', 'crm-sales-hubspot.html', 'Về Sales'); return; }
+  s ? drawDetail(s) : ({ summary:drawSummary, team:drawList, tasks:drawTasks, schedule:drawSchedule, feed:drawFeed, leads:drawWsLeads, deals:drawWsDeals }[TAB] || drawSummary)(); }
 draw();
 HX.onChange = draw;
 // Board Đội sale: kéo thẻ sang cột khác = đổi Trạng thái của sale

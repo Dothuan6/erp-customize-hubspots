@@ -217,6 +217,12 @@ textarea.ed{height:auto;min-height:72px;padding:6px 8px;resize:vertical}
 .demo button[aria-pressed="true"]{background:#fff;color:#111;font-weight:600}
 .demo:not(.open) > :not(.dtog){display:none}
 .demo .dtog{color:#fff;font-weight:600}
+.demo.open{flex-wrap:wrap;max-width:calc(100vw - 24px);border-radius:16px}
+.demo .dsep{width:1px;height:16px;background:#555;margin:0 2px}
+.demo .dlb{color:#aaa;padding:0 2px}
+/* Trường bị khoá theo quyền (vd. Sale phụ trách khi tạo bản ghi) — hiện giá trị dạng chữ, không cho chọn */
+.ro-v{display:flex;flex-direction:column;gap:2px;padding:8px 0 2px;font-size:14px;color:var(--on-surface)}
+.ro-v small{font-size:12px;color:var(--on-surface-variant)}
 
 /* ── Kiểu trường bổ sung (14 loại của ERP) ── */
 .req{color:var(--error);font-weight:700}

@@ -9,7 +9,9 @@
 const HXC = (() => {
   const { esc, empty, fmt, display, editor, toast, modal, confirmBox, $, USERS, STAGES } = HX;
   const deals = HX.api;
-  const ME = 'Phương Nguyễn';
+  const SEED_ME = 'Phương Nguyễn'; // owner trong dữ liệu mẫu
+  const AS_KEY = 'hx-crm-as'; // mockup: "Đăng nhập là" (công tắc ở nút ⚙ góc trái dưới) — chỉ để minh hoạ phân quyền
+  let ME = (() => { try { return localStorage.getItem(AS_KEY) || SEED_ME; } catch { return SEED_ME; } })();
   const TODAY = new Date('2026-09-28T09:00:00+07:00');
 
   /* ── Danh mục ── */
@@ -74,11 +76,11 @@ const HXC = (() => {
     Object.entries(CO).forEach(([n, [name, domain, industry, city, emp]]) => {
       const d = deals.get('r0' + n); const st = d ? d.values[STAGE] : null;
       const created = d ? addDays(d.createdAt, -2) : iso('2026-07-15');
-      companies.push({ id:'co' + n, createdAt: created, values:{ name, domain, industry, phone:'028 ' + (3800 + Number(n) * 17) + ' ' + (1000 + Number(n) * 37), owner: d ? d.values[SALE] : ME, city,
+      companies.push({ id:'co' + n, createdAt: created, values:{ name, domain, industry, phone:'028 ' + (3800 + Number(n) * 17) + ' ' + (1000 + Number(n) * 37), owner: d ? d.values[SALE] : SEED_ME, city,
         lifecycle: st === WON ? 'Customer' : st === LOST ? 'Lead' : 'Opportunity', employees: emp, country:'Việt Nam', leadstatus: st === WON ? null : st === LOST ? 'Không phù hợp' : 'Có deal' } });
       if (d) dealLinks[d.id] = { company:'co' + n, contacts:[] };
     });
-    companies.push({ id:'co14', createdAt: iso('2026-09-26', 14), values:{ name:'Titan Bases', domain:'titanbases.com', industry:'Công nghệ', phone:'', owner: ME, city:'TP. Hồ Chí Minh', lifecycle:'Lead', employees: 8, country:'Việt Nam', leadstatus:'Mới' } });
+    companies.push({ id:'co14', createdAt: iso('2026-09-26', 14), values:{ name:'Titan Bases', domain:'titanbases.com', industry:'Công nghệ', phone:'', owner: SEED_ME, city:'TP. Hồ Chí Minh', lifecycle:'Lead', employees: 8, country:'Việt Nam', leadstatus:'Mới' } });
     // [id, họ, tên, chức danh, công ty, nguồn, deal, nhãn]
     const CT = [
       ['01','Nguyễn Thị','Hạnh','Giám đốc vận hành','13','Giới thiệu','r013','Người quyết định'],
@@ -109,7 +111,7 @@ const HXC = (() => {
       const created = company ? addDays(company.createdAt, i % 2) : n === '17' ? iso('2026-07-08', 10) : iso('2026-08-19', 15);
       contacts.push({ id:'ct' + n, createdAt: created, company: company ? company.id : null, values:{
         email: `${noAccent(first)}.${noAccent(last.split(' ')[0])}@${company ? company.values.domain : n === '17' ? 'gmail.com' : 'vietsales.vn'}`,
-        firstname:first, lastname:last, jobtitle:job, phone:'09' + String(12345678 + i * 7654321).slice(0, 8), owner: company ? company.values.owner : ME,
+        firstname:first, lastname:last, jobtitle:job, phone:'09' + String(12345678 + i * 7654321).slice(0, 8), owner: company ? company.values.owner : SEED_ME,
         lifecycle, leadstatus, city: company ? company.values.city : 'TP. Hồ Chí Minh', source } });
       if (d) dealLinks[d.id].contacts.push({ id:'ct' + n, label });
     });
@@ -190,6 +192,7 @@ const HXC = (() => {
     ];
     persist();
   }
+  if (!db.sales.some(s => s.values.name === ME)) ME = SEED_ME;
   db.sales.forEach(s => { if ('team' in s.values || 'quota' in s.values) { delete s.values.team; delete s.values.quota; persist(); } if (!USERS.includes(s.values.name)) USERS.push(s.values.name); });
 
   /* ── Phần 7: Trường bổ sung (thuộc tính tuỳ chỉnh) ── */
@@ -404,7 +407,7 @@ const HXC = (() => {
           <label>Giai Đoạn Pipeline <span class="req">*</span><select class="in" id="ad_stage">${STAGES.map(s => `<option>${esc(s)}</option>`).join('')}</select></label>
           <label>Tổng Cash-In Dự Kiến (Amount)<input class="in" id="ad_amt" type="number" min="0"></label>
           <label>Ngày Dự Kiến Chốt<input class="in" id="ad_close" type="date"></label>
-          <label>Sale phụ trách<select class="in" id="ad_owner">${USERS.map(u => `<option ${u === (from.values.owner || ME) ? 'selected' : ''}>${u}</option>`).join('')}</select></label>
+          ${perm.canAssign() ? `<label>Sale phụ trách<select class="in" id="ad_owner">${USERS.map(u => `<option ${u === (from.values.owner || ME) ? 'selected' : ''}>${u}</option>`).join('')}</select></label>` : `<label>Sale phụ trách<input type="hidden" id="ad_owner" value="${esc(ME)}"><span class="ro-v">${esc(ME)}<small>Chỉ trưởng nhóm / quản lý được giao cho sale khác</small></span></label>`}
           <div class="assoc-sec"><b>Liên kết Deal với</b><div class="nil" style="font-size:13px">${co ? `Company: <b>${esc(co.values.name)}</b>` : ''}${fromT === 'contact' ? `${co ? ' · ' : ''}Contact: <b>${esc(fullName(from))}</b>` : ''}${fromT === 'company' ? ` · ${assoc.contactsOfCompany(fromId).length} contact của công ty` : ''}</div></div></form>`;
         $('#aaF', p).innerHTML = `<button class="btn btn--primary" id="adGo">Tạo</button><button class="btn btn--text" data-pclose>Huỷ</button>`;
         $('#adGo', p).onclick = () => {
@@ -915,6 +918,29 @@ const HXC = (() => {
     };
   }
 
+  /* ── Phân quyền (08/10/2026) — theo "User permissions" của HubSpot ──
+     Mỗi quyền Xem / Sửa / Xoá có phạm vi: Tất cả | Của mình (không chia nhóm nên bỏ mức "Nhóm").
+     Đợt này áp cho Lead và Deal + màn Sales. Prototype suy quyền từ Vai trò của sale;
+     bản thật: bộ quyền (permission set) gán cho từng user trong RBAC của ERP, BE phải lọc / chặn ở API (specs/CRM-11). */
+  const MANAGER_ROLES = ['Trưởng nhóm', 'Sales Manager'];
+  const SCOPED = ['lead', 'deal'];
+  const ownerOf = (t, r) => t === 'deal' ? r.values[SALE] : r.values.owner;
+  const perm = {
+    get level() { const s = saleByName(ME); return s && MANAGER_ROLES.includes(s.values.role) ? 'manager' : 'sale'; },
+    get label() { return perm.level === 'manager' ? 'Quản lý' : 'Sale'; },
+    seeAll: () => perm.level === 'manager',          // Xem: Tất cả | Của mình
+    canAssign: () => perm.level === 'manager',       // giao bản ghi cho sale khác (đổi owner / Sale phụ trách)
+    canManageTeam: () => perm.level === 'manager',   // tab Đội sale: thêm sale, đổi trạng thái, chuyển giao
+    canView: (t, r) => !r || perm.seeAll() || !SCOPED.includes(t) || ownerOf(t, r) === ME,
+    canEdit: (t, r) => perm.canView(t, r),
+    canDelete: (t, r) => perm.canView(t, r),
+  };
+  HX.lockField = f => f.key === SALE && !perm.canAssign() ? ME : null;
+  const loginAs = name => { try { localStorage.setItem(AS_KEY, name); } catch {} location.reload(); };
+  const demoAs = () => `<span class="dsep"></span><span class="dlb">Đăng nhập là</span>` + db.sales.filter(s => s.values.status !== 'Đã nghỉ').map(s => `<button aria-pressed="${s.values.name === ME}" data-as="${esc(s.values.name)}" title="${esc(s.values.role || '')}">${esc(s.values.name)} · ${MANAGER_ROLES.includes(s.values.role) ? 'Quản lý' : 'Sale'}</button>`).join('');
+  // Trang chi tiết không có quyền xem
+  const noAccess = (what, back, backLabel) => `<div class="card" style="grid-column:1/-1;padding:32px;text-align:center;max-width:520px;margin:40px auto"><span class="ms" style="font-size:36px;color:var(--on-surface-variant)">lock</span><p style="margin:8px 0 4px"><b>Bạn không có quyền xem ${what} này</b></p><p class="nil" style="font-size:13px;margin-bottom:14px">Bản ghi thuộc sale khác. Liên hệ trưởng nhóm / quản lý nếu cần.</p><a class="btn btn--secondary" href="${back}">${backLabel}</a></div>`;
+
   /* ── Liên kết trong form "Tạo bản ghi" của Deals (HX.openCreate) ── */
   const dealAssocForm = () => `<div class="assoc-sec"><b>Liên kết Deal với</b><label>Company<select class="in" id="cf__company"><option value="">— Không —</option>${db.companies.map(c => `<option value="${c.id}">${esc(c.values.name)}</option>`).join('')}</select></label>
     <label>Contact<select class="in" id="cf__contact"><option value="">— Không —</option>${db.contacts.map(c => `<option value="${c.id}">${esc(fullName(c))}${c.company ? ' · ' + esc((get('company', c.company) || {values:{}}).values.name || '') : ''}</option>`).join('')}</select></label></div>`;
@@ -922,7 +948,7 @@ const HXC = (() => {
     if (ct && ct.value) { associate('deal', dealId, 'contact', ct.value, 'Người quyết định'); const c = get('contact', ct.value); if (c.company && !(co && co.value)) associate('deal', dealId, 'company', c.company); }
     if (co && co.value) associate('deal', dealId, 'company', co.value); }
 
-  return { ME, TODAY, LIFECYCLE, LEAD_STATUS, SOURCES, INDUSTRIES, ASSOC_LABELS, CONTACT_FIELDS, COMPANY_FIELDS, OBJ, STAGE, CASH, CLOSE, SALE, WON, LOST,
+  return { ME, SEED_ME, perm, loginAs, demoAs, noAccess, TODAY, LIFECYCLE, LEAD_STATUS, SOURCES, INDUSTRIES, ASSOC_LABELS, CONTACT_FIELDS, COMPANY_FIELDS, OBJ, STAGE, CASH, CLOSE, SALE, WON, LOST,
     db: () => db, get, list, related, assoc, associate, dissociate, update, create, remove, activitiesOf, addActivity, updateActivity, removeActivity, lastContacted, itemsOf, liTotal, liNet, totalsOf, dealTotals, saveItems, money,
     SALE_FIELDS, TEAMS, ROLES, sales, saleById, saleByName, saleUrl, createSale, updateSale, saleStats, DEAL_BASE, isNewField, extraKeys, setExtra, addCustomField,
     titleOf, fullName, initials, url, dt, dOnly, props, createPanel, addAssocPanel, assocCard, timeline, composer, lineItemsCard, lineItemEditor, dealAssocForm, saveDealAssoc,

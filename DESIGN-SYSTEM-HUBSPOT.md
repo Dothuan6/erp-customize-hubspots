@@ -2,7 +2,7 @@
 
 > **Phạm vi:** đồng bộ giao diện **toàn bộ web ERP hiện tại** (erp.tuoitresoft.com, mã nguồn `systemdesign/`) với prototype hướng HubSpot (repo `erp-customize-hubspots`).
 > **Quan hệ với file gốc:** đây là **lớp theme** nằm trên `systemdesign/systemdesign/DESIGN-SYSTEM.md` (v3.3). File gốc vẫn là nguồn-sự-thật cho kiến trúc (component-first §1bis, token 3 tầng §2, breakpoint §7.2, z-index §7.5, trợ năng §12bis, quy ước code §13). File này **chỉ ghi đè giá trị và bổ sung mẫu** — mục nào không nhắc ở đây thì giữ nguyên như file gốc.
-> **Phiên bản 1.9** · 07/10/2026 · Trạng thái: 🟡 Đề xuất — chờ team FE duyệt
+> **Phiên bản 1.11** · 08/10/2026 · Trạng thái: 🟡 Đề xuất — chờ team FE duyệt
 > **Xem trực quan:** `design-system.html` trong repo prototype (mở cùng các màn `crm-*.html` để so).
 > **Nguyên tắc dự án không đổi:** *chức năng = 100% ERP · giao diện & UX = theo HubSpot.* Theme này không thêm/bớt chức năng nào.
 
@@ -536,6 +536,7 @@ Màu đối tượng (token mới, chỉ dùng trong sơ đồ quan hệ và bi�
 | `--obj-contact` | `#D4532B` | *(giữ)* | Contact |
 | `--obj-sale` | `#7447DB` | `#9B7BF2` | Sale / nhân viên, đường nhân viên (bản tối 5.2:1 trên nền tối) |
 | `--obj-company` | `#00788F` | *(giữ)* | Company |
+| `--obj-lead` | `#C2417F` | *(giữ)* | Lead (bản 1.10; 4.8:1 với biểu tượng trắng) |
 | `--obj-deal` | `#00855A` | *(giữ)* | Deal |
 | `--obj-activity` | `#516F90` | *(giữ)* | Hoạt động |
 | `--obj-lineitem` | `#A86A00` | *(giữ)* | Line item |
@@ -589,6 +590,20 @@ Tab chưa dựng hiển thị nhãn `.soonb` cạnh tên tab; nhãn này chỉ c
 | Bảng trong thẻ `.ws-tw` | dùng DataTable §6.6, dòng 44px, không cố định cột; thanh lọc `.ws-bar` phía trên, chân `.ws-foot` 12px |
 
 ---
+
+### 6.22 Trạng thái theo quyền (mới, bản 1.11) (`.ro-v` · khối khoá)
+
+Dùng khi người dùng không có quyền với một trường hoặc một bản ghi (`specs/CRM-11`). Nguyên tắc: không hiện ô chọn / nút mà người dùng không dùng được; giải thích bằng một dòng chữ ngắn.
+
+| Phần | Đặc tả |
+| --- | --- |
+| Trường bị khoá trong form tạo `.ro-v` | Thay ô chọn bằng chữ: giá trị 14/400 `--on-surface`, dòng phụ 12 `--on-surface-variant` ("Chỉ trưởng nhóm / quản lý được giao cho sale khác"); đệm trên 8px; giá trị gửi đi bằng input ẩn |
+| Trường bị khoá trên trang chi tiết | Dòng thuộc tính dạng `.prop.ro` (không hover, không mở trình sửa), có `title` giải thích |
+| Bấm sửa trường bị khoá ở bảng / panel | Dùng lại `.ed-note` (12px nghiêng `--on-surface-variant`) với chữ "Chỉ trưởng nhóm / quản lý được đổi", tự đóng sau 1,6 giây — như ghi chú của trường Liên kết |
+| Khối khoá trang chi tiết | Card giữa trang, rộng tối đa 520, đệm 32, căn giữa: biểu tượng `lock` 36px `--on-surface-variant`; tiêu đề đậm "Bạn không có quyền xem … này"; dòng phụ 13px; nút phụ quay về danh sách |
+| Nút, tab, bộ lọc không có quyền | Ẩn hẳn (không làm mờ): "Gán owner", "Đổi / Thêm" ở card Sales, tab "Đội sale", nút "xem theo", view "Lead của tôi" / "Lead chưa có owner", bộ lọc nhanh owner |
+
+Prototype có thêm nhóm "Đăng nhập là" trong thanh demo "⚙ Giao diện" (`.demo .dsep .dlb`) để đổi người dùng — chỉ phục vụ mockup, không đưa vào bản thật.
 
 ## 7. Mẫu trang (template)
 
@@ -756,6 +771,7 @@ Theo RULE 2b của dự án — mọi lệch/bổ sung phải ghi vào file gố
 | §8.7 DataTable | Sửa (bản 1.1) | Mật độ Thoáng/Gọn là tuỳ chọn cá nhân lưu theo người dùng (không localStorage); kiểu Bảng/Board là thuộc tính của view. Nguồn: `specs/CRM-01` §4.11 |
 | §8.22 Tổng hợp | Bổ sung component mới (bản 1.4) | `StageBar` — thanh giai đoạn bấm được cho Lead pipeline (§6.19). Nguồn: prototype `crm-leads.js` |
 | §8.22 Tổng hợp | Bổ sung component mới (bản 1.6) | `WorkspaceCard` — thẻ thu gọn của Sales workspace, kèm ô đếm lọc và dòng việc (§6.20). Nguồn: prototype `crm-sales-hubspot.html` |
+| §8.22 Tổng hợp | Bổ sung mẫu mới (bản 1.11) | Trạng thái theo quyền: trường khoá `.ro-v`, khối khoá trang chi tiết, quy tắc ẩn nút / tab không có quyền (§6.22). Nguồn: `specs/CRM-11` |
 | §8.22 Tổng hợp | Bổ sung mẫu mới (bản 1.7) | Lịch `.cal` (Ngày / Tuần / Tháng) và hàng đợi task trong Modal (§6.21). Nguồn: prototype `crm-sales-hubspot.html` |
 
 ---
@@ -764,6 +780,8 @@ Theo RULE 2b của dự án — mọi lệch/bổ sung phải ghi vào file gố
 
 | Phiên bản | Ngày | Nội dung | Tác giả |
 | --- | --- | --- | --- |
+| 1.11 | 08/10/2026 | Thêm §6.22 Trạng thái theo quyền (trường khoá `.ro-v`, khối khoá trang chi tiết, ẩn nút / tab không có quyền) và dòng tương ứng ở §12; số 6.22 dùng lại sau khi mục cũ đã gỡ ở bản 1.9. Phát sinh khi dựng phân quyền theo owner (`specs/CRM-11`) | Claude (Cowork) cho TTS |
+| 1.10 | 08/10/2026 | §6.18: thêm token `--obj-lead` (`#C2417F`) cho thẻ Lead trong sơ đồ quan hệ; sơ đồ nay có 8 đối tượng, 16 liên kết, khung `viewBox 1120 × 770`; biểu tượng SVG `.nd .ic` cũng ẩn khi font chưa tải (như `.ms`) | Claude (Cowork) cho TTS |
 | 1.9 | 07/10/2026 | Gỡ §6.22 (các mẫu của tab Chỉ tiêu) và dòng tương ứng ở §12: tab Chỉ tiêu và trường Chỉ tiêu tháng đã bỏ khỏi prototype theo yêu cầu | Claude (Cowork) cho TTS |
 | 1.8 | 07/10/2026 | §6.22: các mẫu của tab Chỉ tiêu (Goals): bộ lọc ô chọn, nhãn trạng thái, ô thực tế / chỉ tiêu, thẻ số liệu, bước trình tạo, ô chọn mẫu; §7.1: board Sales đổi từ Team sang Trạng thái; thêm dòng vào §12 | Claude (Cowork) cho TTS |
 | 1.7 | 07/10/2026 | §6.21: lịch Ngày / Tuần / Tháng và hàng đợi task của Sales workspace; thêm dòng vào §12 | Claude (Cowork) cho TTS |

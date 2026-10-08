@@ -232,7 +232,7 @@ const kpi = (label, v, prevV, k) => { const d = prevV ? Math.round((v - prevV) /
 /* ── Danh mục báo cáo của từng dashboard (đúng danh sách trên portal HubSpot; bỏ 2 thẻ Tickets — ngoài phạm vi) ── */
 function data() {
   const C = HXC.list('contact').filter(c => ownerOK(c.values.owner) && (!st.adv.lifecycle.length || st.adv.lifecycle.includes(c.values.lifecycle)));
-  const D = HX.api.list().filter(d => ownerOK(d.values[SALE]) && (!st.adv.goi.length || st.adv.goi.includes(d.values.g_i_d_ch_v_m_c_ti_u)));
+  const D = HX.api.list().filter(d => HXC.perm.canView('deal', d) && ownerOK(d.values[SALE]) && (!st.adv.goi.length || st.adv.goi.includes(d.values.g_i_d_ch_v_m_c_ti_u)));
   const A = [...HXC.db().activities].filter(a => ownerOK(a.by));
   return { C, D, A, R: range(), P: prevRange(), M: monthsIn() };
 }

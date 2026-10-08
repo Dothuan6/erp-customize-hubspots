@@ -154,7 +154,7 @@ html[data-theme="dark"] .newb{background:#0D3A66;color:#BBDEFB}
 const {esc, fmt, display, toast, confirmBox, $} = HX;
 const qs = new URLSearchParams(location.search);
 const T = ['contact','company','deal'].includes(qs.get('type')) ? qs.get('type') : 'deal';
-const ID = qs.get('id') || (HXC.list(T)[0] || {}).id;
+const ID = qs.get('id') || (HXC.list(T).find(x => HXC.perm.canView(T, x)) || {}).id;
 const O = HXC.OBJ[T];
 HX.shell(T === 'contact' ? 'contacts' : T === 'company' ? 'companies' : 'deals');
 const r = HXC.get(T, ID);
@@ -167,6 +167,7 @@ const DEAL_KEYS = ['sale_ph_tr_ch','g_i_d_ch_v_m_c_ti_u','th_i_h_n_thanh_to_n','
 const KEY_T = { contact:'Thông tin chính', company:'Thông tin chính', deal:'Về Deal này' };
 
 if (!r) { $('#grid').innerHTML = `<div class="card soon" style="grid-column:1/-1"><span class="ms">search_off</span>Không tìm thấy bản ghi.<a class="btn btn--secondary" href="${O.list}">Về ${O.plural}</a></div>`; }
+else if (!HXC.perm.canView(T, r)) { $('#grid').innerHTML = HXC.noAccess(T === 'deal' ? 'deal' : 'bản ghi', O.list, 'Về ' + O.plural); } // phân quyền (specs/CRM-11)
 else {
   const F = HX.F;
   const name = () => HXC.titleOf(T, r);
@@ -275,7 +276,7 @@ else {
   /* Card "Sales" trên Deal: sale phụ trách (trường "Sale phụ trách" của Deal) — cùng dạng card liên kết Contacts / Companies */
   function salesCard(el) {
     const name = r.values[HXC.SALE], s = name ? HXC.saleByName(name) : null;
-    el.innerHTML = `<div class="ch"><span class="ms sm">expand_more</span>Sales (${name ? 1 : 0})<span class="r"><button class="btn btn--text sm" data-salepick><span class="ms xs">${name ? 'swap_horiz' : 'add'}</span>${name ? 'Đổi' : 'Thêm'}</button></span></div>
+    el.innerHTML = `<div class="ch"><span class="ms sm">expand_more</span>Sales (${name ? 1 : 0})<span class="r">${HXC.perm.canAssign() ? `<button class="btn btn--text sm" data-salepick><span class="ms xs">${name ? 'swap_horiz' : 'add'}</span>${name ? 'Đổi' : 'Thêm'}</button>` : ''}</span></div>
       <div class="cb">${name ? `<div class="ac-it"><div class="ac-top"><span class="av sm">${esc(HXC.initials(name))}</span>${s ? `<a href="${HXC.saleUrl(name)}" class="ac-name">${esc(name)}</a>` : `<span class="ac-name" style="color:var(--on-surface)">${esc(name)}</span>`}<span class="tag pk">Deal owner</span></div>
         ${s ? `${[s.values.role, s.values.team].filter(Boolean).length ? `<div class="ac-ln">${esc([s.values.role, s.values.team].filter(Boolean).join(' · '))}</div>` : ''}
         <div class="ac-ln"><span>Email:</span> ${s.values.email ? `<a class="lk" href="mailto:${esc(s.values.email)}">${esc(s.values.email)}</a>` : '—'}</div><div class="ac-ln"><span>Số điện thoại:</span> ${esc(s.values.phone || '—')}</div>` : `<div class="ac-ln"><span>Chưa có hồ sơ trong Đội sale.</span></div>`}</div>`

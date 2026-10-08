@@ -293,7 +293,8 @@ const valOf = (r, key) => key === '__createdAt' ? r.createdAt : key === '__lasta
 
 /* ── Bộ lọc nhanh (HubSpot: Deal owner · Create date · Last activity date · Close date · ⊕ · ✎ · Advanced filters) ── */
 const CLOSE = 'ng_y_d_ki_n_ch_t', OWNER = 'sale_ph_tr_ch';
-const QUICK0 = [OWNER, '__createdAt', '__lastact', CLOSE].filter(k => k.startsWith('__') || F[k]);
+const VIS = () => api.list().filter(r => HXC.perm.canView('deal', r)); // phân quyền: sale thường chỉ thấy deal mình phụ trách (specs/CRM-11)
+const QUICK0 = [OWNER, '__createdAt', '__lastact', CLOSE].filter(k => (k.startsWith('__') || F[k]) && (k !== OWNER || HXC.perm.seeAll()));
 const QMORE = [STAGE, 'g_i_d_ch_v_m_c_ti_u', 'th_i_h_n_thanh_to_n', 'l_do_th_t_b_i'].filter(k => F[k]);
 const qField = k => k === '__createdAt' ? CREATED : k === '__lastact' ? LASTACT : F[k];
 const qIsDate = k => k === '__createdAt' || k === '__lastact' || (F[k] && isDate(F[k]));
@@ -320,7 +321,7 @@ function pass(r, fl){
   } return true;
 }
 function rows(){
-  let list = api.list().filter(r => st.filters.every(fl => pass(r, fl)) && passQ(r));
+  let list = VIS().filter(r => st.filters.every(fl => pass(r, fl)) && passQ(r));
   if (st.q) { const q = st.q.toLowerCase(); list = list.filter(r => FIELDS.some(f => String(fmt(r.values[f.key], f)).toLowerCase().includes(q))); }
   const s = st.sort || {key:'__createdAt', dir:'desc'}, d = s.dir === 'asc' ? 1 : -1;
   return [...list].sort((a, b) => { const x = valOf(a, s.key), y = valOf(b, s.key);
@@ -524,7 +525,7 @@ function renderTable(){
   footer(all.length, pages);
 }
 function footer(n, pages){
-  const tot = api.list().length;
+  const tot = VIS().length;
   $('#footCount').textContent = `${n} bản ghi`;
   $('#footInfo').textContent = (st.filters.length || st.q) ? `Hiển thị ${n} / ${tot} bản ghi` : (mode() === 'TABLE' ? `Trang ${st.page}/${pages}` : '');
   $('#count').textContent = `${tot} bản ghi`;

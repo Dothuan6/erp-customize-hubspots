@@ -160,7 +160,12 @@ const HX = (() => {
   const title = r => (FIELDS[0] && fmt(r.values[FIELDS[0].key], FIELDS[0])) || r.values.t_n_deal || '—';
 
   /* ── Trình sửa theo kiểu trường (FieldValueEditor): Enter/blur lưu, Esc huỷ ── */
+  let lockField = () => null; // phân quyền: HXC gán — trả về giá trị bị khoá (vd. Sale phụ trách = tôi) nếu người dùng không được sửa trường này
   function editor(f, value, onSave, onCancel, where = 'table') {
+    if (lockField(f)) {
+      const d = document.createElement('div'); d.className = 'ed-note'; d.textContent = 'Chỉ trưởng nhóm / quản lý được đổi';
+      setTimeout(onCancel, 1600); return d;
+    }
     if (f.type === 'RELATION' && where === 'table') {
       const d = document.createElement('div'); d.className = 'ed-note'; d.textContent = 'Chỉnh sửa trực tiếp tại trang chi tiết';
       setTimeout(onCancel, 1600); return d;
@@ -263,7 +268,7 @@ const HX = (() => {
       <div class="tb-right">
         <button class="tb-create" data-palette><span class="ms sm">add</span>Tạo</button>
         <button class="icon-btn" aria-label="Thông báo: 86 chưa đọc" title="Thông báo"><span class="ms">notifications</span><span class="badge-count">86</span></button>
-        <span class="avatar" title="Tài khoản">PN</span>
+        <span class="avatar" id="meAv" title="Tài khoản">PN</span>
       </div>`;
     $('#sidebar').innerHTML = NAV.map(([i, l, k, href]) => i === 'sep' ? '<div class="nav-sep"></div>' : `<a class="nav-i" href="${href || '#'}" ${k && k === cur ? 'aria-current="page"' : ''} title="${l}"><span class="ms">${i}</span><span class="lbl">${l}</span></a>`).join('')
       + `<div class="nav-sp"></div><a class="nav-i" href="#" title="Cài đặt"><span class="ms">settings</span><span class="lbl">Cài đặt</span></a>`;
@@ -273,12 +278,14 @@ const HX = (() => {
     document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); palette(); } });
     $('#demo').innerHTML = `<button class="dtog" aria-expanded="false">⚙ Giao diện</button>
       <button aria-pressed="true" data-brand="crm">Tông HubSpot</button><button aria-pressed="false" data-brand="">HarnexAI gốc</button>
-      <button aria-pressed="false" data-dark>Tối</button><button data-reset title="Xoá thay đổi đã lưu trong trình duyệt">Dữ liệu mẫu</button>`;
+      <button aria-pressed="false" data-dark>Tối</button><button data-reset title="Xoá thay đổi đã lưu trong trình duyệt">Dữ liệu mẫu</button>${typeof HXC !== 'undefined' && HXC.demoAs ? HXC.demoAs() : ''}`;
+    if (typeof HXC !== 'undefined') { const a = $('#meAv'); a.textContent = HXC.initials(HXC.ME); a.title = `${HXC.ME} · ${HXC.perm.label}`; }
     $('#demo').onclick = e => {
       const b = e.target.closest('button'); if (!b) return;
       if (b.classList.contains('dtog')) { $('#demo').classList.toggle('open'); return; }
       if (b.hasAttribute('data-dark')) { const on = document.documentElement.dataset.theme !== 'dark'; document.documentElement.dataset.theme = on ? 'dark' : 'light'; b.setAttribute('aria-pressed', on); return; }
       if (b.hasAttribute('data-reset')) { api.reset(); return; }
+      if (b.dataset.as) { HXC.loginAs(b.dataset.as); return; }
       $('#demo').querySelectorAll('[data-brand]').forEach(x => x.setAttribute('aria-pressed', x === b));
       if (b.dataset.brand) document.documentElement.dataset.brand = b.dataset.brand; else delete document.documentElement.dataset.brand;
     };
@@ -339,7 +346,8 @@ const HX = (() => {
     p.innerHTML = `<div class="pn-h"><h2>Tạo bản ghi mới</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
       <form class="pn-b field-form" id="crForm">${FIELDS.map(f => {
         const id = 'cf_' + f.key;
-        let input;
+        let input; const lk = lockField(f);
+        if (lk) return `<label>${esc(f.name)}<input type="hidden" id="${id}" value="${esc(lk)}"><span class="ro-v">${esc(lk)}<small>Chỉ trưởng nhóm / quản lý được giao cho sale khác</small></span></label>`;
         if (hasChoices(f.type) || f.type === 'USER') input = `<select class="in" id="${id}" ${f.type === 'MULTI_SELECT' ? 'multiple size="4"' : ''}>${f.type === 'MULTI_SELECT' ? '' : '<option value="">— Chọn —</option>'}${optsOf(f).map(c => `<option>${esc(c)}</option>`).join('')}</select>`;
         else if (f.type === 'RELATION') input = `<select class="in" id="${id}"><option value="">— Chọn —</option>${RELATED.map(x => `<option value="${x.id}">${esc(x.label)}</option>`).join('')}</select>`;
         else if (f.type === 'LONG_TEXT') input = `<textarea class="in" id="${id}"></textarea>`;
@@ -391,5 +399,5 @@ const HX = (() => {
 
   return { OTHERS, COLLECTION, FIELDS, F, STAGES, WORKFLOWS, TYPES, TYPE, USERS, REL_TARGETS, FIELDS_URL, hasChoices, isNum, optsOf, check, slug,
     api, esc, empty, fmt, display, chipCls, pill, pillCls, createdFmt, title, editor, toast, modal, confirmBox,
-    shell, openPanel, closePanel, propList, openCreate, importDialog, sheetDialog, workflowDialog, $, set onChange(fn) { onChange = fn; } };
+    shell, openPanel, closePanel, propList, openCreate, importDialog, sheetDialog, workflowDialog, $, set onChange(fn) { onChange = fn; }, set lockField(fn) { lockField = fn; } };
 })();

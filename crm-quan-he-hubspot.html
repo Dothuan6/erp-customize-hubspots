@@ -15,7 +15,7 @@ function retry(){if(n++<120)setTimeout(go,250)}
 d.readyState==='loading'?d.addEventListener('DOMContentLoaded',go):go()})();</script>
 <link rel="stylesheet" href="crm-shared.css">
 <style>
-/* ═══ Phần 7 · Lưu đồ quan hệ Company – Contact – Deal – Sale ═══
+/* ═══ Phần 7 · Lưu đồ quan hệ Contact – Company – Lead – Deal – Sale ═══
    Clone ý tưởng "Data model overview" của HubSpot (Settings › Data management › Data model): mỗi đối tượng là 1 thẻ (số bản ghi, số thuộc tính),
    đường nối = liên kết (association) kèm bản số 1:N / N:N. Rê chuột để làm nổi liên kết của 1 đối tượng, bấm thẻ để xem chi tiết. Số liệu tính trực tiếp từ dữ liệu mẫu. */
 .frame{overflow:auto}
@@ -40,6 +40,7 @@ d.readyState==='loading'?d.addEventListener('DOMContentLoaded',go):go()})();</sc
 .nd .tp{font:700 15px 'Be Vietnam Pro',Inter,sans-serif;fill:var(--on-surface)}
 .nd .sb{font:500 12px Inter,sans-serif;fill:var(--on-surface-variant)}
 .nd .ic{font-family:'Material Symbols Outlined';font-size:20px;fill:#fff}
+html:not(.icons-ready) .nd .ic{visibility:hidden} /* giống .ms: không lộ tên icon trong SVG khi font chưa tải */
 /* Đường liên kết */
 .eg path{fill:none;stroke:var(--on-surface-variant);stroke-width:1.6;transition:opacity .15s,stroke-width .15s}
 .eg.own path{stroke:#7C4DFF}
@@ -85,11 +86,11 @@ table.rt{border-collapse:collapse;width:100%;min-width:880px}
   <header class="topbar" id="topbar"></header>
   <nav class="sidebar" id="sidebar" aria-label="Điều hướng chính"></nav>
   <main class="main"><div class="frame" id="frame">
-    <div class="ph"><h1>Sơ đồ quan hệ dữ liệu</h1><span class="tag">Company · Contact · Deal · Sale</span>
+    <div class="ph"><h1>Sơ đồ quan hệ dữ liệu</h1><span class="tag">Contact · Company · Lead · Deal · Sale</span>
       <div class="r"><a class="btn btn--secondary" href="crm-sales-hubspot.html"><span class="ms sm">badge</span>Sales</a><button class="btn btn--secondary" id="pngBtn"><span class="ms sm">download</span>Tải SVG</button></div></div>
     <p class="lead">Mỗi thẻ là một đối tượng CRM (collection trên ERP). Đường tím = quyền sở hữu (Sale là owner), đường liền = liên kết lưu trên bản ghi, đường đứt = hoạt động gắn với nhiều bản ghi. Rê chuột vào thẻ để làm nổi các liên kết của nó; bấm thẻ hoặc nhãn để xem chi tiết và số liên kết thực tế.</p>
     <div class="legend"><span><i class="own"></i>Sở hữu (owner)</span><span><i></i>Liên kết (association)</span><span><i class="act"></i>Hoạt động gắn bản ghi</span><span><b style="color:var(--primary)">1:N</b> một – nhiều</span><span><b style="color:var(--primary)">N:N</b> nhiều – nhiều</span></div>
-    <div class="cv"><svg id="dg" viewBox="0 0 1120 720" role="img" aria-label="Sơ đồ quan hệ giữa Sale, Company, Contact, Deal, Hoạt động, Line item và Sản phẩm"></svg></div>
+    <div class="cv"><svg id="dg" viewBox="0 0 1120 770" role="img" aria-label="Sơ đồ quan hệ giữa Sale, Contact, Company, Lead, Deal, Hoạt động, Line item và Sản phẩm"></svg></div>
     <div class="sec"><h2>Luồng dữ liệu bán hàng</h2><div class="flow" id="flow"></div></div>
     <div class="sec"><h2>Chi tiết các quan hệ</h2><div class="tw"><table class="rt"><thead><tr><th>Quan hệ</th><th>Bản số</th><th>Lưu ở đâu (gợi ý BE)</th><th>Hiển thị / thao tác ở màn hình</th><th>Khi xoá</th><th style="text-align:right">Liên kết hiện có</th></tr></thead><tbody id="rt"></tbody></table></div></div>
   </div></main>
@@ -102,27 +103,30 @@ table.rt{border-collapse:collapse;width:100%;min-width:880px}
 
 <script src="crm-shared.js"></script>
 <script src="crm-objects.js"></script>
+<script src="crm-leads.js"></script>
 <script>
 const { esc, toast, $ } = HX;
 HX.shell('schema');
 const db = HXC.db(), deals = HX.api.list(), links = db.dealLinks;
-const saleNames = HXC.sales().map(s => s.values.name);
+const saleNames = HXC.sales().map(s => s.values.name), leads = HXL.list();
 const W = 200, H = 88;
 /* ── Đối tượng ── */
 const N = {
-  contact: { x:460, y:40,  name:'Contact', icon:'person', color:'#FF7A59', href:'crm-contacts-hubspot.html', n: db.contacts.length, props: HXC.CONTACT_FIELDS.length,
-    desc:'Người liên hệ tại khách hàng. Mỗi contact có tối đa 1 công ty chính, có thể tham gia nhiều Deal với nhãn vai trò (Người quyết định, Người ảnh hưởng…).', keys:['email','firstname','lastname','owner','lifecycle','leadstatus'] },
-  sale: { x:460, y:200, name:'Sale', icon:'badge', color:'#7C4DFF', href:'crm-sales-hubspot.html', n: HXC.sales().length, props: HXC.SALE_FIELDS.length,
-    desc:'Nhân viên kinh doanh (collection NhanVien của ERP). Là owner của Contact, Company và “Sale phụ trách” của Deal; là người tạo / được giao hoạt động. KPI trên trang Sales được tính từ các liên kết này.', keys:['name','email','team','role','quota','status'] },
-  company: { x:80, y:320, name:'Company', icon:'domain', color:'#0091AE', href:'crm-companies-hubspot.html', n: db.companies.length, props: HXC.COMPANY_FIELDS.length,
-    desc:'Doanh nghiệp khách hàng. Gom nhiều contact và nhiều deal; lifecycle stage của company phản ánh deal tốt nhất.', keys:['name','domain','industry','owner','lifecycle','leadstatus'] },
-  deal: { x:840, y:320, name:'Deal', icon:'handshake', color:'#00A884', href:'crm-giao-dich-hubspot.html', n: deals.length, props: HX.FIELDS.length,
-    desc:'Cơ hội bán hàng (collection Deals_Pipeline của ERP). Thuộc 1 company, có nhiều contact, 1 sale phụ trách, nhiều line item; giá trị Deal có thể lấy từ tổng line item.', keys:['m_deal','t_n_deal','giai_o_n_pipeline','t_ng_cash_in_d_ki_n','ng_y_d_ki_n_ch_t','sale_ph_tr_ch'] },
-  activity: { x:460, y:500, name:'Hoạt động', icon:'forum', color:'#516F90', href:null, n: db.activities.length, props: 8,
-    desc:'Ghi chú, cuộc gọi, cuộc họp, task (collection Sales_Activities). Một hoạt động gắn cùng lúc với nhiều contact / company / deal nên hiện trên timeline của tất cả bản ghi đó.', keys:[] },
-  lineitem: { x:840, y:500, name:'Line item', icon:'receipt_long', color:'#F5A623', href:null, n: db.lineItems.length, props: 8 + db.liFields.length,
+  sale: { x:460, y:30, name:'Sale', icon:'badge', color:'#7C4DFF', href:'crm-sales-hubspot.html', n: HXC.sales().length, props: HXC.SALE_FIELDS.length,
+    desc:'Nhân viên kinh doanh, lấy từ danh sách thành viên có sẵn của hệ thống (collection NhanVien của ERP). Là owner của Contact, Company, Lead và “Sale phụ trách” của Deal; là người tạo / được giao hoạt động. Trang Sales tổng hợp lead, deal, task theo các liên kết này.', keys:['name','email','phone','role','status','joined'] },
+  contact: { x:80, y:110, name:'Contact', icon:'person', color:'#FF7A59', href:'crm-contacts-hubspot.html', n: db.contacts.length, props: HXC.CONTACT_FIELDS.length,
+    desc:'Người liên hệ tại khách hàng. Mỗi contact có tối đa 1 công ty chính, có thể có nhiều Lead và tham gia nhiều Deal với nhãn vai trò (Người quyết định, Người ảnh hưởng…).', keys:['email','firstname','lastname','owner','lifecycle','leadstatus'] },
+  company: { x:80, y:430, name:'Company', icon:'domain', color:'#0091AE', href:'crm-companies-hubspot.html', n: db.companies.length, props: HXC.COMPANY_FIELDS.length,
+    desc:'Doanh nghiệp khách hàng. Gom nhiều contact, nhiều lead và nhiều deal; lifecycle stage của company phản ánh deal tốt nhất.', keys:['name','domain','industry','owner','lifecycle','leadstatus'] },
+  lead: { x:460, y:270, name:'Lead', icon:'person_search', color:'#C2417F', href:HXL.LIST_URL, n: leads.length, props: HXL.FIELDS.length,
+    desc:'Cơ hội tiềm năng đang được sale tiếp cận (như đối tượng Lead của HubSpot). Bắt buộc gắn với 1 Contact hoặc 1 Company; một contact / company có thể có nhiều lead. Giai đoạn: Mới → Đang liên hệ → Đã kết nối → Đạt / Không đạt. Khi “Đạt” có thể tạo Deal (Deal ghi lại Mã lead); “Không đạt” phải chọn lý do.', keys:['name','stage','owner','label','type','source','code','reason'] },
+  deal: { x:840, y:270, name:'Deal', icon:'handshake', color:'#00A884', href:'crm-giao-dich-hubspot.html', n: deals.length, props: HX.FIELDS.length,
+    desc:'Cơ hội bán hàng (collection Deals_Pipeline của ERP). Thuộc 1 company, có nhiều contact, 1 sale phụ trách, nhiều line item; có thể sinh ra từ 1 lead đạt (trường Lead Id). Giá trị Deal có thể lấy từ tổng line item.', keys:['m_deal','t_n_deal','lead_id','giai_o_n_pipeline','t_ng_cash_in_d_ki_n','sale_ph_tr_ch'] },
+  activity: { x:460, y:560, name:'Hoạt động', icon:'forum', color:'#516F90', href:null, n: db.activities.length + leads.reduce((s, l) => s + l.acts.filter(a => a.type !== 'SYSTEM').length, 0), props: 8,
+    desc:'Ghi chú, cuộc gọi, cuộc họp, task (collection Sales_Activities). Hoạt động trên Contact / Company / Deal gắn cùng lúc với nhiều bản ghi nên hiện trên timeline của tất cả bản ghi đó; hoạt động ghi trên Lead nằm ở timeline của lead (gọi / họp tự chuyển giai đoạn lead).', keys:[] },
+  lineitem: { x:840, y:530, name:'Line item', icon:'receipt_long', color:'#F5A623', href:null, n: db.lineItems.length, props: 8 + db.liFields.length,
     desc:'Dòng sản phẩm trong Deal: số lượng, đơn giá, chiết khấu, tần suất thanh toán, kỳ hạn. Sao chép giá từ sản phẩm lúc thêm, sửa riêng không ảnh hưởng thư viện.', keys:[] },
-  product: { x:840, y:630, name:'Sản phẩm', icon:'inventory_2', color:'#99AFC4', href:null, n: db.products.length, props: 6,
+  product: { x:840, y:660, name:'Sản phẩm', icon:'inventory_2', color:'#99AFC4', href:null, n: db.products.length, props: 6,
     desc:'Thư viện sản phẩm / gói dịch vụ dùng chung. Một sản phẩm được dùng ở nhiều line item của nhiều deal.', keys:[] },
 };
 /* ── Liên kết: điểm vẽ, bản số, nơi lưu, số liên kết thực tế ── */
@@ -136,20 +140,29 @@ const cnt = {
   actCt: db.activities.reduce((s, a) => s + (a.contacts || []).length, 0),
   actCo: db.activities.reduce((s, a) => s + (a.companies || []).length, 0),
   actDeal: db.activities.reduce((s, a) => s + (a.deals || []).length, 0),
+  saleLead: leads.filter(l => saleNames.includes(l.values.owner)).length,
+  ctLead: leads.filter(l => l.contact).length, coLead: leads.filter(l => l.company).length,
+  leadDeal: leads.filter(l => HXL.dealOf(l)).length,
+  actLead: leads.reduce((s, l) => s + l.acts.filter(a => a.type !== 'SYSTEM').length, 0),
   dealLi: db.lineItems.length, prodLi: db.lineItems.filter(li => li.product).length,
 };
 const E = [
-  { a:'sale', b:'contact', k:'own', pts:[[560,200],[560,128]], lab:[560,164], card:'1:N', name:'Contact owner', lb:'owner', field:'contact.owner = sale.name (BE nên lưu sale_id)', ui:'Cột & bộ lọc “Contact owner” ở danh sách; “Thông tin chính” trên record; trang Sales › Contacts', del:'Sale nghỉ → “Chuyển giao bản ghi” cho sale khác', n:cnt.saleContact },
-  { a:'sale', b:'company', k:'own', pts:[[460,250],[280,336]], lab:[370,293], card:'1:N', name:'Company owner', lb:'owner', field:'company.owner = sale.name', ui:'Danh sách Companies; record Company; trang Sales › Companies', del:'Như trên', n:cnt.saleCompany },
-  { a:'sale', b:'deal', k:'own', pts:[[660,250],[840,336]], lab:[750,293], card:'1:N', name:'Sale phụ trách', lb:'Sale phụ trách', field:'deal.sale_ph_tr_ch (trường có sẵn trên Deals_Pipeline)', ui:'Bảng / board Deals, “Về Deal này”, Báo cáo theo owner, trang Sales › Deals', del:'Như trên', n:cnt.saleDeal },
-  { a:'company', b:'contact', k:'', pts:[[220,320],[460,108]], lab:[330,222], card:'1:N', name:'Công ty chính', lb:'Công ty chính', field:'contact.company_id', ui:'Card “Companies” trên record Contact, card “Contacts” trên record Company, cột “Công ty chính”', del:'Xoá company → contact mất công ty chính (không xoá contact)', n:cnt.coCt },
-  { a:'contact', b:'deal', k:'', pts:[[660,108],[900,320]], lab:[790,222], card:'N:N', name:'Contact của Deal + nhãn vai trò', lb:'có nhãn vai trò', field:'bảng nối deal_contacts(deal_id, contact_id, label)', ui:'Card “Contacts” trên Deal (nhãn Người quyết định…), card “Deals” trên Contact, form tạo Deal', del:'Xoá 1 bên → xoá dòng nối', n:cnt.ctDeal },
-  { a:'company', b:'deal', k:'', pts:[[280,384],[840,384]], lab:[560,384], card:'1:N', name:'Công ty của Deal', lb:'Công ty của Deal', field:'deal.company_id', ui:'Card “Companies” trên Deal, card “Deals” trên Company, mở rộng dòng ở danh sách', del:'Xoá company → deal mất công ty (giữ deal)', n:cnt.coDeal },
-  { a:'activity', b:'company', k:'act', pts:[[460,548],[180,408]], lab:[330,483], card:'N:N', name:'Hoạt động của Company', lb:'gắn hoạt động', field:'activity_links(activity_id, object, record_id)', ui:'Timeline tab “Hoạt động”, Catch-up “Tương tác gần đây”', del:'Xoá hoạt động → gỡ khỏi mọi timeline', n:cnt.actCo },
-  { a:'activity', b:'deal', k:'act', pts:[[660,548],[890,408]], lab:[770,483], card:'N:N', name:'Hoạt động của Deal', lb:'gắn hoạt động', field:'activity_links', ui:'Timeline Deal; cột “Hoạt động tiếp theo” ở bảng Deals', del:'Như trên', n:cnt.actDeal },
-  { a:'activity', b:'contact', k:'act', pts:[[520,588],[520,690],[30,690],[30,70],[460,70]], lab:[245,70], card:'N:N', name:'Hoạt động của Contact', lb:'gắn hoạt động', field:'activity_links', ui:'Timeline Contact; “Liên hệ gần nhất” tự tính từ cuộc gọi / họp', del:'Như trên', n:cnt.actCt },
-  { a:'deal', b:'lineitem', k:'', pts:[[990,408],[990,500]], lab:[990,454], card:'1:N', name:'Line item của Deal', lb:'Line items', field:'line_item.deal_id', ui:'Card “Line items” + trình sửa toàn màn hình trên Deal', del:'Xoá deal → xoá line item', n:cnt.dealLi },
-  { a:'product', b:'lineitem', k:'', pts:[[940,630],[940,588]], lab:[940,609], card:'1:N', name:'Sản phẩm của Line item', lb:'Sản phẩm', field:'line_item.product_id (sao chép tên, giá)', ui:'Thư viện sản phẩm trong trình sửa line item', del:'Xoá sản phẩm → line item giữ bản sao', n:cnt.prodLi },
+  { a:'sale', b:'contact', k:'own', pts:[[460,74],[180,74],[180,110]], lab:[320,74], card:'1:N', name:'Contact owner', lb:'owner', field:'contact.owner = sale.name (BE nên lưu sale_id)', ui:'Cột & bộ lọc “Contact owner” ở danh sách; “Thông tin chính” trên record', del:'Sale nghỉ → “Chuyển giao bản ghi” cho sale khác', n:cnt.saleContact },
+  { a:'sale', b:'company', k:'own', pts:[[460,46],[40,46],[40,474],[80,474]], lab:[200,46], card:'1:N', name:'Company owner', lb:'owner', field:'company.owner = sale.name', ui:'Danh sách Companies; record Company', del:'Như trên', n:cnt.saleCompany },
+  { a:'sale', b:'lead', k:'own', pts:[[560,118],[560,270]], lab:[560,226], card:'1:N', name:'Lead owner', lb:'owner', field:'lead.owner = sale.name', ui:'Cột & bộ lọc “Lead owner” ở danh sách Leads; record Lead; trang Sales › Leads', del:'Như trên', n:cnt.saleLead },
+  { a:'sale', b:'deal', k:'own', pts:[[660,74],[1000,74],[1000,270]], lab:[830,74], card:'1:N', name:'Sale phụ trách', lb:'Sale phụ trách', field:'deal.sale_ph_tr_ch (trường có sẵn trên Deals_Pipeline)', ui:'Bảng / board Deals, card “Sales” trên record Deal, Báo cáo theo owner, trang Sales › Deals', del:'Như trên', n:cnt.saleDeal },
+  { a:'company', b:'contact', k:'', pts:[[180,430],[180,198]], lab:[180,314], card:'1:N', name:'Công ty chính', lb:'Công ty chính', field:'contact.company_id', ui:'Card “Companies” trên record Contact, card “Contacts” trên record Company, cột “Công ty chính”', del:'Xoá company → contact mất công ty chính (không xoá contact)', n:cnt.coCt },
+  { a:'contact', b:'deal', k:'', pts:[[280,160],[880,160],[880,270]], lab:[740,160], card:'N:N', name:'Contact của Deal + nhãn vai trò', lb:'có nhãn vai trò', field:'bảng nối deal_contacts(deal_id, contact_id, label)', ui:'Card “Contacts” trên Deal (nhãn Người quyết định…), card “Deals” trên Contact, form tạo Deal', del:'Xoá 1 bên → xoá dòng nối', n:cnt.ctDeal },
+  { a:'contact', b:'lead', k:'', pts:[[280,186],[460,290]], lab:[370,238], card:'1:N', name:'Lead của Contact', lb:'Leads', field:'lead.contact_id', ui:'Ô Contact trong panel “Tạo lead”; cột “Contact” ở danh sách Leads; card “Contact” và “Lead khác cùng contact / công ty” trên record Lead', del:'Xoá contact → lead mất liên kết contact (gợi ý BE: không còn Company thì xoá lead)', n:cnt.ctLead },
+  { a:'company', b:'lead', k:'', pts:[[280,450],[460,336]], lab:[370,393], card:'1:N', name:'Lead của Company', lb:'Leads', field:'lead.company_id', ui:'Ô Company trong panel “Tạo lead” (tự điền theo công ty chính của contact); cột “Company” ở danh sách Leads; card “Company” trên record Lead', del:'Xoá company → lead mất liên kết company (gợi ý BE: không còn Contact thì xoá lead)', n:cnt.coLead },
+  { a:'lead', b:'deal', k:'', pts:[[660,314],[840,314]], lab:[750,314], card:'1:1', name:'Deal tạo từ Lead đạt', lb:'tạo khi Đạt', field:'lead.deal_id; deal.lead_id = lead.code (Mã lead)', ui:'Hộp “Lead đạt — tạo Deal” khi chuyển lead sang Đạt; card “Deal” trên record Lead, cột “Deal” ở danh sách Leads; trường “Lead Id” trên Deal', del:'Xoá lead → Contact, Company, Deal liên kết giữ nguyên (Deal còn Mã lead)', n:cnt.leadDeal },
+  { a:'company', b:'deal', k:'', pts:[[280,496],[700,496],[700,340],[840,340]], lab:[420,496], card:'1:N', name:'Công ty của Deal', lb:'Công ty của Deal', field:'deal.company_id', ui:'Card “Companies” trên Deal, card “Deals” trên Company, mở rộng dòng ở danh sách', del:'Xoá company → deal mất công ty (giữ deal)', n:cnt.coDeal },
+  { a:'activity', b:'lead', k:'act', pts:[[560,560],[560,358]], lab:[560,436], card:'1:N', name:'Hoạt động của Lead', lb:'gắn hoạt động', field:'lead.acts[] (BE: activity_links, object = lead)', ui:'Timeline record Lead; cột “Ngày hoạt động gần nhất” ở danh sách Leads; ghi cuộc gọi / cuộc họp tự chuyển giai đoạn lead', del:'Xoá lead → xoá hoạt động của lead', n:cnt.actLead },
+  { a:'activity', b:'company', k:'act', pts:[[460,604],[180,604],[180,518]], lab:[320,604], card:'N:N', name:'Hoạt động của Company', lb:'gắn hoạt động', field:'activity_links(activity_id, object, record_id)', ui:'Timeline tab “Hoạt động”, Catch-up “Tương tác gần đây”', del:'Xoá hoạt động → gỡ khỏi mọi timeline', n:cnt.actCo },
+  { a:'activity', b:'deal', k:'act', pts:[[660,604],[800,604],[800,400],[900,400],[900,358]], lab:[800,500], card:'N:N', name:'Hoạt động của Deal', lb:'gắn hoạt động', field:'activity_links', ui:'Timeline Deal; cột “Hoạt động tiếp theo” ở bảng Deals', del:'Như trên', n:cnt.actDeal },
+  { a:'activity', b:'contact', k:'act', pts:[[520,648],[520,750],[20,750],[20,150],[80,150]], lab:[270,750], card:'N:N', name:'Hoạt động của Contact', lb:'gắn hoạt động', field:'activity_links', ui:'Timeline Contact; “Liên hệ gần nhất” tự tính từ cuộc gọi / họp', del:'Như trên', n:cnt.actCt },
+  { a:'deal', b:'lineitem', k:'', pts:[[990,358],[990,530]], lab:[990,444], card:'1:N', name:'Line item của Deal', lb:'Line items', field:'line_item.deal_id', ui:'Card “Line items” + trình sửa toàn màn hình trên Deal', del:'Xoá deal → xoá line item', n:cnt.dealLi },
+  { a:'product', b:'lineitem', k:'', pts:[[940,660],[940,618]], lab:[940,639], card:'1:N', name:'Sản phẩm của Line item', lb:'Sản phẩm', field:'line_item.product_id (sao chép tên, giá)', ui:'Thư viện sản phẩm trong trình sửa line item', del:'Xoá sản phẩm → line item giữ bản sao', n:cnt.prodLi },
 ];
 /* ── Vẽ ── */
 const svg = $('#dg');
@@ -175,7 +188,7 @@ function openP(html) { const p = $('#panel'); p.innerHTML = html; p.onclick = e 
   p.classList.add('open'); document.body.classList.add('panel-open'); document.body.classList.remove('dock'); }
 function nodePanel(k) {
   const o = N[k], es = E.filter(e => e.a === k || e.b === k);
-  const flds = k === 'sale' ? HXC.SALE_FIELDS : k === 'contact' ? HXC.CONTACT_FIELDS : k === 'company' ? HXC.COMPANY_FIELDS : k === 'deal' ? HX.FIELDS : [];
+  const flds = k === 'sale' ? HXC.SALE_FIELDS : k === 'contact' ? HXC.CONTACT_FIELDS : k === 'company' ? HXC.COMPANY_FIELDS : k === 'deal' ? HX.FIELDS : k === 'lead' ? HXL.FIELDS : [];
   openP(`<div class="pn-h"><h2>${esc(o.name)}</h2><button class="btn btn--text btn--icon" data-pclose aria-label="Đóng"><span class="ms">close</span></button></div>
     <div class="pn-b pd"><p>${esc(o.desc)}</p>
       <h3>Liên kết (${es.length})</h3><div class="al">${es.map(e => { const other = e.a === k ? e.b : e.a; return `<div><span class="ms sm" style="color:${N[other].color}">${N[other].icon}</span><button class="lk" data-go="${other}" style="color:var(--link);font-weight:600">${esc(N[other].name)}</button><span class="card-n">${e.card}</span><span class="nil" style="font-size:12px">${esc(e.name)}</span><span class="n">${e.n}</span></div>`; }).join('')}</div>
@@ -196,16 +209,16 @@ svg.addEventListener('focusout', () => hl(null));
 
 /* ── Luồng & bảng ── */
 $('#flow').innerHTML = [
-  ['Sale nhận lead', 'Sale tạo / được giao Contact (owner) và gắn Company chính. Company có owner riêng (thường là cùng sale).'],
-  ['Mở cơ hội', 'Tạo Deal từ Contact / Company: Deal tự liên kết Company + Contact (nhãn “Người quyết định”), Sale phụ trách = owner.'],
-  ['Chăm sóc & báo giá', 'Ghi hoạt động (gọi, họp, task) — mỗi hoạt động gắn cùng lúc Contact, Company, Deal. Thêm line item từ thư viện sản phẩm.'],
-  ['Chốt & đo lường', 'Deal Closed Won → Contact/Company thành Customer. Doanh số và pipeline của Sale tính từ các Deal này (trang Sales, Báo cáo).'],
+  ['Tạo lead', 'Sale tạo lead gắn với Contact và / hoặc Company có sẵn (bắt buộc ít nhất một), là Lead owner. Một contact có thể có nhiều lead.'],
+  ['Tiếp cận & đánh giá', 'Ghi cuộc gọi, cuộc họp, task trên lead — giai đoạn tự chuyển Mới → Đang liên hệ → Đã kết nối. Không phù hợp → “Không đạt” kèm lý do.'],
+  ['Lead đạt → Deal', 'Chuyển lead sang “Đạt” và tạo Deal: Deal tự liên kết Company + Contact (nhãn “Người quyết định”), ghi Mã lead, Sale phụ trách = lead owner; Contact lên Opportunity.'],
+  ['Chăm sóc & chốt', 'Ghi hoạt động trên Deal (gắn cùng lúc Contact, Company), thêm line item từ thư viện sản phẩm. Deal Closed Won → Contact/Company thành Customer; trang Sales, Báo cáo tính từ các Deal này.'],
 ].map(([t, d], i) => `<div class="fs"><b><span class="n">${i + 1}</span>${t}</b><p>${d}</p></div>`).join('');
 $('#rt').innerHTML = E.map((e, i) => `<tr data-e="${i}"><td><b>${esc(N[e.a].name)} ↔ ${esc(N[e.b].name)}</b><div class="nil" style="font-size:12px">${esc(e.name)}</div></td><td><span class="card-n">${e.card}</span></td><td><code>${esc(e.field)}</code></td><td>${esc(e.ui)}</td><td>${esc(e.del)}</td><td style="text-align:right;font-weight:700">${e.n}</td></tr>`).join('');
 $('#rt').onclick = e => { const tr = e.target.closest('tr[data-e]'); if (tr) edgePanel(+tr.dataset.e); };
 $('#pngBtn').onclick = () => { const clone = svg.cloneNode(true); clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   const css = [...document.styleSheets].map(s => { try { return [...s.cssRules].map(r => r.cssText).filter(t => /\.(eg|nd|ch)\b/.test(t)).join('\n'); } catch { return ''; } }).join('\n');
-  clone.insertAdjacentHTML('afterbegin', `<style>:root{--surface:#fff;--outline-variant:#DFE3EB;--on-surface:#213343;--on-surface-variant:#516F90;--primary:#0B5CAD;--page-bg:#F5F8FA}${css}</style><rect width="1120" height="720" fill="#F5F8FA"/>`);
+  clone.insertAdjacentHTML('afterbegin', `<style>:root{--surface:#fff;--outline-variant:#DFE3EB;--on-surface:#213343;--on-surface-variant:#516F90;--primary:#0B5CAD;--page-bg:#F5F8FA}${css}</style><rect width="1120" height="770" fill="#F5F8FA"/>`);
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([clone.outerHTML], { type:'image/svg+xml' })); a.download = 'so-do-quan-he-crm.svg'; a.click(); toast('Đã tải sơ đồ (SVG)'); };
 </script>
 </body>

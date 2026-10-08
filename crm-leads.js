@@ -33,6 +33,8 @@ const HXL = (() => {
     { key:'reason', name:'Lý do không đạt', type:'SELECT', choices:REASONS },
   ];
   const F = k => FIELDS.find(f => f.key === k);
+  // Phân quyền: sale thường không giao bản ghi cho người khác → ô owner hiện dạng chữ, giá trị = tôi
+  const lockedOwner = (label, id) => `<label>${label}<input type="hidden" id="${id}" value="${esc(ME)}"><span class="ro-v">${esc(ME)}<small>Chỉ trưởng nhóm / quản lý được giao cho sale khác</small></span></label>`;
   const ACT = { NOTE:['sticky_note_2', 'Ghi chú'], CALL:['call', 'Cuộc gọi'], TASK:['task_alt', 'Task'], MEETING:['event', 'Cuộc họp'], SYSTEM:['sync', 'Hệ thống'] };
 
   /* ── Store ── */
@@ -41,6 +43,7 @@ const HXL = (() => {
   const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
   const codeOf = (d, n) => { const x = new Date(d); return `LEAD${x.getFullYear()}${String(x.getMonth() + 1).padStart(2, '0')}${String(x.getDate()).padStart(2, '0')}${String(n).padStart(3, '0')}`; };
   function seed() {
+    const ME = HXC.SEED_ME; // dữ liệu mẫu luôn theo owner gốc, không theo người đang “đăng nhập”
     // [id, tên, contact, company, deal, giai đoạn, owner, nhãn, loại, nguồn, ngày tạo, giờ, lý do, hoạt động[]]
     const S = [
       ['ld01', 'Titan Bases — Nguyễn Long', 'ct16', 'co14', null, 'Mới', ME, 'Nóng', TYPES[0], 'Sự kiện', '2026-09-26', 15, null,
@@ -156,7 +159,7 @@ const HXL = (() => {
         <label>Giai Đoạn Pipeline <span class="req">*</span><select class="in" id="cv_stage">${HX.STAGES.filter(s => ![S.WON, S.LOST].includes(s)).map(s => `<option>${esc(s)}</option>`).join('')}</select></label>
         <label>Tổng Cash-In Dự Kiến (Amount)<input class="in" id="cv_amt" type="number" min="0"></label>
         <label>Ngày Dự Kiến Chốt<input class="in" id="cv_close" type="date"></label>
-        <label>Sale phụ trách<select class="in" id="cv_owner">${USERS.map(u => `<option ${u === (l.values.owner || ME) ? 'selected' : ''}>${esc(u)}</option>`).join('')}</select></label>
+        ${HXC.perm.canAssign() ? `<label>Sale phụ trách<select class="in" id="cv_owner">${USERS.map(u => `<option ${u === (l.values.owner || ME) ? 'selected' : ''}>${esc(u)}</option>`).join('')}</select></label>` : lockedOwner('Sale phụ trách', 'cv_owner')}
         <div class="assoc-sec"><b>Deal sẽ được liên kết với</b><div style="font-size:13px">Lead: <b>${esc(l.values.name)}</b> (${esc(l.values.code)})${ct ? `<br>Contact: <b>${esc(S.fullName(ct))}</b>` : ''}${co ? `<br>Company: <b>${esc(co.values.name)}</b>` : ''}</div></div>
         <p class="err" id="cvE" role="alert"></p></form></div>
       <div class="mf l"><button class="btn btn--primary" id="cvOk">Tạo Deal</button><button class="btn btn--secondary" data-close>Huỷ</button><button class="lk" id="cvSkip">Đạt, chưa tạo Deal</button></div></div>`, (bg, close) => {
@@ -183,7 +186,7 @@ const HXL = (() => {
           <label>Company<select class="in" id="lf_company"><option value="">— Không —</option>${companies.map(c => `<option value="${c.id}" ${c.id === opts.company ? 'selected' : ''}>${esc(c.values.name)}</option>`).join('')}</select></label></div>
         <label for="lf_name">Tên lead <span class="req">*</span><input class="in" id="lf_name" placeholder="Tự điền theo contact / công ty"></label>
         <label>Giai đoạn lead <span class="req">*</span>${sel('lf_stage', OPEN, 'Mới')}</label>
-        <label>Lead owner<select class="in" id="lf_owner"><option value="">— Chưa có owner —</option>${USERS.map(u => `<option ${u === ME ? 'selected' : ''}>${esc(u)}</option>`).join('')}</select></label>
+        ${HXC.perm.canAssign() ? `<label>Lead owner<select class="in" id="lf_owner"><option value="">— Chưa có owner —</option>${USERS.map(u => `<option ${u === ME ? 'selected' : ''}>${esc(u)}</option>`).join('')}</select></label>` : lockedOwner('Lead owner', 'lf_owner')}
         <label>Nhãn lead${sel('lf_label', LABELS)}</label>
         <label>Loại lead${sel('lf_type', TYPES, TYPES[0])}</label>
         <label>Nguồn${sel('lf_source', S.SOURCES)}</label>
@@ -207,7 +210,7 @@ const HXL = (() => {
   /* ── Thuộc tính sửa tại chỗ ── */
   function props(box, l, keys, onChange = () => {}) {
     const fs = keys.map(F).filter(f => f && (f.key !== 'reason' || l.values.stage === DISQ));
-    box.innerHTML = fs.map(f => `<div class="prop ${f.key === 'code' ? 'ro' : ''}" data-k="${f.key}"><label>${esc(f.name)}</label><div class="v">${f.key === 'owner' && !l.values.owner ? '<span class="nil">Chưa có owner</span>' : display(l.values[f.key], f)}</div></div>`).join('');
+    box.innerHTML = fs.map(f => `<div class="prop ${f.key === 'code' || (f.key === 'owner' && !HXC.perm.canAssign()) ? 'ro' : ''}" data-k="${f.key}" ${f.key === 'owner' && !HXC.perm.canAssign() ? 'title="Chỉ trưởng nhóm / quản lý được đổi owner"' : ''}><label>${esc(f.name)}</label><div class="v">${f.key === 'owner' && !l.values.owner ? '<span class="nil">Chưa có owner</span>' : display(l.values[f.key], f)}</div></div>`).join('');
     box.onclick = e => { const pr = e.target.closest('.prop'); if (!pr || pr.classList.contains('ro') || pr.querySelector('.ed,.selcell')) return;
       const f = F(pr.dataset.k), v = pr.querySelector('.v'), back = () => props(box, l, keys, onChange);
       v.replaceChildren(HX.editor(f, l.values[f.key], nv => { if (nv === l.values[f.key]) return back();
@@ -227,8 +230,9 @@ function HXLeadList() {
   const VF = { _contact:{ key:'_contact', name:'Contact', type:'TEXT' }, _company:{ key:'_company', name:'Company', type:'TEXT' }, _deal:{ key:'_deal', name:'Deal', type:'TEXT' },
     _lastact:{ key:'_lastact', name:'Ngày hoạt động gần nhất', type:'DATE' }, _created:{ key:'_created', name:'Ngày tạo', type:'DATE' } };
   const F = k => VF[k] || L.F(k);
-  const VIEWS = [['all', 'Tất cả leads'], ['open', 'Lead đang mở'], ['mine', 'Lead của tôi'], ['un', 'Lead chưa có owner']];
-  const QUICK = ['owner', 'stage', 'label', '_created'], QUICK_MORE = ['type', 'source', 'reason', '_lastact'];
+  const VIS = () => L.list().filter(x => HXC.perm.canView('lead', x)); // phân quyền: sale thường chỉ thấy lead của mình
+  const VIEWS = [['all', 'Tất cả leads'], ['open', 'Lead đang mở'], ['mine', 'Lead của tôi'], ['un', 'Lead chưa có owner']].filter(v => HXC.perm.seeAll() || !['mine', 'un'].includes(v[0]));
+  const QUICK = ['owner', 'stage', 'label', '_created'].filter(k => k !== 'owner' || HXC.perm.seeAll()), QUICK_MORE = ['type', 'source', 'reason', '_lastact'];
   const COLS = ['stage', '_contact', '_company', 'owner', 'label', '_lastact', '_created'], COLS_MORE = ['type', 'source', 'code', '_deal', 'reason'];
   const DATE_P = [['today', 'Hôm nay'], ['week', 'Tuần này'], ['month', 'Tháng này'], ['d7', '7 ngày qua'], ['d30', '30 ngày qua'], ['d90', '90 ngày qua'], ['year', 'Năm nay']];
   const st = { view:'all', q:'', f:{}, sort:{ key:'_created', dir:'desc' }, sel:new Set(), mode:'BOARD', quick:[...QUICK], cols:[...COLS], fcollapsed:false };
@@ -239,7 +243,7 @@ function HXLeadList() {
     return { today:[+d0, +d0 + day], week:[+d0 - wd * day, +d0 + day], month:[+new Date(d0.getFullYear(), d0.getMonth(), 1), +d0 + day], d7:[+d0 - 6 * day, +d0 + day], d30:[+d0 - 29 * day, +d0 + day], d90:[+d0 - 89 * day, +d0 + day], year:[+new Date(d0.getFullYear(), 0, 1), +d0 + day] }[p]; };
   const isDate = k => k === '_created' || k === '_lastact';
   function rows() {
-    let l = L.list().slice();
+    let l = VIS().slice();
     if (st.view === 'open') l = l.filter(L.isOpen);
     if (st.view === 'mine') l = l.filter(x => x.values.owner === ME);
     if (st.view === 'un') l = l.filter(x => !x.values.owner);
@@ -260,7 +264,7 @@ function HXLeadList() {
 
   /* ── Vẽ ── */
   function drawTabs() {
-    const n = k => k === 'open' ? L.list().filter(L.isOpen).length : k === 'mine' ? L.list().filter(x => x.values.owner === ME).length : k === 'un' ? L.list().filter(x => !x.values.owner).length : L.list().length;
+    const n = k => k === 'open' ? VIS().filter(L.isOpen).length : k === 'mine' ? VIS().filter(x => x.values.owner === ME).length : k === 'un' ? VIS().filter(x => !x.values.owner).length : VIS().length;
     $('#vtabs').innerHTML = VIEWS.map(([k, l]) => `<button class="vtab" role="tab" aria-selected="${st.view === k}" data-view="${k}"><span class="ms sm">${st.mode === 'BOARD' ? 'view_kanban' : 'table_rows'}</span>${l}<span class="vn">${n(k)}</span></button>`).join('')
       + `<button class="btn btn--text btn--icon" data-toast="Tạo view mới: đặt tên, chọn kiểu Bảng/Board (như màn Deals)" aria-label="Tạo view"><span class="ms sm">add</span></button>`;
   }
@@ -298,7 +302,7 @@ function HXLeadList() {
     document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === st.mode));
     document.body.classList.toggle('fcollapsed', st.fcollapsed); $('#filterBtn').setAttribute('aria-pressed', !st.fcollapsed); $('#colIc').textContent = st.fcollapsed ? 'expand_more' : 'expand_less';
     const list = rows(); st.mode === 'BOARD' ? drawBoard(list) : drawTable(list);
-    $('#count').textContent = `${L.list().length} bản ghi`; $('#footCount').textContent = `${list.length} leads`;
+    $('#count').textContent = `${VIS().length} bản ghi`; $('#footCount').textContent = `${list.length} leads`;
     $('#bulk').classList.toggle('on', st.sel.size > 0); $('#bulkN').textContent = `Đã chọn ${st.sel.size} lead`;
   }
 
@@ -388,6 +392,7 @@ function HXLeadList() {
   $('#refresh').onclick = () => { draw(); toast('Đã làm mới'); };
   $('#resetBtn').onclick = () => { Object.assign(st, { f:{}, q:'', sort:{ key:'_created', dir:'desc' }, quick:[...QUICK], cols:[...COLS] }); $('#q').value = ''; draw(); toast('Đã khôi phục view mặc định'); };
   $('#bulkCancel').onclick = () => { st.sel.clear(); draw(); };
+  if (!HXC.perm.canAssign()) $('#bulkOwner').hidden = true;
   $('#bulkOwner').onclick = e => { e.stopPropagation(); const p = openPop($('#bulkOwner'), `<div class="hd">Gán owner cho ${st.sel.size} lead</div>${HX.USERS.map(u => `<button class="mi" data-bo="${esc(u)}">${esc(u)}</button>`).join('')}`, 240);
     p.onclick = ev => { ev.stopPropagation(); const b = ev.target.closest('[data-bo]'); if (b) { [...st.sel].forEach(id => L.update(id, 'owner', b.dataset.bo)); p.classList.remove('open'); toast(`Đã gán ${b.dataset.bo} cho ${st.sel.size} lead`); st.sel.clear(); draw(); } }; };
   $('#bulkStage').onclick = e => { e.stopPropagation(); const p = openPop($('#bulkStage'), `<div class="hd">Chuyển ${st.sel.size} lead sang</div>${L.OPEN.map(s => `<button class="mi" data-bs="${esc(s)}">${esc(s)}</button>`).join('')}<div class="sep"></div><div class="nil" style="padding:6px 10px;font-size:12px">“Đạt” và “Không đạt” cần xử lý từng lead (tạo Deal / chọn lý do).</div>`, 260);
@@ -400,7 +405,8 @@ function HXLeadList() {
 function HXLeadRecord() {
   const { esc, display, toast, confirmBox, modal, $ } = HX; const L = HXL, S = HXC;
   HX.shell('leads');
-  const id = new URLSearchParams(location.search).get('id') || (L.list()[0] || {}).id; const l = L.get(id);
+  const id = new URLSearchParams(location.search).get('id') || (L.list().find(x => S.perm.canView('lead', x)) || {}).id; const l = L.get(id);
+  if (l && !S.perm.canView('lead', l)) { $('#grid').innerHTML = S.noAccess('lead', L.LIST_URL, 'Về danh sách Leads'); return; }
   if (!l) { $('#grid').innerHTML = `<div class="card" style="grid-column:1/-1;padding:32px;text-align:center"><span class="ms" style="font-size:36px">search_off</span><p><b>Không tìm thấy lead</b></p><a class="btn btn--secondary" href="${L.LIST_URL}">Về danh sách Leads</a></div>`; return; }
   let tab = 'ALL';
   const KEYS = ['stage', 'owner', 'label', 'type', 'source', 'reason', 'code'];
@@ -441,7 +447,7 @@ function HXLeadRecord() {
   }
   function drawRight() {
     const ct = L.contactOf(l), co = L.companyOf(l), d = L.dealOf(l);
-    const others = [...(ct ? L.ofContact(ct.id) : []), ...(co ? L.ofCompany(co.id) : [])].filter((x, i, a) => x.id !== l.id && a.findIndex(y => y.id === x.id) === i);
+    const others = [...(ct ? L.ofContact(ct.id) : []), ...(co ? L.ofCompany(co.id) : [])].filter((x, i, a) => x.id !== l.id && a.findIndex(y => y.id === x.id) === i && S.perm.canView('lead', x));
     const card = (title, n, body, empty) => `<section class="card"><div class="ch"><span>${title} (${n})</span></div><div class="cb">${n ? body : `<div class="ac-empty"><span class="ms">link_off</span>${empty}</div>`}</div></section>`;
     $('#right').innerHTML =
       card('Contact', ct ? 1 : 0, ct ? `<div class="ac-it"><div class="ac-top"><span class="av sm">${esc(S.initials(S.fullName(ct)))}</span><a class="ac-name" href="${S.url('contact', ct.id)}">${esc(S.fullName(ct))}</a><span class="tag pk">Primary</span></div>
